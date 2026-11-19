@@ -1164,19 +1164,48 @@
       }).catch(() => {});
   };
 
+  window.downloadPracticePdfReport = function (sessionId) {
+    const logs = getPracticeLogs();
+    const rec = logs.find(x => x.sessionId === sessionId) || logs[0];
+    if (!rec) { alert("No submitted practice mock found to export."); return; }
+    const w = window.open("", "_blank", "width=960,height=820");
+    if (!w) { alert("Please allow popups to download your PDF marksheet."); return; }
+    const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const auditItems = Array.isArray(rec.itemsAudit) ? rec.itemsAudit : [];
+    const itemsHtml = auditItems.map(it => `<div style="border:1px solid #cbd5e1;border-radius:8px;padding:10px;margin-bottom:8px;page-break-inside:avoid;"><div style="font-size:11px;font-weight:800;margin-bottom:4px;">Q${it.num}/${auditItems.length} &bull; ${esc(it.subj)} (${esc(it.chapter)}) &mdash; ${esc(it.statusLabel)}</div><div style="font-size:12px;margin-bottom:4px;white-space:pre-line;">${esc(it.prompt)}</div><div style="font-size:11px;"><strong>Your Response:</strong> ${esc(it.userText)} | <strong style="color:#047857;">Official:</strong> ${esc(it.officialText)}</div><div style="font-size:11px;background:#f8fafc;padding:5px;margin-top:4px;"><strong>Solution:</strong> ${esc(it.explanation)}</div></div>`).join("");
+    w.document.write(`<!DOCTYPE html><html><head><title>${esc(rec.sessionId)} - GOALisB Practice Marksheet</title></head><body style="font-family:system-ui,sans-serif;padding:24px;color:#0f172a;max-width:860px;margin:auto;"><div style="border-bottom:3px solid #4338ca;padding-bottom:10px;display:flex;justify-content:space-between;"><div><div style="font-size:11px;font-weight:800;color:#4338ca;">GOALisB ${IS_JEE ? "JEE" : "NEET UG"} PRACTICE ARENA</div><h1 style="margin:4px 0 0;font-size:19px;">${esc(rec.blueprint).toUpperCase()} — DIAGNOSTIC MARKSHEET</h1></div><div style="text-align:right;font-size:11px;"><div><strong>Practice ID:</strong> ${esc(rec.sessionId)}</div><div><strong>Date:</strong> ${esc(rec.timestamp)}</div><div><strong>Scope:</strong> ${esc(rec.scope)}</div></div></div><div style="margin:12px 0;padding:10px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:12px;"><div><strong>Candidate:</strong><br/>${esc(rec.candidate || "Senapati Roy")}</div><div><strong>Score:</strong><br/><strong style="color:#047857;font-size:14px;">${rec.totalScore}/${rec.maxScore}</strong></div><div><strong>Accuracy:</strong><br/>${esc(rec.accuracy)}% (${esc(rec.counts)})</div><div><strong>Time Taken:</strong><br/>${esc(rec.timeTaken)}</div></div><div style="padding-top:6px;"><h2 style="font-size:14px;margin-bottom:8px;">QUESTION-BY-QUESTION RESPONSE &amp; SOLUTION AUDIT (${auditItems.length} QUESTIONS)</h2>${itemsHtml || "<p>Detailed item audit recorded for newly submitted sessions.</p>"}</div><script>window.onload=function(){setTimeout(function(){window.print();},250);};</script></body></html>`);
+    w.document.close();
+  };
+
   window.submitPracticeMock = function () {
     const meta = getPracticeMeta();
     const paper = buildPracticePaper();
     let score = 0, c = 0, w = 0, att = 0;
-    paper.forEach((item, idx) => {
+    const itemsAudit = paper.map((item, idx) => {
       const raw = window._PM_ANS[idx];
-      if (raw !== undefined && String(raw).trim() !== "") {
+      const hasAns = raw !== undefined && String(raw).trim() !== "";
+      let statusLabel = "Unattempted (0 Marks)", userText = "(No response submitted)", isCorrect = false;
+      const officialText = (item.question_type === "NUMERICAL_INT" || !Array.isArray(item.options_json))
+        ? String(item.correct_answer)
+        : `(${String.fromCharCode(65 + Number(item.correct_answer))}) ${item.options_json[Number(item.correct_answer)] || item.correct_answer}`;
+      if (hasAns) {
         att++;
-        const ok = (item.question_type === "NUMERICAL_INT" || !Array.isArray(item.options_json))
-          ? (Number(String(raw).trim()) === Number(item.correct_answer) || String(raw).trim() === String(item.correct_answer).trim())
-          : (String(Number(raw)) === String(item.correct_answer).trim());
-        if (ok) { score += 4; c++; } else { score -= 1; w++; }
+        if (item.question_type === "NUMERICAL_INT" || !Array.isArray(item.options_json)) {
+          userText = String(raw).trim();
+          isCorrect = (Number(userText) === Number(item.correct_answer)) || (userText === String(item.correct_answer).trim());
+        } else {
+          const oi = Number(raw);
+          userText = `(${String.fromCharCode(65 + oi)}) ${item.options_json[oi] || raw}`;
+          isCorrect = (String(oi) === String(item.correct_answer).trim());
+        }
+        if (isCorrect) { score += 4; c++; statusLabel = "Correct (+4 Marks)"; }
+        else { score -= 1; w++; statusLabel = "Incorrect (-1 Mark)"; }
       }
+      return {
+        num: idx + 1, subj: item.mock_subj || meta.scope, chapter: item.chapter_name || "",
+        prompt: item.prompt || "", statusLabel, isCorrect, hasAns, userText, officialText,
+        explanation: item.explanation || ""
+      };
     });
     const unatt = paper.length - att;
     const acc = att > 0 ? ((c / att) * 100).toFixed(1) : "0.0";
@@ -1185,13 +1214,15 @@
     savePracticeLog({
       sessionId: window._PM_SERIAL,
       timestamp: new Date().toLocaleString(),
+      candidate: getCandidateName(),
       blueprint: meta.label,
       scope: meta.scope,
       totalScore: score,
       maxScore: meta.maxMarks,
       accuracy: acc,
       counts: `${c}C / ${w}W / ${unatt}U`,
-      timeTaken: Math.floor(elapsed / 60) + "m " + (elapsed % 60) + "s"
+      timeTaken: Math.floor(elapsed / 60) + "m " + (elapsed % 60) + "s",
+      itemsAudit
     });
     window.renderScienceTab5();
   };
@@ -1250,10 +1281,10 @@
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
-            <thead><tr class="border-b border-slate-200 text-[11px] font-extrabold uppercase text-slate-500"><th class="py-2 pr-3">PRACTICE ID</th><th class="py-2 pr-3">DATE &amp; TIME</th><th class="py-2 pr-3">SUBJECT BLUEPRINT</th><th class="py-2 pr-3">SCORE</th><th class="py-2 pr-3">ACCURACY</th><th class="py-2">TIME</th></tr></thead>
+            <thead><tr class="border-b border-slate-200 text-[11px] font-extrabold uppercase text-slate-500"><th class="py-2 pr-3">PRACTICE ID</th><th class="py-2 pr-3">DATE &amp; TIME</th><th class="py-2 pr-3">SUBJECT BLUEPRINT</th><th class="py-2 pr-3">SCORE</th><th class="py-2 pr-3">ACCURACY</th><th class="py-2 pr-3">TIME</th><th class="py-2">MARKSHEET</th></tr></thead>
             <tbody>
               ${!pLogs.length ? `<tr><td colspan="6" class="py-4 text-slate-500">No subject practice mocks completed yet. Select a subject above and launch a timed practice mock.</td></tr>`
-              : pLogs.map(x => `<tr class="border-b border-slate-100"><td class="py-2.5 pr-3 font-mono font-extrabold">${x.sessionId}</td><td class="py-2.5 pr-3 text-slate-600">${x.timestamp}</td><td class="py-2.5 pr-3 font-bold">${x.blueprint}</td><td class="py-2.5 pr-3 font-black text-${accent}-700">${x.totalScore} / ${x.maxScore}</td><td class="py-2.5 pr-3 font-semibold">${x.accuracy}% (${x.counts})</td><td class="py-2.5">${x.timeTaken}</td></tr>`).join("")}
+              : pLogs.map(x => `<tr class="border-b border-slate-100"><td class="py-2.5 pr-3 font-mono font-extrabold">${x.sessionId}</td><td class="py-2.5 pr-3 text-slate-600">${x.timestamp}</td><td class="py-2.5 pr-3 font-bold">${x.blueprint}</td><td class="py-2.5 pr-3 font-black text-${accent}-700">${x.totalScore} / ${x.maxScore}</td><td class="py-2.5 pr-3 font-semibold">${x.accuracy}% (${x.counts})</td><td class="py-2.5 pr-3">${x.timeTaken}</td><td class="py-2.5"><button type="button" onclick="window.downloadPracticePdfReport('${x.sessionId}');" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold cursor-pointer">Download PDF Marksheet</button></td></tr>`).join("")}
             </tbody>
           </table>
         </div>
@@ -1297,6 +1328,7 @@
               <button type="button" onclick="window.resetPracticeMock();" class="px-3.5 py-2 rounded-xl bg-rose-50 border border-rose-300 text-rose-700 text-xs font-extrabold cursor-pointer">Abort &amp; Reset</button>
               <button type="button" onclick="window.submitPracticeMock();" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold cursor-pointer">Submit Practice Mock</button>
             ` : `
+              <button type="button" onclick="window.downloadPracticePdfReport('${window._PM_SERIAL}');" class="px-4 py-2 rounded-xl bg-amber-500 text-slate-950 text-xs font-extrabold cursor-pointer">Download PDF Marksheet</button>
               <button type="button" onclick="window.resetPracticeMock();" class="px-4 py-2 rounded-xl bg-${accent}-600 text-white text-xs font-extrabold cursor-pointer">New Practice Mock</button>
             `}
           </div>
@@ -1619,6 +1651,17 @@
 
     target.innerHTML = `
       <div class="max-w-7xl mx-auto pt-4 pb-10 space-y-5">
+        ${window._PM_SUBMITTED ? (() => {
+          const latest = getPracticeLogs().find(x => x.sessionId === window._PM_SERIAL) || getPracticeLogs()[0];
+          return latest ? `
+            <div class="bg-white border-2 border-emerald-500 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+              <div>
+                <div class="text-xs font-extrabold uppercase text-emerald-700">PRACTICE MOCK SCORECARD &bull; ${latest.sessionId}</div>
+                <div class="text-xl font-black text-slate-900 mt-0.5">Score: ${latest.totalScore} / ${latest.maxScore} &bull; Accuracy: ${latest.accuracy}% (${latest.counts})</div>
+              </div>
+              <button type="button" onclick="window.downloadPracticePdfReport('${latest.sessionId}');" class="px-4 py-2.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-extrabold shadow-sm cursor-pointer">Download PDF Marksheet</button>
+            </div>` : "";
+        })() : ""}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div class="flex items-start justify-between gap-2">
