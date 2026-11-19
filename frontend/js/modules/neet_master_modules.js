@@ -524,6 +524,60 @@
     localStorage.removeItem(SYNC_KEY);
     window.renderScienceTab4();
   };
+  window.submitMockAndSync = function () {
+    const paper = buildFullMockPaper();
+    const res = evaluateMockPaper(paper);
+    window._CBT_SUBMITTED = true;
+    saveMockLog({
+      sessionId: window._MOCK_SESSION_ID,
+      timestamp: new Date().toLocaleString(),
+      candidate: getCandidateName(),
+      status: "SUBMITTED",
+      timeTaken: res.minsTaken,
+      pacePerQ: res.pacePerQ,
+      accuracy: res.accuracy,
+      verdict: res.verdict,
+      counts: `${res.totalCorrect}C / ${res.totalWrong}W / ${res.unattempted}U`,
+      totalScore: res.totalScore,
+      maxScore: IS_JEE ? 300 : 720,
+      projection: res.projection,
+      subjects: res.subjStats,
+      itemsAudit: res.itemsAudit
+    });
+    window.renderScienceTab4();
+  };
+
+  window.exitMockWithoutSubmission = function () {
+    const paper = buildFullMockPaper();
+    const res = evaluateMockPaper(paper);
+    const attemptedCount = paper.length - res.unattempted;
+    saveMockLog({
+      sessionId: window._MOCK_SESSION_ID,
+      timestamp: new Date().toLocaleString(),
+      candidate: getCandidateName(),
+      status: "EXITED_UNSUBMITTED (" + attemptedCount + "/" + paper.length + " Qs)",
+      timeTaken: res.minsTaken,
+      pacePerQ: res.pacePerQ,
+      accuracy: res.accuracy,
+      verdict: "Partial Exit — Not Synced to Tab 6",
+      counts: `${res.totalCorrect}C / ${res.totalWrong}W / ${res.unattempted}U`,
+      totalScore: res.totalScore,
+      maxScore: IS_JEE ? 300 : 720,
+      projection: "Partial Exit — Not Synced to Tab 6",
+      subjects: res.subjStats,
+      itemsAudit: res.itemsAudit
+    });
+    window._MOCK_SESSION_ID = newSessionId();
+    window._CBT_ANS = {};
+    window._CBT_REVIEW = {};
+    window._CBT_VISITED = { 0: true };
+    window._CBT_SUBMITTED = false;
+    window._CBT_SEC_LEFT = 180 * 60;
+    window._CBT_IDX = 0;
+    window.renderScienceTab4();
+  };
+
+
 
 
   window.startFreshMockReset = function () {
