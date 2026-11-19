@@ -822,145 +822,70 @@
   };
 
   // ============================================================================
-  // TAB 6: RATIONAL MULTI-SUBJECT PERCENTILE / AIR & COLLEGE FORECASTER
+  // TAB 6: SMOOTH IN-PLACE MULTI-SUBJECT PERCENTILE / AIR & COLLEGE FORECASTER
   // ============================================================================
   window._T6_JEE = { p: 76, c: 74, m: 68, shift: "MODERATE", cat: "GEN" };
   window._T6_NEET = { p: 155, c: 160, b: 175, z: 170, diff: "MODERATE", cat: "GEN" };
 
-  window.renderScienceTab6 = function (el) {
-    enforceScienceBrand();
-    const target = getTarget(el);
-    if (!target) return;
+  window.updateScienceTab6 = function () {
+    const out = document.getElementById("t6-live-results");
+    if (!out) return;
 
     if (IS_JEE) {
       const st = window._T6_JEE;
       const rawTotal = st.p + st.c + st.m;
       const shiftAdj = st.shift === "TOUGH" ? 14 : (st.shift === "EASY" ? -12 : 0);
+      const catBonus = st.cat === "SCST" ? 45 : (st.cat === "OBC" ? 14 : (st.cat === "EWS" ? 10 : 0));
       const eff = Math.min(300, Math.max(0, rawTotal + shiftAdj));
+      const cutoffEff = Math.min(300, eff + catBonus);
 
-      let pct = "92.40 %ile", air = "~68,000 – 85,000", tier = "State Govt / Top Private Engineering Colleges";
-      let colleges = [
-        { inst: "IIT Bombay / Delhi / Madras / Kanpur", branch: "CSE / MnC / EE (via JEE Adv Top 1,200)", status: eff >= 245 ? "High Readiness" : "Push Math +15" },
-        { inst: "NIT Trichy / Surathkal / Warangal", branch: "Computer Science & Engineering (CSE)", status: eff >= 235 ? "Safe Target" : (eff >= 215 ? "Borderline" : "Need +" + (235 - eff) + " Marks") },
-        { inst: "NIT Trichy / Surathkal / Rourkela / Calicut", branch: "ECE / Electrical / Mechanical", status: eff >= 195 ? "Safe Target" : "Need +" + (195 - eff) + " Marks" },
-        { inst: "IIIT Hyderabad / IIIT Bangalore / DTU / NSUT", branch: "CSE / AI & Data Science", status: eff >= 215 ? "Competitive" : "Need +" + (215 - eff) + " Marks" }
-      ];
-
+      let pct = "91.80 %ile", air = "AIR ~72,000 – 90,000", tier = "State Govt / Top Private Engineering Colleges";
       if (eff >= 265) { pct = "99.95+ %ile"; air = "AIR 350 – 850"; tier = "Top 5 IITs & NIT Trichy CSE Tier"; }
       else if (eff >= 235) { pct = "99.72 %ile"; air = "AIR 2,200 – 3,800"; tier = "NIT Trichy/Surathkal CSE & Top IIT Core"; }
       else if (eff >= 210) { pct = "99.35 %ile"; air = "AIR 6,500 – 9,200"; tier = "Top NITs (ECE/EE) & IIT Qualifying Safe"; }
       else if (eff >= 180) { pct = "98.45 %ile"; air = "AIR 16,000 – 22,000"; tier = "Top 10 NITs Core & IIITs"; }
       else if (eff >= 145) { pct = "96.20 %ile"; air = "AIR 40,000 – 52,000"; tier = "NIT North-East / IIITs / JEE Adv Cutoff Cleared"; }
+      else if (eff >= 110) { pct = "93.40 %ile"; air = "AIR 62,000 – 78,000"; tier = "JEE Advanced Borderline / State Govt Core"; }
 
-      const weakest = [["Physics", st.p], ["Chemistry", st.c], ["Mathematics", st.m]].sort((a, b) => a[1] - b[1])[0];
-      const ladder = [
-        ["260+ / 300", "99.93+ %ile", "AIR < 1,000", "NIT Trichy CSE / Top IIT Adv Contender"],
-        ["230 – 259", "99.65 – 99.92 %ile", "AIR 1,000 – 4,500", "Top 3 NITs CSE / IIIT-H & IIIT-B"],
-        ["200 – 229", "99.10 – 99.64 %ile", "AIR 4,500 – 11,500", "Top NITs ECE/EE & All-India IIITs"],
-        ["165 – 199", "97.80 – 99.09 %ile", "AIR 11,500 – 28,000", "Mid-Tier NITs / DTU / NSUT Core"],
-        ["115 – 164", "93.50 – 97.79 %ile", "AIR 28,000 – 80,000", "JEE Advanced Cutoff Qualified (Gen)"]
+      const colleges = [
+        { inst: "IIT Bombay / Delhi / Madras / Kanpur", branch: "CSE / MnC / EE (via JEE Adv Top 1,200)", status: cutoffEff >= 245 ? "High Readiness" : "Need +" + (245 - cutoffEff) + " Eq." },
+        { inst: "NIT Trichy / Surathkal / Warangal", branch: "Computer Science & Engineering (CSE)", status: cutoffEff >= 235 ? "Safe Target" : "Need +" + (235 - cutoffEff) + " Eq." },
+        { inst: "NIT Trichy / Surathkal / Rourkela / Calicut", branch: "ECE / Electrical / Mechanical", status: cutoffEff >= 195 ? "Safe Target" : "Need +" + (195 - cutoffEff) + " Eq." },
+        { inst: "IIIT Hyderabad / IIIT Bangalore / DTU / NSUT", branch: "CSE / AI & Data Science", status: cutoffEff >= 215 ? "Competitive" : "Need +" + (215 - cutoffEff) + " Eq." }
       ];
 
-      target.innerHTML = `
-        <div class="max-w-7xl mx-auto pt-4 pb-10 space-y-5">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            <!-- Left 5 Cols: Interactive PCM Score & Shift Simulator -->
-            <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
-              <div>
-                <div class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">NTA JEE MAIN &amp; ADVANCED CALIBRATOR</div>
-                <h2 class="text-xl font-extrabold text-slate-900 mt-0.5">Subject Marks &amp; Shift Simulator</h2>
-              </div>
+      const weakest = [["Physics", st.p], ["Chemistry", st.c], ["Mathematics", st.m]].sort((a, b) => a[1] - b[1])[0];
+      const diag = document.getElementById("t6-bottleneck");
+      if (diag) {
+        diag.innerHTML = `<div class="font-extrabold">Bottleneck Diagnostic: ${weakest[0]} (${weakest[1]}/100)</div>
+          <div>Eliminating just <strong>4 negative-marking errors</strong> (+20 marks) lifts your shift-normalized score to <strong>${Math.min(300, eff + 20)}/300</strong>.</div>`;
+      }
 
-              ${[["Physics", "p", st.p], ["Chemistry", "c", st.c], ["Mathematics", "m", st.m]].map(([lbl, key, val]) => `
-                <div class="space-y-1">
-                  <div class="flex justify-between text-xs font-extrabold">
-                    <span>${lbl} (out of 100)</span>
-                    <span class="text-indigo-700">${val} / 100</span>
-                  </div>
-                  <input type="range" min="0" max="100" value="${val}" oninput="window._T6_JEE.${key}=Number(this.value); window.renderScienceTab6();" class="w-full accent-indigo-600 cursor-pointer" />
-                </div>
-              `).join("")}
-
-              <div class="grid grid-cols-2 gap-3 pt-1 text-xs">
-                <div>
-                  <label class="block font-extrabold text-slate-600 mb-1">NTA Shift Normalization</label>
-                  <select onchange="window._T6_JEE.shift=this.value; window.renderScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
-                    <option value="TOUGH" ${st.shift === "TOUGH" ? "selected" : ""}>Tough Shift (+14 Marks Eq.)</option>
-                    <option value="MODERATE" ${st.shift === "MODERATE" ? "selected" : ""}>Moderate Shift (Standard)</option>
-                    <option value="EASY" ${st.shift === "EASY" ? "selected" : ""}>High-Scoring Shift (-12 Eq.)</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block font-extrabold text-slate-600 mb-1">Admission Category</label>
-                  <select onchange="window._T6_JEE.cat=this.value; window.renderScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
-                    <option value="GEN" ${st.cat === "GEN" ? "selected" : ""}>General (OPEN)</option>
-                    <option value="EWS" ${st.cat === "EWS" ? "selected" : ""}>GEN-EWS</option>
-                    <option value="OBC" ${st.cat === "OBC" ? "selected" : ""}>OBC-NCL</option>
-                    <option value="SCST" ${st.cat === "SCST" ? "selected" : ""}>SC / ST</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950 space-y-1">
-                <div class="font-extrabold">Bottleneck Diagnostic: ${weakest[0]} (${weakest[1]}/100)</div>
-                <div>Eliminating just <strong>4 negative-marking errors</strong> (+20 marks) lifts your effective score to <strong>${Math.min(300, eff + 20)}/300</strong>.</div>
-              </div>
-            </div>
-
-            <!-- Right 7 Cols: Projected Percentile, AIR & JoSAA College Matrix -->
-            <div class="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
-                  <div class="text-[10px] font-extrabold uppercase text-indigo-700">Raw / Normalized Total</div>
-                  <div class="text-2xl font-black text-slate-900 mt-0.5">${rawTotal} <span class="text-xs font-bold text-slate-500">/ 300</span></div>
-                  <div class="text-[11px] font-bold text-indigo-700 mt-0.5">Shift-Eq: ${eff}/300</div>
-                </div>
-                <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
-                  <div class="text-[10px] font-extrabold uppercase text-emerald-700">Projected NTA Percentile</div>
-                  <div class="text-2xl font-black text-emerald-900 mt-0.5">${pct}</div>
-                  <div class="text-[11px] font-bold text-emerald-700 mt-0.5">Est. CRL: ${air}</div>
-                </div>
-                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                  <div class="text-[10px] font-extrabold uppercase text-slate-500">JoSAA Admission Tier</div>
-                  <div class="text-xs font-extrabold text-slate-900 mt-1 leading-snug">${tier}</div>
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700">Target Institute &amp; Branch Readiness Matrix</div>
-                ${colleges.map(c => `
-                  <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <div>
-                      <div class="font-extrabold text-slate-900">${c.inst}</div>
-                      <div class="text-slate-600">${c.branch}</div>
-                    </div>
-                    <span class="px-3 py-1 rounded-full bg-white border border-slate-300 font-extrabold text-indigo-700">${c.status}</span>
-                  </div>
-                `).join("")}
-              </div>
-
-              <div class="overflow-x-auto pt-1">
-                <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-2">NTA JEE Main Marks vs. Percentile Calibration Ladder</div>
-                <table class="w-full text-left border-collapse text-xs">
-                  <thead>
-                    <tr class="border-b border-slate-200 text-slate-500">
-                      <th class="py-2 pr-3">Score Band</th><th class="py-2 pr-3">Percentile</th><th class="py-2 pr-3">CRL AIR</th><th class="py-2">Target Outcome</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${ladder.map(r => `
-                      <tr class="border-b border-slate-100">
-                        <td class="py-2 pr-3 font-extrabold text-slate-900">${r[0]}</td>
-                        <td class="py-2 pr-3 font-bold text-emerald-700">${r[1]}</td>
-                        <td class="py-2 pr-3 font-semibold">${r[2]}</td>
-                        <td class="py-2 text-slate-600">${r[3]}</td>
-                      </tr>
-                    `).join("")}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+      out.innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
+            <div class="text-[10px] font-extrabold uppercase text-indigo-700">Raw / Normalized Total</div>
+            <div class="text-2xl font-black text-slate-900 mt-0.5">${rawTotal} <span class="text-xs font-bold text-slate-500">/ 300</span></div>
+            <div class="text-[11px] font-bold text-indigo-700 mt-0.5">Shift-Eq: ${eff}/300</div>
           </div>
+          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+            <div class="text-[10px] font-extrabold uppercase text-emerald-700">Projected NTA Percentile</div>
+            <div class="text-2xl font-black text-emerald-900 mt-0.5">${pct}</div>
+            <div class="text-[11px] font-bold text-emerald-700 mt-0.5">Est. CRL: ${air}</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="text-[10px] font-extrabold uppercase text-slate-500">JoSAA Admission Tier (${st.cat})</div>
+            <div class="text-xs font-extrabold text-slate-900 mt-1 leading-snug">${tier}</div>
+          </div>
+        </div>
+        <div class="space-y-2 pt-2">
+          <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700">Target Institute &amp; Branch Readiness Matrix (${st.cat})</div>
+          ${colleges.map(c => `
+            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div><div class="font-extrabold text-slate-900">${c.inst}</div><div class="text-slate-600">${c.branch}</div></div>
+              <span class="px-3 py-1 rounded-full bg-white border border-slate-300 font-extrabold text-indigo-700">${c.status}</span>
+            </div>
+          `).join("")}
         </div>
       `;
     } else {
@@ -968,9 +893,11 @@
       const rawTotal = st.p + st.c + st.b + st.z;
       const bioTotal = st.b + st.z;
       const diffAdj = st.diff === "TOUGH" ? 15 : (st.diff === "EASY" ? -10 : 0);
+      const catBonus = st.cat === "SCST" ? 85 : (st.cat === "OBC" ? 12 : (st.cat === "EWS" ? 10 : 0));
       const eff = Math.min(720, Math.max(0, rawTotal + diffAdj));
+      const quotaEff = Math.min(720, eff + catBonus);
 
-      let air = "AIR ~38,000 – 52,000", tier = "State Quota / Semi-Govt MBBS & BDS";
+      let air = "AIR ~45,000 – 68,000", tier = "State Quota / Semi-Govt MBBS & BDS";
       if (eff >= 705) { air = "AIR 1 – 150"; tier = "AIIMS New Delhi / MAMC / VMMC Delhi"; }
       else if (eff >= 685) { air = "AIR 400 – 1,800"; tier = "Top AIIMS (Bhopal, Jodhpur, Rishikesh) & JIPMER"; }
       else if (eff >= 660) { air = "AIR 2,800 – 6,500"; tier = "Premier State Govt Medical Colleges (AIQ)"; }
@@ -978,123 +905,165 @@
       else if (eff >= 595) { air = "AIR 26,000 – 42,000"; tier = "State Quota Govt MBBS (85% Domicile)"; }
 
       const colleges = [
-        { inst: "AIIMS New Delhi / MAMC / VMMC", quota: "All India Quota (15%) • Target 700+", status: eff >= 700 ? "Safe Contender" : "Need +" + (700 - eff) + " Marks" },
-        { inst: "AIIMS Bhopal / Jodhpur / Bhubaneswar / JIPMER", quota: "All India Quota (15%) • Target 680+", status: eff >= 680 ? "Safe Contender" : "Need +" + (680 - eff) + " Marks" },
-        { inst: "Top State Govt Medical Colleges (GMC)", quota: "AIQ & 85% State Quota • Target 645+", status: eff >= 645 ? "High Probability" : "Need +" + (645 - eff) + " Marks" },
-        { inst: "Govt MBBS Seat (General / EWS / OBC)", quota: "85% State Quota • Target 610+", status: eff >= 610 ? "Within Cutoff" : "Need +" + (610 - eff) + " Marks" }
+        { inst: "AIIMS New Delhi / MAMC / VMMC", quota: "All India Quota (15%) • Target 700+", status: quotaEff >= 700 ? "Safe Contender" : "Need +" + (700 - quotaEff) + " Marks" },
+        { inst: "AIIMS Bhopal / Jodhpur / Bhubaneswar / JIPMER", quota: "All India Quota (15%) • Target 680+", status: quotaEff >= 680 ? "Safe Contender" : "Need +" + (680 - quotaEff) + " Marks" },
+        { inst: "Top State Govt Medical Colleges (GMC)", quota: "AIQ & 85% State Quota • Target 645+", status: quotaEff >= 645 ? "High Probability" : "Need +" + (645 - quotaEff) + " Marks" },
+        { inst: "Govt MBBS Seat (" + st.cat + " Quota)", quota: "85% State Quota • Target 610+", status: quotaEff >= 610 ? "Within Cutoff" : "Need +" + (610 - quotaEff) + " Marks" }
       ];
 
       const weakest = [["Physics", st.p], ["Chemistry", st.c], ["Botany", st.b], ["Zoology", st.z]].sort((a, b) => a[1] - b[1])[0];
-      const ladder = [
-        ["700 – 720", "AIR 1 – 350", "AIIMS New Delhi / MAMC / JIPMER"],
-        ["680 – 699", "AIR 350 – 2,500", "AIIMS Bhopal, Jodhpur, Rishikesh & Top GMCs"],
-        ["650 – 679", "AIR 2,500 – 10,500", "Premier State Govt Medical Colleges (AIQ)"],
-        ["615 – 649", "AIR 10,500 – 28,000", "Govt MBBS Seats (AIQ & State Quota)"],
-        ["575 – 614", "AIR 28,000 – 55,000", "State Domicile MBBS / Semi-Govt Quota"]
-      ];
+      const diag = document.getElementById("t6-bottleneck");
+      if (diag) {
+        diag.innerHTML = `<div class="font-extrabold">Biology Anchor: ${bioTotal}/360 &bull; Weakest Subject: ${weakest[0]} (${weakest[1]}/180)</div>
+          <div>Avoiding just <strong>5 NCERT Assertion-Reason traps</strong> (+25 marks) boosts your effective score to <strong>${Math.min(720, eff + 25)}/720</strong>.</div>`;
+      }
 
-      target.innerHTML = `
-        <div class="max-w-7xl mx-auto pt-4 pb-10 space-y-5">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            <!-- Left 5 Cols: Interactive PCB 720-Mark Calibrator -->
-            <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
-              <div>
-                <div class="text-xs font-extrabold uppercase tracking-wider text-emerald-600">NTA NEET UG 720-MARK CALIBRATOR</div>
-                <h2 class="text-xl font-extrabold text-slate-900 mt-0.5">PCB Subject Marks &amp; AIR Simulator</h2>
-              </div>
-
-              ${[["Physics", "p", st.p], ["Chemistry", "c", st.c], ["Botany", "b", st.b], ["Zoology", "z", st.z]].map(([lbl, key, val]) => `
-                <div class="space-y-1">
-                  <div class="flex justify-between text-xs font-extrabold">
-                    <span>${lbl} (out of 180)</span>
-                    <span class="text-emerald-700">${val} / 180</span>
-                  </div>
-                  <input type="range" min="0" max="180" value="${val}" oninput="window._T6_NEET.${key}=Number(this.value); window.renderScienceTab6();" class="w-full accent-emerald-600 cursor-pointer" />
-                </div>
-              `).join("")}
-
-              <div class="grid grid-cols-2 gap-3 pt-1 text-xs">
-                <div>
-                  <label class="block font-extrabold text-slate-600 mb-1">Paper Difficulty Level</label>
-                  <select onchange="window._T6_NEET.diff=this.value; window.renderScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
-                    <option value="TOUGH" ${st.diff === "TOUGH" ? "selected" : ""}>Tough Paper (+15 Eq.)</option>
-                    <option value="MODERATE" ${st.diff === "MODERATE" ? "selected" : ""}>Standard NTA Paper</option>
-                    <option value="EASY" ${st.diff === "EASY" ? "selected" : ""}>High-Cutoff Paper (-10 Eq.)</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block font-extrabold text-slate-600 mb-1">Counselling Quota</label>
-                  <select onchange="window._T6_NEET.cat=this.value; window.renderScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
-                    <option value="GEN" ${st.cat === "GEN" ? "selected" : ""}>AIQ / State General</option>
-                    <option value="EWS" ${st.cat === "EWS" ? "selected" : ""}>GEN-EWS</option>
-                    <option value="OBC" ${st.cat === "OBC" ? "selected" : ""}>OBC-NCL</option>
-                    <option value="SCST" ${st.cat === "SCST" ? "selected" : ""}>SC / ST</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950 space-y-1">
-                <div class="font-extrabold">Biology Anchor: ${bioTotal}/360 &bull; Weakest Subject: ${weakest[0]} (${weakest[1]}/180)</div>
-                <div>Avoiding just <strong>5 NCERT Assertion-Reason traps</strong> (+25 marks) boosts your score to <strong>${Math.min(720, eff + 25)}/720</strong>.</div>
-              </div>
-            </div>
-
-            <!-- Right 7 Cols: Projected AIR & AIIMS/GMC Readiness Matrix -->
-            <div class="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
-                  <div class="text-[10px] font-extrabold uppercase text-emerald-700">Total NEET Score</div>
-                  <div class="text-2xl font-black text-slate-900 mt-0.5">${rawTotal} <span class="text-xs font-bold text-slate-500">/ 720</span></div>
-                  <div class="text-[11px] font-bold text-emerald-700 mt-0.5">Biology: ${bioTotal}/360</div>
-                </div>
-                <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
-                  <div class="text-[10px] font-extrabold uppercase text-indigo-700">Projected All India Rank</div>
-                  <div class="text-xl font-black text-indigo-950 mt-0.5">${air}</div>
-                  <div class="text-[11px] font-bold text-indigo-700 mt-0.5">MCC / State Counselling</div>
-                </div>
-                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                  <div class="text-[10px] font-extrabold uppercase text-slate-500">Medical College Tier</div>
-                  <div class="text-xs font-extrabold text-slate-900 mt-1 leading-snug">${tier}</div>
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700">AIIMS &amp; Government Medical College Readiness</div>
-                ${colleges.map(c => `
-                  <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <div>
-                      <div class="font-extrabold text-slate-900">${c.inst}</div>
-                      <div class="text-slate-600">${c.quota}</div>
-                    </div>
-                    <span class="px-3 py-1 rounded-full bg-white border border-slate-300 font-extrabold text-emerald-700">${c.status}</span>
-                  </div>
-                `).join("")}
-              </div>
-
-              <div class="overflow-x-auto pt-1">
-                <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-2">NTA NEET UG Marks vs. AIR Calibration Ladder</div>
-                <table class="w-full text-left border-collapse text-xs">
-                  <thead>
-                    <tr class="border-b border-slate-200 text-slate-500">
-                      <th class="py-2 pr-3">Score Band (720)</th><th class="py-2 pr-3">Projected AIR</th><th class="py-2">Medical College Allocation</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${ladder.map(r => `
-                      <tr class="border-b border-slate-100">
-                        <td class="py-2 pr-3 font-extrabold text-slate-900">${r[0]}</td>
-                        <td class="py-2 pr-3 font-bold text-emerald-700">${r[1]}</td>
-                        <td class="py-2 text-slate-600">${r[2]}</td>
-                      </tr>
-                    `).join("")}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+      out.innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+            <div class="text-[10px] font-extrabold uppercase text-emerald-700">Total NEET Score</div>
+            <div class="text-2xl font-black text-slate-900 mt-0.5">${rawTotal} <span class="text-xs font-bold text-slate-500">/ 720</span></div>
+            <div class="text-[11px] font-bold text-emerald-700 mt-0.5">Biology: ${bioTotal}/360</div>
           </div>
+          <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
+            <div class="text-[10px] font-extrabold uppercase text-indigo-700">Projected All India Rank</div>
+            <div class="text-xl font-black text-indigo-950 mt-0.5">${air}</div>
+            <div class="text-[11px] font-bold text-indigo-700 mt-0.5">MCC / State (${st.cat})</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="text-[10px] font-extrabold uppercase text-slate-500">Medical College Tier</div>
+            <div class="text-xs font-extrabold text-slate-900 mt-1 leading-snug">${tier}</div>
+          </div>
+        </div>
+        <div class="space-y-2 pt-2">
+          <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700">AIIMS &amp; Government Medical College Readiness (${st.cat})</div>
+          ${colleges.map(c => `
+            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div><div class="font-extrabold text-slate-900">${c.inst}</div><div class="text-slate-600">${c.quota}</div></div>
+              <span class="px-3 py-1 rounded-full bg-white border border-slate-300 font-extrabold text-emerald-700">${c.status}</span>
+            </div>
+          `).join("")}
         </div>
       `;
     }
+  };
+
+  window.syncT6Val = function (key, rawVal) {
+    const maxV = IS_JEE ? 100 : 180;
+    const v = Math.min(maxV, Math.max(0, Math.round(Number(rawVal) || 0)));
+    if (IS_JEE) window._T6_JEE[key] = v;
+    else window._T6_NEET[key] = v;
+    const rEl = document.getElementById("t6-rng-" + key);
+    const nEl = document.getElementById("t6-num-" + key);
+    if (rEl && Number(rEl.value) !== v) rEl.value = v;
+    if (nEl && Number(nEl.value) !== v) nEl.value = v;
+    window.updateScienceTab6();
+  };
+
+  window.renderScienceTab6 = function (el) {
+    enforceScienceBrand();
+    const target = getTarget(el);
+    if (!target) return;
+
+    const accent = IS_JEE ? "indigo" : "emerald";
+    const maxSub = IS_JEE ? 100 : 180;
+    const rows = IS_JEE
+      ? [["Physics", "p", window._T6_JEE.p], ["Chemistry", "c", window._T6_JEE.c], ["Mathematics", "m", window._T6_JEE.m]]
+      : [["Physics", "p", window._T6_NEET.p], ["Chemistry", "c", window._T6_NEET.c], ["Botany", "b", window._T6_NEET.b], ["Zoology", "z", window._T6_NEET.z]];
+
+    const ladder = IS_JEE ? [
+      ["260+ / 300", "99.93+ %ile", "AIR < 1,000", "NIT Trichy CSE / Top IIT Adv Contender"],
+      ["230 – 259", "99.65 – 99.92 %ile", "AIR 1,000 – 4,500", "Top 3 NITs CSE / IIIT-H & IIIT-B"],
+      ["200 – 229", "99.10 – 99.64 %ile", "AIR 4,500 – 11,500", "Top NITs ECE/EE & All-India IIITs"],
+      ["165 – 199", "97.80 – 99.09 %ile", "AIR 11,500 – 28,000", "Mid-Tier NITs / DTU / NSUT Core"],
+      ["115 – 164", "93.50 – 97.79 %ile", "AIR 28,000 – 80,000", "JEE Advanced Cutoff Qualified (Gen)"]
+    ] : [
+      ["700 – 720", "AIR 1 – 350", "AIIMS New Delhi / MAMC / JIPMER"],
+      ["680 – 699", "AIR 350 – 2,500", "AIIMS Bhopal, Jodhpur, Rishikesh & Top GMCs"],
+      ["650 – 679", "AIR 2,500 – 10,500", "Premier State Govt Medical Colleges (AIQ)"],
+      ["615 – 649", "AIR 10,500 – 28,000", "Govt MBBS Seats (AIQ & State Quota)"],
+      ["575 – 614", "AIR 28,000 – 55,000", "State Domicile MBBS / Semi-Govt Quota"]
+    ];
+
+    target.innerHTML = `
+      <div class="max-w-7xl mx-auto pt-4 pb-10 space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+            <div>
+              <div class="text-xs font-extrabold uppercase tracking-wider text-${accent}-600">${IS_JEE ? "NTA JEE MAIN & ADVANCED CALIBRATOR" : "NTA NEET UG 720-MARK CALIBRATOR"}</div>
+              <h2 class="text-xl font-extrabold text-slate-900 mt-0.5">${IS_JEE ? "Subject Marks & Shift Simulator" : "PCB Subject Marks & AIR Simulator"}</h2>
+            </div>
+
+            ${rows.map(([lbl, key, val]) => `
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs font-extrabold">
+                  <span>${lbl} (0 – ${maxSub})</span>
+                  <div class="flex items-center gap-1">
+                    <input id="t6-num-${key}" type="number" min="0" max="${maxSub}" value="${val}"
+                      oninput="window.syncT6Val('${key}', this.value);"
+                      class="w-16 rounded-lg border border-slate-300 px-2 py-1 text-right font-mono font-extrabold text-${accent}-700" />
+                    <span class="text-slate-500">/ ${maxSub}</span>
+                  </div>
+                </div>
+                <input id="t6-rng-${key}" type="range" min="0" max="${maxSub}" step="1" value="${val}"
+                  oninput="window.syncT6Val('${key}', this.value);"
+                  class="w-full accent-${accent}-600 cursor-pointer" />
+              </div>
+            `).join("")}
+
+            <div class="grid grid-cols-2 gap-3 pt-1 text-xs">
+              <div>
+                <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "NTA Shift Normalization" : "Paper Difficulty Level"}</label>
+                <select onchange="if(${IS_JEE}) window._T6_JEE.shift=this.value; else window._T6_NEET.diff=this.value; window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
+                  <option value="TOUGH">Tough Paper (+${IS_JEE ? 14 : 15} Eq.)</option>
+                  <option value="MODERATE" selected>Standard NTA Paper</option>
+                  <option value="EASY">High-Cutoff Paper (-${IS_JEE ? 12 : 10} Eq.)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "Admission Category" : "Counselling Quota"}</label>
+                <select onchange="if(${IS_JEE}) window._T6_JEE.cat=this.value; else window._T6_NEET.cat=this.value; window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
+                  <option value="GEN" selected>General (OPEN)</option>
+                  <option value="EWS">GEN-EWS</option>
+                  <option value="OBC">OBC-NCL</option>
+                  <option value="SCST">SC / ST</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="t6-bottleneck" class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950 space-y-1"></div>
+          </div>
+
+          <div class="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+            <div id="t6-live-results" class="space-y-4"></div>
+
+            <div class="overflow-x-auto pt-2 border-t border-slate-100">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-2">${IS_JEE ? "NTA JEE Main Marks vs. Percentile Calibration Ladder" : "NTA NEET UG Marks vs. AIR Calibration Ladder"}</div>
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-slate-200 text-slate-500">
+                    ${IS_JEE
+                      ? '<th class="py-2 pr-3">Score Band</th><th class="py-2 pr-3">Percentile</th><th class="py-2 pr-3">CRL AIR</th><th class="py-2">Target Outcome</th>'
+                      : '<th class="py-2 pr-3">Score Band (720)</th><th class="py-2 pr-3">Projected AIR</th><th class="py-2">Medical College Allocation</th>'}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${ladder.map(r => `
+                    <tr class="border-b border-slate-100">
+                      <td class="py-2 pr-3 font-extrabold text-slate-900">${r[0]}</td>
+                      <td class="py-2 pr-3 font-bold text-emerald-700">${r[1]}</td>
+                      <td class="py-2 ${IS_JEE ? 'pr-3 font-semibold' : 'text-slate-600'}">${r[2]}</td>
+                      ${IS_JEE ? `<td class="py-2 text-slate-600">${r[3]}</td>` : ""}
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    window.updateScienceTab6();
   };
 
 
