@@ -717,34 +717,10 @@
   };
 
   // ============================================================================
-  // TAB 5: TRAP DOCTOR & AI CONCEPT/DERIVATION DOUBT STUDIO
+  // TAB 5: TRAP DOCTOR (20 TRAPS/SUBJECT) & AI CONCEPT/DERIVATION DOUBT STUDIO
   // ============================================================================
   window._T5_SUBJ = "ALL";
-  window._T5_HISTORY = window._T5_HISTORY || [];
-
-  const JEE_TRAPS = [
-    { subj: "PHYSICS", title: "Dielectric Insertion: Battery Connected vs. Disconnected", trap: "Assuming stored energy U always increases by factor K when a dielectric slab is inserted.", fix: "Battery CONNECTED => V is constant, so C -> K*C, Q -> K*Q, and U -> K*U. Battery DISCONNECTED => Q is constant, so V -> V/K, E -> E/K, and U -> U/K (decreases K times)." },
-    { subj: "PHYSICS", title: "Pure Rolling Static Friction Direction & Work", trap: "Assuming static friction always opposes linear motion and dissipates mechanical energy.", fix: "In pure rolling (v_cm = omega*R), the contact point is instantaneously at rest so static friction does ZERO net work. Up an incline or down an incline without external torque, static friction points UP the incline." },
-    { subj: "PHYSICS", title: "Series LCR Resonance Voltage Magnification", trap: "Thinking individual V_L or V_C cannot exceed the applied AC source voltage V_rms.", fix: "At resonance (X_L = X_C), V_L and V_C are 180 degrees out of phase and cancel each other, so Z = R, while V_L = V_C = Q * V_rms can exceed source voltage by the Quality Factor Q." },
-    { subj: "CHEMISTRY", title: "10^(-8) M Strong Acid pH Calculation", trap: "Writing pH = -log10(10^-8) = 8.00 for a dilute HCl solution.", fix: "An acidic solution in water at 298 K can NEVER have pH >= 7. Include water auto-ionization: [H+] = 10^-8 + 10^-7 = 1.1e-7 M => pH = 6.96." },
-    { subj: "CHEMISTRY", title: "Halogens in Electrophilic Aromatic Substitution", trap: "Assuming ring-deactivating groups always direct incoming electrophiles to the meta position.", fix: "Halogens (-F, -Cl, -Br, -I) deactivate the benzene ring via strong -I inductive withdrawal, yet direct ORTHO/PARA via +M lone-pair resonance." },
-    { subj: "CHEMISTRY", title: "Solids & Liquids in Kp = Kc*(RT)^(Delta n_g)", trap: "Counting moles of CaCO3(s) or H2O(l) when calculating gaseous mole change Delta n_g.", fix: "Count STRICTLY gaseous reactants and products in Delta n_g, and always convert temperature T to Kelvin." },
-    { subj: "MATHEMATICS", title: "Adjoint & Scalar Determinant Scaling |adj A| & |kA|", trap: "Writing |k*A| = k*|A| or |adj A| = |A| for an n x n square matrix.", fix: "For order n: |k*A| = k^n * |A|, |adj A| = |A|^(n-1), and |adj(adj A)| = |A|^((n-1)^2)." },
-    { subj: "MATHEMATICS", title: "Definite Integral vs. Geometric Area", trap: "Evaluating integral_0^(2pi) sin(x) dx = 0 and reporting area bounded by y = sin(x) as 0.", fix: "Algebraic definite integral cancels signed lobes, whereas geometric area integrates |f(x)|: integral_0^pi sin(x) dx + |integral_pi^(2pi) sin(x) dx| = 2 + 2 = 4." },
-    { subj: "MATHEMATICS", title: "AM >= GM Positivity Domain Requirement", trap: "Applying AM >= GM directly to x + 1/x without checking whether x > 0.", fix: "AM >= GM holds strictly for positive real numbers (x > 0 => min = 2). For x < 0, x + 1/x <= -2 (maximum is -2)." }
-  ];
-
-  const NEET_TRAPS = [
-    { subj: "BOTANY", title: "Polymerase Synthesis Direction vs. Template Reading", trap: "Confusing template strand polarity (3' -> 5') with the direction of polymerization.", fix: "ALL DNA and RNA polymerases catalyze polymerization strictly in the 5' -> 3' direction. The mRNA sequence matches the coding strand (with U replacing T)." },
-    { subj: "BOTANY", title: "Eukaryotic RNA Polymerases I, II, and III", trap: "Mixing up which eukaryotic RNA polymerase transcribes tRNA vs. rRNA.", fix: "RNA Pol I = rRNAs (28S, 18S, 5.8S); RNA Pol II = hnRNA (mRNA precursor); RNA Pol III = tRNA, 5srRNA, and snRNAs." },
-    { subj: "BOTANY", title: "Stroma Lamellae & Cyclic Photophosphorylation", trap: "Assuming cyclic photophosphorylation generates both ATP and NADPH.", fix: "Stroma lamellae lack BOTH PS II and NADP reductase enzyme; hence cyclic photophosphorylation synthesizes ONLY ATP (no NADPH, no O2 evolution)." },
-    { subj: "BOTANY", title: "Aquatic Plants Pollination (Water Hyacinth & Water Lily)", trap: "Assuming all aquatic angiosperms are pollinated by water (hydrophily).", fix: "NCERT classic trap: Water hyacinth and water lily emerge above water and are pollinated by INSECTS or WIND." },
-    { subj: "ZOOLOGY", title: "Loop of Henle Descending vs. Ascending Limb Permeability", trap: "Reversing water and electrolyte permeability of the two limbs of Henle's loop.", fix: "Descending limb is permeable to WATER (impermeable to electrolytes); Ascending limb is impermeable to WATER (transports NaCl out)." },
-    { subj: "ZOOLOGY", title: "Sarcomere Band Changes During Muscle Contraction", trap: "Thinking the A-band shortens along with the I-band during contraction.", fix: "The anisotropic A-band (thick myosin filament length) REMAINS CONSTANT; the I-band and H-zone shorten and Z-lines move closer." },
-    { subj: "ZOOLOGY", title: "100 mL Blood O2 vs. CO2 Delivery Constants", trap: "Confusing 5 mL O2 delivery with 4 mL CO2 delivery per 100 mL blood.", fix: "100 mL oxygenated blood delivers ~5 mL O2 to tissues; 100 mL deoxygenated blood delivers ~4 mL CO2 to alveoli." },
-    { subj: "CHEMISTRY", title: "10^(-8) M Strong Acid pH Calculation", trap: "Writing pH = 8 for 10^(-8) M HCl.", fix: "Include water auto-ionization [H+] = 10^-8 + 10^-7 = 1.1e-7 M => pH = 6.96 (always < 7 for an acid)." },
-    { subj: "PHYSICS", title: "Dielectric Insertion: Battery Connected vs. Isolated", trap: "Forgetting whether V or Q is held constant during dielectric insertion.", fix: "Battery connected => V constant (U -> K*U); Battery disconnected => Q constant (U -> U/K)." }
-  ];
+  window._T5_QUERY = "";
 
   window.renderScienceTab5 = function (el) {
     const accent = IS_JEE ? "indigo" : "emerald";
@@ -752,9 +728,13 @@
     const target = getTarget(el);
     if (!target) return;
 
-    const traps = IS_JEE ? JEE_TRAPS : NEET_TRAPS;
+    const traps = IS_JEE ? (window.JEE_TRAPS_BANK || []) : (window.NEET_TRAPS_BANK || []);
     const subjs = IS_JEE ? ["ALL", "PHYSICS", "CHEMISTRY", "MATHEMATICS"] : ["ALL", "BOTANY", "ZOOLOGY", "CHEMISTRY", "PHYSICS"];
-    const visibleTraps = traps.filter(t => window._T5_SUBJ === "ALL" || t.subj === window._T5_SUBJ);
+    const qLower = String(window._T5_QUERY || "").trim().toLowerCase();
+    const visibleTraps = traps.filter(t =>
+      (window._T5_SUBJ === "ALL" || t.subj === window._T5_SUBJ) &&
+      (!qLower || t.title.toLowerCase().includes(qLower) || t.trap.toLowerCase().includes(qLower) || t.fix.toLowerCase().includes(qLower))
+    );
     const samplePrompts = IS_JEE ? [
       "Derive the minimum coefficient of static friction required for pure rolling of a solid sphere down an incline of angle theta.",
       "Why is chlorobenzene less reactive than benzene toward electrophilic substitution yet ortho/para directing?",
@@ -767,22 +747,29 @@
 
     target.innerHTML = `
       <div class="max-w-7xl mx-auto pt-4 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <!-- Left 7 Cols: Curated NTA Trap Doctor Matrix -->
+        <!-- Left 7 Cols: Curated NTA Trap Doctor Matrix (20 per Subject) -->
         <div class="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <div class="text-xs font-extrabold uppercase tracking-wider text-rose-600">NEGATIVE-MARKING PREVENTION CLINIC (-1 TRAP DOCTOR)</div>
+              <div class="text-xs font-extrabold uppercase tracking-wider text-rose-600">NEGATIVE-MARKING PREVENTION CLINIC (${traps.length} NTA TRAPS &bull; 20/SUBJECT)</div>
               <h2 class="text-xl font-extrabold text-slate-900 mt-0.5">High-Frequency NTA Concept Traps</h2>
             </div>
-            <div class="flex flex-wrap gap-1.5">
-              ${subjs.map(s => `
-                <button type="button" onclick="window._T5_SUBJ='${s}'; window.renderScienceTab5();"
-                  class="px-3 py-1 rounded-full text-xs font-bold cursor-pointer ${window._T5_SUBJ === s ? `bg-${accent}-600 text-white` : "bg-slate-100 text-slate-700 hover:bg-slate-200"}">${s}</button>
-              `).join("")}
-            </div>
+            <input type="text" value="${String(window._T5_QUERY || "").replace(/"/g, '&quot;')}" oninput="window._T5_QUERY=this.value; window.renderScienceTab5();"
+              placeholder="Search traps (e.g., Nernst, Henle, EcoRI, rolling)..."
+              class="w-full sm:w-64 rounded-xl border border-slate-300 px-3 py-1.5 text-xs font-medium" />
           </div>
 
-          <div class="space-y-3">
+          <div class="flex flex-wrap gap-1.5">
+            ${subjs.map(s => {
+              const cnt = s === "ALL" ? traps.length : traps.filter(x => x.subj === s).length;
+              return `
+                <button type="button" onclick="window._T5_SUBJ='${s}'; window.renderScienceTab5();"
+                  class="px-3 py-1 rounded-full text-xs font-bold cursor-pointer ${window._T5_SUBJ === s ? `bg-${accent}-600 text-white` : "bg-slate-100 text-slate-700 hover:bg-slate-200"}">${s} (${cnt})</button>
+              `;
+            }).join("")}
+          </div>
+
+          <div class="space-y-3 max-h-[760px] overflow-y-auto pr-1">
             ${visibleTraps.map((item, idx) => `
               <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-2 text-xs">
                 <div class="flex items-center justify-between gap-2">
@@ -803,7 +790,6 @@
             `).join("")}
           </div>
         </div>
-
         <!-- Right 5 Cols: Interactive AI Doubt & Derivation Solver -->
         <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm h-fit">
           <div>
