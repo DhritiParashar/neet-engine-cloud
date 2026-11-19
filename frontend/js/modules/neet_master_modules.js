@@ -691,6 +691,7 @@
       window.renderScienceTab4();
       return;
     }
+    // Abort unsubmitted run cleanly WITHOUT logging to Full-Mock Ledger or Tab 6
     window._MOCK_SERIAL_ID = newSerialId();
     window._CBT_STARTED = false;
     window._CBT_ANS = {};
@@ -717,14 +718,87 @@
   window.downloadMockPdfReport = function (sessionId) {
     const logs = getVerifiedFullMockLogs();
     const rec = logs.find(x => x.sessionId === sessionId) || logs[0];
-    if (!rec) { alert("Only submitted Full-Length Mocks generate an Official Marksheet PDF."); return; }
+    if (!rec) {
+      alert("Only completed & officially submitted Full-Length Mocks generate an Official Marksheet PDF.");
+      return;
+    }
     const w = window.open("", "_blank", "width=960,height=820");
-    if (!w) { alert("Please allow popups to download your PDF marksheet."); return; }
+    if (!w) {
+      alert("Please allow popups for this site to download your PDF marksheet.");
+      return;
+    }
     const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    const subjRows = Object.entries(rec.subjects || {}).map(([k, v]) => `<tr><td style="padding:8px;border:1px solid #cbd5e1;font-weight:700;">${esc(k)}</td><td style="padding:8px;border:1px solid #cbd5e1;font-weight:800;">${v.s} / ${v.max}</td><td style="padding:8px;border:1px solid #cbd5e1;color:#047857;">${v.c} (+${v.c * 4})</td><td style="padding:8px;border:1px solid #cbd5e1;color:#be123c;">${v.w} (-${v.w})</td></tr>`).join("");
+    const subjRows = Object.entries(rec.subjects || {}).map(([k, v]) => `
+      <tr>
+        <td style="padding:8px;border:1px solid #cbd5e1;font-weight:700;">${esc(k)}</td>
+        <td style="padding:8px;border:1px solid #cbd5e1;font-weight:800;">${v.s} / ${v.max}</td>
+        <td style="padding:8px;border:1px solid #cbd5e1;color:#047857;">${v.c} (+${v.c * 4})</td>
+        <td style="padding:8px;border:1px solid #cbd5e1;color:#be123c;">${v.w} (-${v.w})</td>
+      </tr>
+    `).join("");
+
     const auditItems = Array.isArray(rec.itemsAudit) ? rec.itemsAudit : [];
-    const itemsHtml = auditItems.map(it => `<div style="border:1px solid #cbd5e1;border-radius:8px;padding:10px;margin-bottom:8px;page-break-inside:avoid;"><div style="font-size:11px;font-weight:800;margin-bottom:4px;">Q${it.num}/${auditItems.length} &bull; ${esc(it.subj)} (${esc(it.chapter)}) &mdash; ${esc(it.statusLabel)}</div><div style="font-size:12px;margin-bottom:4px;white-space:pre-line;">${esc(it.prompt)}</div><div style="font-size:11px;"><strong>Your Response:</strong> ${esc(it.userText)} | <strong style="color:#047857;">Official:</strong> ${esc(it.officialText)}</div><div style="font-size:11px;background:#f8fafc;padding:5px;margin-top:4px;"><strong>Solution:</strong> ${esc(it.explanation)}</div></div>`).join("");
-    w.document.write(`<!DOCTYPE html><html><head><title>${esc(rec.sessionId)} - GOALisB Diagnostic Marksheet</title></head><body style="font-family:system-ui,sans-serif;padding:24px;color:#0f172a;max-width:860px;margin:auto;"><div style="border-bottom:3px solid #4338ca;padding-bottom:10px;display:flex;justify-content:space-between;"><div><div style="font-size:11px;font-weight:800;color:#4338ca;">GOALisB ${IS_JEE ? "JEE" : "NEET UG"} ENGINE</div><h1 style="margin:4px 0 0;font-size:19px;">OFFICIAL FULL-MOCK DIAGNOSTIC MARKSHEET</h1></div><div style="text-align:right;font-size:11px;"><div><strong>Serial ID:</strong> ${esc(rec.sessionId)}</div><div><strong>Date:</strong> ${esc(rec.timestamp)}</div><div><strong>Verified:</strong> ${REQUIRED_QS} Qs</div></div></div><div style="margin:12px 0;padding:10px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:12px;"><div><strong>Candidate:</strong><br/>${esc(rec.candidate)}</div><div><strong>Score:</strong><br/><strong style="color:#047857;font-size:14px;">${rec.totalScore}/${rec.maxScore}</strong></div><div><strong>Accuracy:</strong><br/>${esc(rec.accuracy)}% (${esc(rec.counts)})</div><div><strong>Time/Pace:</strong><br/>${esc(rec.timeTaken)} (${esc(rec.pacePerQ)})</div></div><div style="margin-bottom:12px;padding:10px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:8px;font-size:12px;"><strong>Verified Standing:</strong> ${esc(rec.projection)} &bull; <strong>Verdict:</strong> ${esc(rec.verdict)}</div><table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;"><thead><tr style="background:#f1f5f9;text-align:left;"><th style="padding:8px;border:1px solid #cbd5e1;">Subject</th><th style="padding:8px;border:1px solid #cbd5e1;">Net Marks</th><th style="padding:8px;border:1px solid #cbd5e1;">Correct</th><th style="padding:8px;border:1px solid #cbd5e1;">Incorrect</th></tr></thead><tbody>${subjRows}</tbody></table><div style="page-break-before:always;padding-top:10px;"><h2 style="font-size:14px;margin-bottom:8px;">FULL QUESTION &amp; SOLUTION AUDIT (${auditItems.length} QUESTIONS)</h2>${itemsHtml}</div><script>window.onload=function(){setTimeout(function(){window.print();},250);};</script></body></html>`);
+    const itemsHtml = auditItems.map(it => {
+      const badgeColor = !it.hasAns ? "#475569" : (it.isCorrect ? "#047857" : "#be123c");
+      const badgeBg = !it.hasAns ? "#f1f5f9" : (it.isCorrect ? "#ecfdf5" : "#fff1f2");
+      return `
+        <div style="border:1px solid #cbd5e1;border-radius:8px;padding:12px;margin-bottom:10px;page-break-inside:avoid;">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;margin-bottom:6px;">
+            <strong style="color:#1e293b;">Question ${it.num} of ${auditItems.length} &bull; ${esc(it.subj)} (${esc(it.chapter)})</strong>
+            <span style="padding:2px 8px;border-radius:999px;background:${badgeBg};color:${badgeColor};font-weight:800;">${esc(it.sec)} &bull; ${esc(it.statusLabel)}</span>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:#0f172a;margin-bottom:6px;white-space:pre-line;">${esc(it.prompt)}</div>
+          <div style="font-size:11px;color:#334155;margin-bottom:3px;"><strong>Your Submitted Response:</strong> ${esc(it.userText)}</div>
+          <div style="font-size:11px;color:#047857;margin-bottom:4px;"><strong>Official Answer:</strong> ${esc(it.officialText)}</div>
+          <div style="font-size:11px;color:#1e293b;background:#f8fafc;padding:6px 8px;border-radius:6px;"><strong>Solution:</strong> ${esc(it.explanation)}</div>
+        </div>
+      `;
+    }).join("");
+
+    w.document.write(`<!DOCTYPE html><html><head><title>${esc(rec.sessionId)} - GOALisB Official Diagnostic Marksheet</title></head>
+      <body style="font-family:system-ui,-apple-system,sans-serif;padding:28px;color:#0f172a;max-width:860px;margin:auto;">
+        <div style="border-bottom:3px solid #4338ca;padding-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:11px;font-weight:800;color:#4338ca;text-transform:uppercase;">GOALisB ${IS_JEE ? "JEE" : "NEET UG"} Evaluation Engine</div>
+            <h1 style="margin:4px 0 0;font-size:20px;">${IS_JEE ? "OFFICIAL NTA JEE MAIN 75-Q DIAGNOSTIC MARKSHEET" : "OFFICIAL NTA NEET UG 180-Q DIAGNOSTIC MARKSHEET"}</h1>
+          </div>
+          <div style="text-align:right;font-size:11px;">
+            <div><strong>Assessment Serial ID:</strong> ${esc(rec.sessionId)}</div>
+            <div><strong>Timestamp:</strong> ${esc(rec.timestamp)}</div>
+            <div><strong>Verification:</strong> VERIFIED FULL MOCK (${REQUIRED_QS} Qs)</div>
+          </div>
+        </div>
+
+        <div style="margin:14px 0;padding:12px 14px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;font-size:12px;">
+          <div><div style="color:#64748b;font-size:10px;font-weight:700;">CANDIDATE</div><strong>${esc(rec.candidate)}</strong></div>
+          <div><div style="color:#64748b;font-size:10px;font-weight:700;">SCORE AWARDED</div><strong style="font-size:15px;color:#047857;">${rec.totalScore} / ${rec.maxScore}</strong></div>
+          <div><div style="color:#64748b;font-size:10px;font-weight:700;">ACCURACY &amp; SPLIT</div><strong>${esc(rec.accuracy || "0.0")}% (${esc(rec.counts || "")})</strong></div>
+          <div><div style="color:#64748b;font-size:10px;font-weight:700;">TIME &amp; PACE</div><strong>${esc(rec.timeTaken)} (${esc(rec.pacePerQ || "-")})</strong></div>
+        </div>
+
+        <div style="margin-bottom:14px;padding:10px 14px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:8px;font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <div><strong>Verified Present Standing:</strong> ${esc(rec.projection)}</div>
+          <div><strong>Behavioral Verdict:</strong> ${esc(rec.verdict || "Standard Pacing")}</div>
+        </div>
+
+        <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px;">
+          <thead>
+            <tr style="background:#f1f5f9;text-align:left;">
+              <th style="padding:8px;border:1px solid #cbd5e1;">Subject</th>
+              <th style="padding:8px;border:1px solid #cbd5e1;">Net Marks</th>
+              <th style="padding:8px;border:1px solid #cbd5e1;">Correct (+4)</th>
+              <th style="padding:8px;border:1px solid #cbd5e1;">Incorrect (-1)</th>
+            </tr>
+          </thead>
+          <tbody>${subjRows}</tbody>
+        </table>
+
+        <div style="page-break-before:always;border-top:2px solid #4338ca;padding-top:12px;margin-top:16px;">
+          <h2 style="font-size:15px;margin:0 0 10px;color:#1e1b4b;">COMPLETE QUESTION-BY-QUESTION RESPONSE &amp; SOLUTION AUDIT (${auditItems.length} QUESTIONS)</h2>
+          ${itemsHtml}
+        </div>
+        <script>window.onload = function(){ setTimeout(function(){ window.print(); }, 300); };</script>
+      </body></html>`);
     w.document.close();
   };
 
@@ -926,8 +1000,12 @@
       </div>`;
   };
 
-
-  window._T6_MODE = window._T6_MODE || "VERIFIED"; // "VERIFIED" or "WHATIF"
+  // ============================================================================
+  // TAB 6: VERIFIED FULL-MOCK PRESENT-LEVEL FORECASTER & WHAT-IF SANDBOX (v29)
+  // ============================================================================
+  window._T6_MODE = window._T6_MODE || "VERIFIED";
+  window._T6_JEE = { p: 76, c: 74, m: 68, shift: "MODERATE", cat: "GEN" };
+  window._T6_NEET = { p: 155, c: 160, b: 175, z: 170, diff: "MODERATE", cat: "GEN" };
 
   window.applySyncedMockToTab6 = function (sessionId) {
     try {
@@ -957,10 +1035,6 @@
     } catch (_) {}
     return false;
   };
-
-
-  window._T6_JEE = { p: 76, c: 74, m: 68, shift: "MODERATE", cat: "GEN" };
-  window._T6_NEET = { p: 155, c: 160, b: 175, z: 170, diff: "MODERATE", cat: "GEN" };
 
   window.updateScienceTab6 = function () {
     const out = document.getElementById("t6-live-results");
@@ -1122,6 +1196,27 @@
       ["575 – 614", "AIR 28,000 – 55,000", "State Domicile MBBS / Semi-Govt Quota"]
     ];
 
+    const vLogs = getVerifiedFullMockLogs();
+    const avgScore = vLogs.length ? Math.round(vLogs.reduce((a, b) => a + Number(b.totalScore || 0), 0) / vLogs.length) : null;
+    const bestScore = vLogs.length ? Math.max(...vLogs.map(b => Number(b.totalScore || 0))) : null;
+
+    const syncBannerHtml = !vLogs.length
+      ? `<div id="t6-sync-pill" class="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-xs text-amber-950 flex flex-wrap items-center justify-between gap-2">
+          <span><strong>Present Standing Uncalibrated:</strong> 0 Full ${REQUIRED_QS}-Q Mocks submitted yet. Currently previewing What-If Sandbox.</span>
+          <button type="button" onclick="window.selectUnifiedTab(4);" class="px-3 py-1 rounded-lg bg-amber-600 text-white font-extrabold cursor-pointer">Take Full Mock in Tab 4 &rarr;</button>
+        </div>`
+      : `<div id="t6-sync-pill" class="p-3.5 rounded-xl ${window._T6_MODE === "VERIFIED" ? "bg-emerald-50 border-emerald-300 text-emerald-950" : "bg-indigo-50 border-indigo-300 text-indigo-950"} border text-xs space-y-1">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span>${window._T6_MODE === "VERIFIED"
+              ? `<strong>&#10003; Verified Present Level:</strong> Calibrated from Full Mock <strong>${window._T6_SYNCED_ID}</strong>`
+              : `<strong>What-If Target Sandbox:</strong> Comparing target against Full Mock <strong>${window._T6_SYNCED_ID}</strong>`}</span>
+            ${window._T6_MODE !== "VERIFIED"
+              ? `<button type="button" onclick="window.applySyncedMockToTab6(); window.renderScienceTab6();" class="underline font-extrabold cursor-pointer">Restore Present Level</button>`
+              : `<span class="px-2 py-0.5 rounded bg-emerald-600 text-white text-[10px] font-extrabold">OFFICIAL STANDING</span>`}
+          </div>
+          <div class="text-[11px] opacity-90">Full Mocks Completed: <strong>${vLogs.length}</strong> &bull; Rolling Average: <strong>${avgScore}/${MAX_MARKS}</strong> &bull; Best Full Mock: <strong>${bestScore}/${MAX_MARKS}</strong></div>
+        </div>`;
+
     target.innerHTML = `
       <div class="max-w-7xl mx-auto pt-4 pb-10 space-y-5">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -1130,9 +1225,9 @@
               <div>
                 <div class="text-xs font-extrabold uppercase tracking-wider text-${accent}-600">${IS_JEE ? "NTA JEE MAIN & ADVANCED CALIBRATOR" : "NTA NEET UG 720-MARK CALIBRATOR"}</div>
                 <h2 class="text-xl font-extrabold text-slate-900 mt-0.5">${IS_JEE ? "Subject Marks & Shift Simulator" : "PCB Subject Marks & AIR Simulator"}</h2>
-                <div class="text-[11px] font-semibold text-emerald-700 mt-1">Synced with Tab 4 Mock Ledger (Adjust sliders or click Sync Mock)</div>
+                <div class="text-[11px] font-semibold text-emerald-700 mt-1">Synced with Tab 4 Full-Mock Ledger (Adjust sliders or click Sync Mock)</div>
               </div>
-              <button type="button" onclick="if(window.applySyncedMockToTab6()){ window.renderScienceTab6(); } else { alert('No submitted Tab 4 mock found in ledger yet. Submit a Tab 4 mock first.'); }"
+              <button type="button" onclick="if(window.applySyncedMockToTab6()){ window.renderScienceTab6(); } else { alert('No submitted Tab 4 Full Mock found in ledger yet. Submit a complete Tab 4 Full Mock first.'); }"
                 class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-sm cursor-pointer shrink-0">
                 &#8635; Sync Mock
               </button>
@@ -1175,28 +1270,7 @@
               </div>
             </div>
 
-            ${(() => {
-              const vLogs = getVerifiedFullMockLogs();
-              const avgScore = vLogs.length ? Math.round(vLogs.reduce((a, b) => a + Number(b.totalScore || 0), 0) / vLogs.length) : null;
-              const bestScore = vLogs.length ? Math.max(...vLogs.map(b => Number(b.totalScore || 0))) : null;
-              if (!vLogs.length) {
-                return `<div id="t6-sync-pill" class="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-xs text-amber-950 flex flex-wrap items-center justify-between gap-2">
-                  <span><strong>Present Standing Uncalibrated:</strong> 0 Full ${REQUIRED_QS}-Q Mocks submitted yet. Currently previewing What-If Sandbox.</span>
-                  <button type="button" onclick="window.selectUnifiedTab(4);" class="px-3 py-1 rounded-lg bg-amber-600 text-white font-extrabold cursor-pointer">Take Full Mock in Tab 4 &rarr;</button>
-                </div>`;
-              }
-              return `<div id="t6-sync-pill" class="p-3.5 rounded-xl ${window._T6_MODE === "VERIFIED" ? "bg-emerald-50 border-emerald-300 text-emerald-950" : "bg-indigo-50 border-indigo-300 text-indigo-950"} border text-xs space-y-1">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                  <span>${window._T6_MODE === "VERIFIED"
-                    ? `<strong>&#10003; Verified Present Level:</strong> Calibrated from Full Mock <strong>${window._T6_SYNCED_ID}</strong>`
-                    : `<strong>What-If Target Sandbox:</strong> Comparing target against Full Mock <strong>${window._T6_SYNCED_ID}</strong>`}</span>
-                  ${window._T6_MODE !== "VERIFIED"
-                    ? `<button type="button" onclick="window.applySyncedMockToTab6(); window.renderScienceTab6();" class="underline font-extrabold cursor-pointer">Restore Present Level</button>`
-                    : `<span class="px-2 py-0.5 rounded bg-emerald-600 text-white text-[10px] font-extrabold">OFFICIAL STANDING</span>`}
-                </div>
-                <div class="text-[11px] opacity-90">Full Mocks Completed: <strong>${vLogs.length}</strong> &bull; Rolling Average: <strong>${avgScore}/${MAX_MARKS}</strong> &bull; Best Full Mock: <strong>${bestScore}/${MAX_MARKS}</strong></div>
-              </div>`;
-            })()}
+            ${syncBannerHtml}
             <div id="t6-bottleneck" class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950 space-y-1"></div>
           </div>
 
@@ -1231,6 +1305,8 @@
     `;
     window.updateScienceTab6();
   };
+
+
 
 
   // Lock all 6 tab renderers so legacy scripts can never hijack them
