@@ -1,8 +1,9 @@
 // ==============================================================================
-// GOALISB NEET UG MASTER — AUTHORITATIVE 12x12 NEON SUITE & BRAND HEADER
+// GOALISB NEET UG MASTER — COMPLETE 6-TAB NATIVE ENGINE (ZERO GRE/IPMAT LEGACY)
 // ==============================================================================
 (function () {
   const EXAM = "NEET";
+  const IS_JEE = (EXAM === "JEE");
   const MODES = [{'label': 'NEET UG Full 180-Q (720 Marks)', 'sub': '(NTA Standard)', 'sections': 'Physics (45 Qs) &bull; Chemistry (45 Qs) &bull; Botany (45 Qs) &bull; Zoology (45 Qs)'}, {'label': 'NCERT Line-by-Line Biology Vault', 'sub': '(360 Marks Core)', 'sections': 'Class 11 & 12 Botany + Zoology Verbatim NCERT Statements, Diagrams & Cycles'}, {'label': 'Assertion-Reason & Statement Clinic', 'sub': '(Trap Clinic)', 'sections': 'Statement I & II + Assertion-Reason Drills across Biology, Organic & Inorganic'}];
   const TABS = ['1. Physics, Chem & Biology (12x12)', '2. NCERT Line-by-Line Bio Vault', '3. Assertion-Reason Studio', '4. 180-Q / 720-Mark NEET Mock', '5. Trap Doctor & AI Doubts', '6. NEET AIR & AIIMS/GMC Forecaster'];
 
@@ -15,11 +16,11 @@
         else if (t === "GOALisB GRE Master") el.textContent = "GOALisB NEET UG Master";
         else if (t === "GRE GENERAL") el.textContent = "NEET UG MEDICAL";
         else if (t.startsWith("Quant (27 Qs")) el.innerHTML = `Physics (45 Qs &bull; 180m) &bull; Chemistry (45 Qs &bull; 180m) &bull; Biology: Botany &amp; Zoology (90 Qs &bull; 360m) &bull; 720 Marks Scale`;
+        else if (t.includes("Target: 332/340")) el.innerHTML = `Target: 685/720 (AIIMS / Top GMC) &bull; Readiness: 632/720 (~AIR 4,800)`;
       }
       if (t.startsWith("Exam Sections: Quant")) el.innerHTML = `<span class="font-bold">Exam Sections:</span> ${MODES[0].sections}`;
       else if (t.startsWith("Pattern: 54 Qs")) el.innerHTML = `<span class="font-bold">Pattern:</span> 180 Qs | 180 Mins (3 Hrs) | NTA OMR / CBT Scale`;
       else if (t.startsWith("Marking: MCQ +1/0")) el.innerHTML = `<span class="font-bold text-rose-600">Marking:</span> All 180 Compulsory MCQs: +4 Correct | -1 Incorrect`;
-      else if (t.includes("Target: 332/340")) el.innerHTML = `Target: 685/720 (AIIMS / Top GMC) &bull; Readiness: 632/720 (~AIR 4,800)`;
     });
 
     document.querySelectorAll("button").forEach(btn => {
@@ -34,6 +35,14 @@
       else if (txt.startsWith("5. Trap Doctor")) btn.textContent = TABS[4];
       else if (txt.startsWith("6. GRE Score Forecaster")) btn.textContent = TABS[5];
     });
+
+    // Hide any lingering legacy PYQ vault container outside main-workspace
+    document.querySelectorAll("section, div").forEach(box => {
+      const h = box.querySelector("h3");
+      if (h && (h.textContent || "").includes("Live PostgreSQL Worked PYQs")) {
+        box.style.display = "none";
+      }
+    });
   }
 
   window._SCI_MODULES = [];
@@ -43,6 +52,8 @@
   window._SCI_SUB = "THEORY";
   window._SCI_QIDX = 0;
   window._SCI_ATT = {};
+  window._SCI_MOCK_ANS = {};
+  window._SCI_MOCK_SUBMITTED = false;
 
   async function hydrateFromNeon() {
     if (window._SCI_HYDRATED && window._SCI_MODULES.length) return;
@@ -74,9 +85,16 @@
     } catch (_) {}
   }
 
-  window.renderScienceMasterTab1 = async function (el) {
+  function getTarget(el) {
+    return el || document.getElementById("main-workspace") || document.getElementById("tab-content") || document.querySelector("main");
+  }
+
+  // ============================================================================
+  // TAB 1: 12x12 NCERT PCM / PCB MASTER MODULES & WORKED EXAMPLES + DRILLS
+  // ============================================================================
+  window.renderScienceTab1 = async function (el) {
     enforceScienceBrand();
-    const target = el || document.getElementById("main-workspace") || document.getElementById("tab-content") || document.querySelector("main");
+    const target = getTarget(el);
     if (!target) return;
     await hydrateFromNeon();
 
@@ -102,7 +120,7 @@
         <div class="lg:col-span-4 space-y-2.5">
           <div class="text-xs font-extrabold uppercase tracking-wider text-emerald-600">NEET PCB MODULES (6 CHAPTERS • 12x12 NEON BANK)</div>
           ${mods.map((item, idx) => `
-            <button type="button" onclick="window._SCI_MOD_IDX=${idx}; window._SCI_QIDX=0; window.renderScienceMasterTab1();"
+            <button type="button" onclick="window._SCI_MOD_IDX=${idx}; window._SCI_QIDX=0; window.renderScienceTab1();"
               class="w-full text-left p-4 rounded-2xl border transition cursor-pointer ${idx === modIdx
                 ? "bg-emerald-50/90 dark:bg-emerald-950/60 border-emerald-500 shadow-sm"
                 : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-emerald-300"}">
@@ -118,11 +136,11 @@
           <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">${m.chapter_title}</h2>
 
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button" onclick="window._SCI_SUB='THEORY'; window.renderScienceMasterTab1();"
+            <button type="button" onclick="window._SCI_SUB='THEORY'; window.renderScienceTab1();"
               class="px-4 py-2 rounded-full text-xs font-bold cursor-pointer ${window._SCI_SUB === "THEORY" ? "bg-emerald-600 text-white shadow-sm" : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200"}">
               NCERT Master Guide & 12 Worked Examples (${m.worked_examples.length})
             </button>
-            <button type="button" onclick="window._SCI_SUB='DRILLS'; window.renderScienceMasterTab1();"
+            <button type="button" onclick="window._SCI_SUB='DRILLS'; window.renderScienceTab1();"
               class="px-4 py-2 rounded-full text-xs font-bold cursor-pointer ${window._SCI_SUB === "DRILLS" ? "bg-emerald-600 text-white shadow-sm" : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200"}">
               Practice Drills (${drills.length} Items &bull; +4 / -1)
             </button>
@@ -174,7 +192,7 @@
                 </div>
                 <div class="flex flex-wrap gap-1.5">
                   ${drills.map((_, i) => `
-                    <button type="button" onclick="window._SCI_QIDX=${i}; window.renderScienceMasterTab1();"
+                    <button type="button" onclick="window._SCI_QIDX=${i}; window.renderScienceTab1();"
                       class="w-7 h-7 rounded-lg text-xs font-bold border cursor-pointer ${i === qIdx ? "bg-emerald-600 text-white border-emerald-600" : (attMap[i] ? "bg-emerald-600 text-white border-emerald-600" : "bg-white dark:bg-slate-900 border-slate-300")}">${i + 1}</button>
                   `).join("")}
                 </div>
@@ -206,8 +224,8 @@
                   <strong>Official Solution:</strong> ${d.explanation}
                 </div>
                 <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <button type="button" onclick="if(window._SCI_QIDX>0){window._SCI_QIDX--; window.renderScienceMasterTab1();}" class="px-3.5 py-1.5 rounded-xl border text-xs font-bold cursor-pointer">&larr; Previous</button>
-                  <button type="button" onclick="if(window._SCI_QIDX<${drills.length - 1}){window._SCI_QIDX++; window.renderScienceMasterTab1();}" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold cursor-pointer">Next Question &rarr;</button>
+                  <button type="button" onclick="if(window._SCI_QIDX>0){window._SCI_QIDX--; window.renderScienceTab1();}" class="px-3.5 py-1.5 rounded-xl border text-xs font-bold cursor-pointer">&larr; Previous</button>
+                  <button type="button" onclick="if(window._SCI_QIDX<${drills.length - 1}){window._SCI_QIDX++; window.renderScienceTab1();}" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold cursor-pointer">Next Question &rarr;</button>
                 </div>
               </div>
             </div>
@@ -217,21 +235,209 @@
     `;
   };
 
-  // Lock renderTab1 & renderQuantTab so tab1_mastery.js can never overwrite with GRE
-  Object.defineProperty(window, "renderTab1", {
-    get: () => window.renderScienceMasterTab1,
-    set: () => {},
-    configurable: true
-  });
-  Object.defineProperty(window, "renderQuantTab", {
-    get: () => window.renderScienceMasterTab1,
-    set: () => {},
-    configurable: true
+  // ============================================================================
+  // TAB 2: ORGANIC & DERIVATION LAB (JEE) / NCERT BIO LINE-BY-LINE VAULT (NEET)
+  // ============================================================================
+  window.renderScienceTab2 = async function (el) {
+    const target = getTarget(el);
+    if (!target) return;
+    await hydrateFromNeon();
+    const cards = IS_JEE ? [
+      { tag: "PHYSICAL CHEMISTRY", title: "Nernst & Equilibrium Constant Coupling", body: "At 298 K, E_cell = E^0_cell - (0.0591/n)*log10(Q). At equilibrium E_cell = 0, giving log10(K_c) = n*E^0_cell / 0.0591. Never include pure solids or liquids in Q." },
+      { tag: "PHYSICS DERIVATION", title: "Pure Rolling Incline Acceleration & Minimum Friction", body: "a_cm = g*sin(theta)/(1 + k^2/R^2), bottom speed v = sqrt(2gh/(1 + k^2/R^2)), and mu_min = tan(theta)/(1 + R^2/k^2). Solid sphere (2/5) beats disc (1/2) and ring (1)." },
+      { tag: "CALCULUS IDENTITY", title: "King's Property & Newton-Leibniz Rule", body: "Integral_a^b f(x) dx = Integral_a^b f(a+b-x) dx collapses symmetric trig ratios on [0, pi/2] to pi/4. Differentiating variable limits gives f(h(x))h'(x) - f(g(x))g'(x)." },
+      { tag: "ELECTROMAGNETISM", title: "Dielectric Slab Energy Invariants", body: "Battery connected => V constant, C -> K*C, U -> K*U. Battery disconnected => Q constant, V -> V/K, U -> U/K." }
+    ] : [
+      { tag: "BOTANY • CLASS 12 CH. 6", title: "Strict 5' -> 3' Polymerase Polarity & Eukaryotic RNA Pol I/II/III", body: "All DNA and RNA polymerases synthesize strictly in 5' -> 3' direction. In eukaryotes: RNA Pol I = rRNAs (28S, 18S, 5.8S); Pol II = hnRNA; Pol III = tRNA, 5srRNA, snRNAs." },
+      { tag: "BOTANY • LAC OPERON", title: "Constitutive Basal Expression & Inducer Role", body: "A very low basal level of lac operon expression is always present so permease exists on the cell membrane to import lactose (allolactose), which binds and inactivates the i-gene repressor." },
+      { tag: "ZOOLOGY • CLASS 11 CH. 17", title: "100 mL Blood Gas Transport Constants", body: "Every 100 mL of oxygenated blood delivers ~5 mL O2 to tissues; every 100 mL of deoxygenated blood delivers ~4 mL CO2 to alveoli. 70% of CO2 travels as HCO3(-)." },
+      { tag: "ZOOLOGY • CLASS 11 CH. 18", title: "Cardiac Cycle (0.8 s) & ECG Landmarks", body: "At 75 bpm, cardiac cycle = 0.8 s, stroke volume = 70 mL, cardiac output = ~5 L/min. P-wave = atrial depolarization; QRS = ventricular depolarization; T-wave = ventricular repolarization." }
+    ];
+    target.innerHTML = `
+      <div class="max-w-6xl mx-auto pt-4 pb-10 space-y-5">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+          <div class="text-xs font-extrabold uppercase text-emerald-600">${IS_JEE ? "HIGH-YIELD JEE DERIVATIONS & REACTION MECHANISMS" : "VERBATIM NCERT LINE-BY-LINE BIOLOGY & PHYSIOLOGY VAULT"}</div>
+          <h2 class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">${TABS[1]}</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+            ${cards.map(c => `
+              <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 space-y-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">${c.tag}</span>
+                <div class="font-extrabold text-sm text-slate-900 dark:text-white">${c.title}</div>
+                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${c.body}</p>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  // ============================================================================
+  // TAB 3: SECTION B NUMERICAL STUDIO (JEE) / ASSERTION-REASON STUDIO (NEET)
+  // ============================================================================
+  window.renderScienceTab3 = async function (el) {
+    const target = getTarget(el);
+    if (!target) return;
+    await hydrateFromNeon();
+    const specialQs = window._SCI_QUESTIONS.filter(q =>
+      IS_JEE ? q.question_type === "NUMERICAL_INT" : (q.question_type === "ASSERTION_REASON" || q.question_type === "STATEMENT_I_II")
+    );
+    target.innerHTML = `
+      <div class="max-w-5xl mx-auto pt-4 pb-10 space-y-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-xs font-extrabold uppercase text-emerald-600">${IS_JEE ? "NTA SECTION B EXACT INTEGER / NUMERICAL CLINIC" : "NTA ASSERTION-REASON & STATEMENT I/II TRAP STUDIO"}</div>
+              <h2 class="text-xl font-extrabold text-slate-900 dark:text-white mt-0.5">${TABS[2]} (${specialQs.length} Neon Items)</h2>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold">+4 Correct / -1 Incorrect</span>
+          </div>
+          <div class="space-y-4">
+            ${specialQs.map((q, idx) => `
+              <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 space-y-2.5 text-xs">
+                <div class="flex items-center justify-between">
+                  <span class="font-extrabold text-emerald-600">#${idx + 1} &bull; ${q.question_code} (${q.subject})</span>
+                  <span class="font-bold text-slate-500">${q.question_type}</span>
+                </div>
+                <div class="text-sm font-bold text-slate-900 dark:text-white whitespace-pre-line">${q.prompt}</div>
+                <details class="pt-1">
+                  <summary class="cursor-pointer font-extrabold text-emerald-700">Reveal Official Answer &amp; Explanation</summary>
+                  <div class="mt-2 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900">
+                    <strong>Answer:</strong> ${q.options_json ? q.options_json[Number(q.correct_answer)] : q.correct_answer}<br/>
+                    <strong>Explanation:</strong> ${q.explanation}
+                  </div>
+                </details>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  // ============================================================================
+  // TAB 4: LIVE FULL-LENGTH CBT / OMR MINI-MOCK RUNNER (+4 / -1)
+  // ============================================================================
+  window.renderScienceTab4 = async function (el) {
+    const target = getTarget(el);
+    if (!target) return;
+    await hydrateFromNeon();
+    const pool = window._SCI_QUESTIONS.slice(0, 15);
+    let score = 0, right = 0, wrong = 0;
+    if (window._SCI_MOCK_SUBMITTED) {
+      pool.forEach((q, i) => {
+        const ans = window._SCI_MOCK_ANS[i];
+        if (ans !== undefined && ans !== "") {
+          if (String(ans).trim() === String(q.correct_answer).trim()) { score += 4; right++; }
+          else { score -= 1; wrong++; }
+        }
+      });
+    }
+    target.innerHTML = `
+      <div class="max-w-5xl mx-auto pt-4 pb-10 space-y-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <div class="text-xs font-extrabold uppercase text-emerald-600">${IS_JEE ? "NTA JEE CBT DIAGNOSTIC SPRINT (15 Qs • 60 MARKS)" : "NTA NEET UG OMR DIAGNOSTIC SPRINT (15 Qs • 60 MARKS)"}</div>
+              <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">${TABS[3]}</h2>
+            </div>
+            <div class="flex gap-2">
+              <button type="button" onclick="window._SCI_MOCK_SUBMITTED=true; window.renderScienceTab4();" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold cursor-pointer">Submit &amp; Score (+4 / -1)</button>
+              <button type="button" onclick="window._SCI_MOCK_ANS={}; window._SCI_MOCK_SUBMITTED=false; window.renderScienceTab4();" class="px-3.5 py-2 rounded-xl border text-xs font-bold cursor-pointer">Reset</button>
+            </div>
+          </div>
+          ${window._SCI_MOCK_SUBMITTED ? `
+            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-sm font-extrabold text-emerald-900">
+              Diagnostic Score: ${score} / ${pool.length * 4} &bull; Correct: ${right} (+${right * 4}) &bull; Incorrect: ${wrong} (-${wrong})
+            </div>
+          ` : ""}
+          <div class="space-y-4">
+            ${pool.map((q, i) => `
+              <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 space-y-2 text-xs">
+                <div class="font-extrabold text-emerald-600">Q${i + 1}. [${q.subject} &bull; Class ${q.ncert_class}]</div>
+                <div class="text-sm font-bold text-slate-900 dark:text-white whitespace-pre-line">${q.prompt}</div>
+                ${q.question_type === "NUMERICAL_INT" ? `
+                  <input type="text" value="${window._SCI_MOCK_ANS[i] || ""}" onchange="window._SCI_MOCK_ANS[${i}]=this.value;" placeholder="Numerical answer..." class="rounded-xl border px-3 py-1.5 font-mono font-bold" />
+                ` : `
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    ${(q.options_json || []).map((opt, oi) => `
+                      <button type="button" onclick="window._SCI_MOCK_ANS[${i}]='${oi}'; window.renderScienceTab4();"
+                        class="text-left p-2.5 rounded-xl border cursor-pointer ${String(window._SCI_MOCK_ANS[i]) === String(oi) ? "bg-emerald-600 text-white border-emerald-600 font-bold" : "bg-white dark:bg-slate-900 border-slate-200"}">
+                        (${String.fromCharCode(65 + oi)}) ${opt}
+                      </button>
+                    `).join("")}
+                  </div>
+                `}
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  // ============================================================================
+  // TAB 5: TRAP DOCTOR & AI DOUBT SOLVER
+  // ============================================================================
+  window.renderScienceTab5 = function (el) {
+    const target = getTarget(el);
+    if (!target) return;
+    target.innerHTML = `
+      <div class="max-w-4xl mx-auto pt-4 pb-10">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4">
+          <div class="text-xs font-extrabold uppercase text-emerald-600">AI CONCEPT &amp; DERIVATION DOUBT TUTOR</div>
+          <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">${TABS[4]}</h2>
+          <p class="text-xs text-slate-600 dark:text-slate-300">Paste any ${IS_JEE ? "JEE Physics, Chemistry, or Mathematics" : "NEET Physics, Chemistry, Botany, or Zoology"} question or NCERT line below for a step-by-step derivation and trap check.</p>
+          <textarea id="sci-doubt-q" rows="4" class="w-full rounded-2xl border border-slate-300 dark:border-slate-700 p-3.5 text-sm" placeholder="Enter your PCM/PCB problem or NCERT doubt..."></textarea>
+          <button type="button" onclick="(async()=>{const box=document.getElementById('sci-doubt-out'); const q=document.getElementById('sci-doubt-q').value.trim(); if(!q)return; box.classList.remove('hidden'); box.textContent='Solving with GOALisB Science Tutor...'; try{const r=await fetch('/api/doubt',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,exam:EXAM})}); const d=await r.json(); box.textContent=d.answer||d.response||JSON.stringify(d);}catch(e){box.textContent='Check connection and retry.';}})();"
+            class="px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-extrabold cursor-pointer">Solve Step-by-Step</button>
+          <div id="sci-doubt-out" class="hidden p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border text-xs whitespace-pre-line leading-relaxed"></div>
+        </div>
+      </div>
+    `;
+  };
+
+  // ============================================================================
+  // TAB 6: JEE PERCENTILE / IIT-NIT FORECASTER OR NEET AIR / AIIMS-GMC FORECASTER
+  // ============================================================================
+  window.renderScienceTab6 = function (el) {
+    const target = getTarget(el);
+    if (!target) return;
+    target.innerHTML = `
+      <div class="max-w-4xl mx-auto pt-4 pb-10">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4">
+          <div class="text-xs font-extrabold uppercase text-emerald-600">${IS_JEE ? "NTA JEE MAIN PERCENTILE & IIT/NIT ADMISSION PREDICTOR" : "NTA NEET UG ALL INDIA RANK (AIR) & AIIMS/GMC PREDICTOR"}</div>
+          <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">${TABS[5]}</h2>
+          <div class="flex flex-wrap items-center gap-3">
+            <input id="sci-score-in" type="number" min="0" max="${IS_JEE ? 300 : 720}" value="${IS_JEE ? 215 : 655}" class="rounded-xl border px-4 py-2 text-base font-extrabold w-40" />
+            <button type="button" onclick="const s=Number(document.getElementById('sci-score-in').value||0); const out=document.getElementById('sci-rank-out'); out.innerHTML = ${IS_JEE} ? ('Projected JEE Main Percentile: <strong>' + (s>=250?'99.92+ %ile (Top NIT CSE / Adv AIR < 1500)':s>=210?'99.35 %ile (NIT Trichy/Surathkal Core)':s>=170?'98.10 %ile (Top IIIT / NIT)':'94.5+ %ile') + '</strong>') : ('Projected NEET UG Standing: <strong>' + (s>=695?'AIR < 350 (AIIMS New Delhi / MAMC)':s>=660?'AIR ~3,200 (Top State Govt Medical College)':s>=625?'AIR ~14,500 (Govt MBBS All-India Quota)':'Focus on NCERT Bio 345+ Sprint') + '</strong>');"
+              class="px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-extrabold cursor-pointer">Predict Rank &amp; Colleges</button>
+          </div>
+          <div id="sci-rank-out" class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-sm text-emerald-950">
+            ${IS_JEE ? "Projected JEE Main Percentile: <strong>99.35 %ile (NIT Trichy / Surathkal / Warangal Core)</strong>" : "Projected NEET UG Standing: <strong>AIR ~3,800 (Top State Govt Medical College / AIIMS)</strong>"}
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  // Lock all 6 tab renderers so legacy scripts can never hijack them
+  const tabMap = {
+    renderTab1: window.renderScienceTab1,
+    renderQuantTab: window.renderScienceTab1,
+    renderTab2: window.renderScienceTab2,
+    renderTab3: window.renderScienceTab3,
+    renderTab4: window.renderScienceTab4,
+    renderTab5: window.renderScienceTab5,
+    renderTab6: window.renderScienceTab6
+  };
+  Object.entries(tabMap).forEach(([k, fn]) => {
+    Object.defineProperty(window, k, { get: () => fn, set: () => {}, configurable: true });
   });
 
   window.addEventListener("DOMContentLoaded", () => {
     enforceScienceBrand();
-    window.renderScienceMasterTab1();
-    setTimeout(() => { enforceScienceBrand(); window.renderScienceMasterTab1(); }, 350);
+    window.renderScienceTab1();
+    setTimeout(() => { enforceScienceBrand(); window.renderScienceTab1(); }, 350);
   });
 })();
