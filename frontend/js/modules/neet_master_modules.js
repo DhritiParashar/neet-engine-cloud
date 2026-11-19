@@ -536,6 +536,52 @@
     window._CBT_IDX = 0;
     window.renderScienceTab4();
   };
+  function buildFullMockPaper() {
+    if (IS_JEE) {
+      const subjects = ["PHYSICS", "CHEMISTRY", "MATHEMATICS"];
+      const paper = [];
+      subjects.forEach(subj => {
+        const mcqs = window._SCI_QUESTIONS.filter(q => q.subject === subj && q.question_type !== "NUMERICAL_INT");
+        const nums = window._SCI_QUESTIONS.filter(q => q.subject === subj && q.question_type === "NUMERICAL_INT");
+        for (let i = 0; i < 20; i++) {
+          const base = mcqs[i % Math.max(1, mcqs.length)];
+          if (base) paper.push({ ...base, mock_sec: "Section A (MCQ)", mock_subj: subj });
+        }
+        for (let i = 0; i < 5; i++) {
+          const base = nums[i % Math.max(1, nums.length)];
+          if (base) paper.push({ ...base, mock_sec: "Section B (Numerical)", mock_subj: subj });
+        }
+      });
+      return paper;
+    } else {
+      const sections = [["PHYSICS", 45], ["CHEMISTRY", 45], ["BOTANY", 45], ["ZOOLOGY", 45]];
+      const paper = [];
+      sections.forEach(([subj, count]) => {
+        const pool = window._SCI_QUESTIONS.filter(q => q.subject === subj && Array.isArray(q.options_json) && q.options_json.length >= 4);
+        for (let i = 0; i < count; i++) {
+          const base = pool[i % Math.max(1, pool.length)];
+          if (base) paper.push({ ...base, mock_sec: "Compulsory MCQ", mock_subj: subj });
+        }
+      });
+      return paper;
+    }
+  }
+
+  function ensureMockTimer() {
+    if (window._CBT_TIMER_ID) return;
+    window._CBT_TIMER_ID = setInterval(() => {
+      if (window._CBT_SUBMITTED) return;
+      const el = document.getElementById("cbt-clock");
+      if (!el) return;
+      if (window._CBT_SEC_LEFT > 0) window._CBT_SEC_LEFT--;
+      const h = String(Math.floor(window._CBT_SEC_LEFT / 3600)).padStart(2, "0");
+      const m = String(Math.floor((window._CBT_SEC_LEFT % 3600) / 60)).padStart(2, "0");
+      const s = String(window._CBT_SEC_LEFT % 60).padStart(2, "0");
+      el.textContent = `${h}:${m}:${s}`;
+    }, 1000);
+  }
+
+
 
   window.renderScienceTab4 = async function (el) {
     const accent = IS_JEE ? "indigo" : "emerald";
