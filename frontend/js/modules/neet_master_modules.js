@@ -1366,9 +1366,73 @@
     Object.defineProperty(window, k, { get: () => fn, set: () => {}, configurable: true });
   });
 
+  // ============================================================================
+  // SINGLE-CLICK CAPTURE-PHASE TAB ROUTER (BLOCKS LEGACY APP.JS OVERWRITES)
+  // ============================================================================
+  window._ACTIVE_SCI_TAB = window._ACTIVE_SCI_TAB || 1;
+
+  function syncTabPillVisuals(tabNum) {
+    const isJee = (EXAM === "JEE");
+    const activeCls = isJee
+      ? ["bg-indigo-600", "text-white", "border-indigo-600", "shadow-sm"]
+      : ["bg-emerald-600", "text-white", "border-emerald-600", "shadow-sm"];
+    const idleCls = ["bg-white", "text-slate-700", "border-slate-200"];
+
+    document.querySelectorAll("button").forEach(btn => {
+      const txt = (btn.textContent || "").trim();
+      const m = txt.match(/^([1-6])\.\s+/);
+      if (!m) return;
+      const n = Number(m[1]);
+      btn.classList.remove("bg-indigo-600", "bg-emerald-600", "text-white", "border-indigo-600", "border-emerald-600", "shadow-sm", "bg-white", "text-slate-700", "border-slate-200");
+      if (n === tabNum) {
+        btn.classList.add(...activeCls);
+      } else {
+        btn.classList.add(...idleCls);
+      }
+    });
+  }
+
+  window.selectUnifiedTab = function (tabNum) {
+    const n = Math.min(6, Math.max(1, Number(tabNum) || 1));
+    window._ACTIVE_SCI_TAB = n;
+    syncTabPillVisuals(n);
+    const target = getTarget();
+    if (target && !window._SCI_HYDRATED && n <= 4) {
+      target.innerHTML = `<div class="max-w-7xl mx-auto pt-8 text-center text-xs font-extrabold uppercase tracking-wider text-slate-500">Loading Tab ${n} from Neon PostgreSQL...</div>`;
+    }
+    const fns = {
+      1: window.renderScienceTab1,
+      2: window.renderScienceTab2,
+      3: window.renderScienceTab3,
+      4: window.renderScienceTab4,
+      5: window.renderScienceTab5,
+      6: window.renderScienceTab6
+    };
+    if (typeof fns[n] === "function") fns[n](target);
+  };
+
+  document.addEventListener("click", function (ev) {
+    const btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
+    if (!btn) return;
+    const txt = (btn.textContent || "").trim();
+    const m = txt.match(/^([1-6])\.\s+/);
+    if (!m) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    ev.stopImmediatePropagation();
+    window.selectUnifiedTab(Number(m[1]));
+  }, true);
+
   window.addEventListener("DOMContentLoaded", () => {
     enforceScienceBrand();
-    window.renderScienceTab1();
-    setTimeout(() => { enforceScienceBrand(); window.renderScienceTab1(); }, 350);
+    if (window._ACTIVE_SCI_TAB === 1) {
+      window.selectUnifiedTab(1);
+    }
+    setTimeout(() => {
+      enforceScienceBrand();
+      if (window._ACTIVE_SCI_TAB === 1) {
+        syncTabPillVisuals(1);
+      }
+    }, 350);
   });
 })();
