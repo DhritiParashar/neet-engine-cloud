@@ -98,7 +98,7 @@
     if (!target) return;
     await hydrateFromNeon();
 
-    const mods = window._SCI_MODULES;
+    const mods = window._SCI_MODULES.filter(x => !String(x.module_code || "").startsWith("NEET-T2-"));
     if (!mods.length) {
       target.innerHTML = `<div class="p-8 text-center text-sm font-bold text-slate-500">Connecting to Neon PostgreSQL Science Bank...</div>`;
       return;
@@ -238,35 +238,138 @@
   // ============================================================================
   // TAB 2: ORGANIC & DERIVATION LAB (JEE) / NCERT BIO LINE-BY-LINE VAULT (NEET)
   // ============================================================================
+  window._NT2_MOD_IDX = 0;
+  window._NT2_SUB = "THEORY";
+  window._NT2_QIDX = 0;
+  window._NT2_ATT = {};
+
   window.renderScienceTab2 = async function (el) {
+    enforceScienceBrand();
     const target = getTarget(el);
     if (!target) return;
     await hydrateFromNeon();
-    const cards = IS_JEE ? [
-      { tag: "PHYSICAL CHEMISTRY", title: "Nernst & Equilibrium Constant Coupling", body: "At 298 K, E_cell = E^0_cell - (0.0591/n)*log10(Q). At equilibrium E_cell = 0, giving log10(K_c) = n*E^0_cell / 0.0591. Never include pure solids or liquids in Q." },
-      { tag: "PHYSICS DERIVATION", title: "Pure Rolling Incline Acceleration & Minimum Friction", body: "a_cm = g*sin(theta)/(1 + k^2/R^2), bottom speed v = sqrt(2gh/(1 + k^2/R^2)), and mu_min = tan(theta)/(1 + R^2/k^2). Solid sphere (2/5) beats disc (1/2) and ring (1)." },
-      { tag: "CALCULUS IDENTITY", title: "King's Property & Newton-Leibniz Rule", body: "Integral_a^b f(x) dx = Integral_a^b f(a+b-x) dx collapses symmetric trig ratios on [0, pi/2] to pi/4. Differentiating variable limits gives f(h(x))h'(x) - f(g(x))g'(x)." },
-      { tag: "ELECTROMAGNETISM", title: "Dielectric Slab Energy Invariants", body: "Battery connected => V constant, C -> K*C, U -> K*U. Battery disconnected => Q constant, V -> V/K, U -> U/K." }
-    ] : [
-      { tag: "BOTANY • CLASS 12 CH. 6", title: "Strict 5' -> 3' Polymerase Polarity & Eukaryotic RNA Pol I/II/III", body: "All DNA and RNA polymerases synthesize strictly in 5' -> 3' direction. In eukaryotes: RNA Pol I = rRNAs (28S, 18S, 5.8S); Pol II = hnRNA; Pol III = tRNA, 5srRNA, snRNAs." },
-      { tag: "BOTANY • LAC OPERON", title: "Constitutive Basal Expression & Inducer Role", body: "A very low basal level of lac operon expression is always present so permease exists on the cell membrane to import lactose (allolactose), which binds and inactivates the i-gene repressor." },
-      { tag: "ZOOLOGY • CLASS 11 CH. 17", title: "100 mL Blood Gas Transport Constants", body: "Every 100 mL of oxygenated blood delivers ~5 mL O2 to tissues; every 100 mL of deoxygenated blood delivers ~4 mL CO2 to alveoli. 70% of CO2 travels as HCO3(-)." },
-      { tag: "ZOOLOGY • CLASS 11 CH. 18", title: "Cardiac Cycle (0.8 s) & ECG Landmarks", body: "At 75 bpm, cardiac cycle = 0.8 s, stroke volume = 70 mL, cardiac output = ~5 L/min. P-wave = atrial depolarization; QRS = ventricular depolarization; T-wave = ventricular repolarization." }
-    ];
+
+    const mods = window._SCI_MODULES.filter(x => String(x.module_code || "").startsWith("NEET-T2-"));
+    if (!mods.length) {
+      target.innerHTML = `<div class="p-8 text-center text-sm font-bold text-slate-500">Loading NCERT Line-by-Line Biology Vault from Neon...</div>`;
+      return;
+    }
+
+    const modIdx = Math.min(mods.length - 1, Math.max(0, Number(window._NT2_MOD_IDX || 0)));
+    const m = mods[modIdx];
+    const modPrefix = String(m.module_code || "").replace(/-MOD$/, "");
+    const drills = window._SCI_QUESTIONS.filter(q => String(q.question_code || "").startsWith(modPrefix));
+    const qIdx = Math.min(Math.max(0, drills.length - 1), Math.max(0, Number(window._NT2_QIDX || 0)));
+    const d = drills[qIdx];
+    const attMap = window._NT2_ATT[modIdx] || {};
+
     target.innerHTML = `
-      <div class="max-w-6xl mx-auto pt-4 pb-10 space-y-5">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
-          <div class="text-xs font-extrabold uppercase text-emerald-600">${IS_JEE ? "HIGH-YIELD JEE DERIVATIONS & REACTION MECHANISMS" : "VERBATIM NCERT LINE-BY-LINE BIOLOGY & PHYSIOLOGY VAULT"}</div>
-          <h2 class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">${TABS[1]}</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
-            ${cards.map(c => `
-              <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 space-y-2">
-                <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">${c.tag}</span>
-                <div class="font-extrabold text-sm text-slate-900 dark:text-white">${c.title}</div>
-                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${c.body}</p>
-              </div>
-            `).join("")}
+      <div class="max-w-7xl mx-auto pt-4 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-4 space-y-2.5">
+          <div class="text-xs font-extrabold uppercase tracking-wider text-emerald-600">NCERT LINE-BY-LINE BIO VAULT (6 CHAPTERS &bull; 12&times;12 NEON BANK)</div>
+          ${mods.map((item, idx) => `
+            <button type="button" onclick="window._NT2_MOD_IDX=${idx}; window._NT2_QIDX=0; window.renderScienceTab2();"
+              class="w-full text-left p-4 rounded-2xl border transition cursor-pointer ${idx === modIdx
+                ? "bg-emerald-50/90 border-emerald-500 shadow-sm"
+                : "bg-white border-slate-200 hover:border-emerald-300"}">
+              <div class="text-[10px] font-extrabold uppercase text-emerald-600">${item.subject} &bull; NCERT CLASS ${item.ncert_class}</div>
+              <div class="font-extrabold text-sm text-slate-900 leading-snug mt-0.5">${item.chapter_title}</div>
+              <div class="text-xs text-slate-500 mt-1">${item.subtitle}</div>
+            </button>
+          `).join("")}
+        </div>
+
+        <div class="lg:col-span-8 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600">${m.subject} &bull; NCERT CLASS ${m.ncert_class}</span>
+          <h2 class="text-xl font-extrabold text-slate-900">${m.chapter_title}</h2>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="window._NT2_SUB='THEORY'; window.renderScienceTab2();"
+              class="px-4 py-2 rounded-full text-xs font-bold cursor-pointer ${window._NT2_SUB === "THEORY" ? "bg-emerald-600 text-white shadow-sm" : "bg-slate-100 text-slate-700"}">
+              NCERT Master Guide &amp; 12 Worked Examples (${m.worked_examples.length})
+            </button>
+            <button type="button" onclick="window._NT2_SUB='DRILLS'; window.renderScienceTab2();"
+              class="px-4 py-2 rounded-full text-xs font-bold cursor-pointer ${window._NT2_SUB === "DRILLS" ? "bg-emerald-600 text-white shadow-sm" : "bg-slate-100 text-slate-700"}">
+              Practice Drills (${drills.length} Items &bull; +4 / -1)
+            </button>
           </div>
+
+          ${window._NT2_SUB === "THEORY" ? `
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5 text-xs leading-relaxed text-slate-700">
+              <div class="flex items-center justify-between">
+                <span class="font-extrabold uppercase text-[11px] text-emerald-600">EXHAUSTIVE NCERT OVERVIEW &amp; CONCEPT BRIDGE</span>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">12&times;12 Bio Vault</span>
+              </div>
+              <p>${m.overview}</p>
+              <p><strong>Concept Bridge:</strong> ${m.concept_bridge}</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
+              <div class="p-3 rounded-xl border bg-slate-50"><div class="text-[10px] font-bold uppercase text-slate-400">Exam Weightage</div><div class="font-extrabold mt-0.5">${m.weightage_label}</div></div>
+              <div class="p-3 rounded-xl border bg-slate-50"><div class="text-[10px] font-bold uppercase text-slate-400">Target Pace</div><div class="font-extrabold text-emerald-600 mt-0.5">${m.target_pace}</div></div>
+              <div class="p-3 rounded-xl border bg-slate-50"><div class="text-[10px] font-bold uppercase text-slate-400">Core Strategy</div><div class="font-extrabold text-amber-600 mt-0.5">${m.strategy_tag}</div></div>
+            </div>
+
+            <div class="space-y-2">
+              ${m.laws.map(r => `
+                <div class="p-3.5 rounded-xl border bg-white text-xs">
+                  <div class="font-extrabold">${r.name}</div>
+                  <div class="text-slate-600 mt-0.5">${r.desc}</div>
+                </div>
+              `).join("")}
+            </div>
+
+            <div class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-3">
+              <div class="text-xs font-extrabold uppercase text-emerald-800">GRADED WORKED EXAMPLES (${m.worked_examples.length} SOLVED STEP-BY-STEP)</div>
+              ${m.worked_examples.map(w => `
+                <div class="p-4 rounded-xl bg-white border border-slate-200 text-xs space-y-1.5">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="font-extrabold text-slate-900">${w.p}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold shrink-0">${w.tier}</span>
+                  </div>
+                  <div class="text-slate-600 whitespace-pre-line">${w.s}</div>
+                </div>
+              `).join("")}
+            </div>
+          ` : (d ? `
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <div class="text-xs font-extrabold uppercase tracking-wider text-emerald-600">INTERACTIVE PRACTICE WORKBENCH (${drills.length} ITEMS &bull; NEON POSTGRESQL)</div>
+                  <div class="text-xs text-slate-500 mt-0.5">Attempted: <strong>${Object.keys(attMap).length}/${drills.length}</strong> &bull; Correct: <strong class="text-emerald-600">${Object.values(attMap).filter(Boolean).length}</strong></div>
+                </div>
+                <div class="flex flex-wrap gap-1.5">
+                  ${drills.map((_, i) => `
+                    <button type="button" onclick="window._NT2_QIDX=${i}; window.renderScienceTab2();"
+                      class="w-7 h-7 rounded-lg text-xs font-bold border cursor-pointer ${i === qIdx ? "bg-emerald-600 text-white border-emerald-600" : (attMap[i] ? "bg-emerald-700 text-white border-emerald-700" : "bg-white border-slate-300")}">${i + 1}</button>
+                  `).join("")}
+                </div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-white border border-slate-200 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-extrabold text-emerald-600">${d.question_code} &bull; Question ${qIdx + 1} of ${drills.length}</span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">${d.question_type} &bull; +4 / -1</span>
+                </div>
+                <div class="text-sm font-bold text-slate-900 leading-relaxed whitespace-pre-line">${d.prompt}</div>
+
+                <div class="grid grid-cols-1 gap-2 text-xs">
+                  ${(d.options_json || []).map((opt, oi) => `
+                    <button type="button" onclick="const ok=(String(${oi})==='${d.correct_answer}'); window._NT2_ATT[${modIdx}]=window._NT2_ATT[${modIdx}]||{}; window._NT2_ATT[${modIdx}][${qIdx}]=ok; document.getElementById('nt2-sol').classList.remove('hidden'); this.classList.add(ok ? 'bg-emerald-100 border-emerald-500 text-emerald-900 font-bold' : 'bg-rose-100 border-rose-400 text-rose-900');"
+                      class="text-left p-3 rounded-xl border border-slate-200 hover:border-emerald-500 font-medium cursor-pointer"><strong>(${String.fromCharCode(65 + oi)})</strong> ${opt}</button>
+                  `).join("")}
+                </div>
+
+                <div id="nt2-sol" class="hidden p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900">
+                  <strong>NCERT Solution:</strong> ${d.explanation}
+                </div>
+                <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                  <button type="button" onclick="if(window._NT2_QIDX>0){window._NT2_QIDX--; window.renderScienceTab2();}" class="px-3.5 py-1.5 rounded-xl border text-xs font-bold cursor-pointer">&larr; Previous</button>
+                  <button type="button" onclick="if(window._NT2_QIDX<${drills.length - 1}){window._NT2_QIDX++; window.renderScienceTab2();}" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold cursor-pointer">Next Question &rarr;</button>
+                </div>
+              </div>
+            </div>
+          ` : `<div class="text-xs text-slate-500">Loading items...</div>`)}
         </div>
       </div>
     `;
