@@ -1373,21 +1373,21 @@
 
   function syncTabPillVisuals(tabNum) {
     const isJee = (EXAM === "JEE");
-    const activeCls = isJee
-      ? ["bg-indigo-600", "text-white", "border-indigo-600", "shadow-sm"]
-      : ["bg-emerald-600", "text-white", "border-emerald-600", "shadow-sm"];
-    const idleCls = ["bg-white", "text-slate-700", "border-slate-200"];
-
+    const bgActive = isJee ? "#4f46e5" : "#059669";
     document.querySelectorAll("button").forEach(btn => {
       const txt = (btn.textContent || "").trim();
       const m = txt.match(/^([1-6])\.\s+/);
       if (!m) return;
       const n = Number(m[1]);
-      btn.classList.remove("bg-indigo-600", "bg-emerald-600", "text-white", "border-indigo-600", "border-emerald-600", "shadow-sm", "bg-white", "text-slate-700", "border-slate-200");
+      if (TABS[n - 1] && txt !== TABS[n - 1]) btn.textContent = TABS[n - 1];
       if (n === tabNum) {
-        btn.classList.add(...activeCls);
+        btn.style.setProperty("background-color", bgActive, "important");
+        btn.style.setProperty("color", "#ffffff", "important");
+        btn.style.setProperty("border-color", bgActive, "important");
       } else {
-        btn.classList.add(...idleCls);
+        btn.style.setProperty("background-color", "#ffffff", "important");
+        btn.style.setProperty("color", "#334155", "important");
+        btn.style.setProperty("border-color", "#e2e8f0", "important");
       }
     });
   }
