@@ -5,7 +5,7 @@
   const EXAM = "NEET";
   const IS_JEE = (EXAM === "JEE");
   const MODES = [{'label': 'NEET UG Full 180-Q (720 Marks)', 'sub': '(NTA Standard)', 'sections': 'Physics (45 Qs) &bull; Chemistry (45 Qs) &bull; Botany (45 Qs) &bull; Zoology (45 Qs)'}, {'label': 'NCERT Line-by-Line Biology Vault', 'sub': '(360 Marks Core)', 'sections': 'Class 11 & 12 Botany + Zoology Verbatim NCERT Statements, Diagrams & Cycles'}, {'label': 'Assertion-Reason & Statement Clinic', 'sub': '(Trap Clinic)', 'sections': 'Statement I & II + Assertion-Reason Drills across Biology, Organic & Inorganic'}];
-  const TABS = ['1. Physics, Chem & Biology (12x12)', '2. NCERT Line-by-Line Bio Vault', '3. Assertion-Reason Studio', '4. 180-Q / 720-Mark NEET Mock', '5. Trap Doctor & AI Doubts', '6. NEET AIR & AIIMS/GMC Forecaster'];
+  const TABS = ['1. Physics, Chem & Biology (12x12)', '2. NCERT Line-by-Line Bio Vault', '3. Assertion-Reason Studio', '4. 180-Q / 720-Mark NEET Mock', '5. Subject Practice Mocks', '6. Trap Doctor & AI Doubts', '7. NEET AIR & AIIMS/GMC Forecaster'];
 
   function enforceScienceBrand() {
     document.documentElement.classList.remove("dark"); document.body.classList.remove("dark"); document.title = "GOALisB NEET UG Master";
@@ -891,7 +891,7 @@
             <h3 class="text-xl font-extrabold text-slate-900 mt-0.5">Serial Mock ID &amp; Verified Present Standing (${logs.length} Full Mocks Logged)</h3>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button" onclick="window.applySyncedMockToTab6(); window.selectUnifiedTab(6);" class="px-4 py-2 rounded-xl bg-${accent}-50 border border-${accent}-200 text-${accent}-700 text-xs font-extrabold cursor-pointer">View Present Forecast in Tab 6 &rarr;</button>
+            <button type="button" onclick="window.applySyncedMockToTab6(); window.selectUnifiedTab(7);" class="px-4 py-2 rounded-xl bg-${accent}-50 border border-${accent}-200 text-${accent}-700 text-xs font-extrabold cursor-pointer">View Present Forecast in Tab 6 &rarr;</button>
             <button type="button" onclick="window.openResetDeclarationModal('CLEAR_LEDGER');" class="px-4 py-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-extrabold cursor-pointer">Clear Log</button>
           </div>
         </div>
@@ -904,7 +904,7 @@
             </thead>
             <tbody>
               ${!logs.length ? `<tr><td colspan="6" class="py-4 text-slate-500">No full-length mocks submitted yet. Short drills and aborted sessions are excluded so Tab 6 reflects only complete ${REQUIRED_QS}-question exam performance.</td></tr>`
-              : logs.map(lg => `<tr class="border-b border-slate-100"><td class="py-3 pr-3 font-mono font-extrabold text-slate-900">${lg.sessionId}</td><td class="py-3 pr-3 text-slate-600">${lg.timestamp}</td><td class="py-3 pr-3 font-semibold">${lg.blueprint}</td><td class="py-3 pr-3 font-black">${lg.totalScore} / ${lg.maxScore}</td><td class="py-3 pr-3 font-bold">${lg.accuracy}% (${lg.counts})</td><td class="py-3 flex gap-1.5"><button type="button" onclick="window.downloadMockPdfReport('${lg.sessionId}');" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold cursor-pointer">PDF Marksheet</button><button type="button" onclick="window.applySyncedMockToTab6('${lg.sessionId}'); window.selectUnifiedTab(6);" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold cursor-pointer">&#8635; Sync Tab 6</button></td></tr>`).join("")}
+              : logs.map(lg => `<tr class="border-b border-slate-100"><td class="py-3 pr-3 font-mono font-extrabold text-slate-900">${lg.sessionId}</td><td class="py-3 pr-3 text-slate-600">${lg.timestamp}</td><td class="py-3 pr-3 font-semibold">${lg.blueprint}</td><td class="py-3 pr-3 font-black">${lg.totalScore} / ${lg.maxScore}</td><td class="py-3 pr-3 font-bold">${lg.accuracy}% (${lg.counts})</td><td class="py-3 flex gap-1.5"><button type="button" onclick="window.downloadMockPdfReport('${lg.sessionId}');" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold cursor-pointer">PDF Marksheet</button><button type="button" onclick="window.applySyncedMockToTab6('${lg.sessionId}'); window.selectUnifiedTab(7);" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold cursor-pointer">&#8635; Sync Tab 6</button></td></tr>`).join("")}
             </tbody>
           </table>
         </div>
@@ -967,7 +967,7 @@
               <button type="button" onclick="window.submitMockAndSync();" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold cursor-pointer">Submit Full Mock &amp; Sync Tab 6</button>
             ` : `
               <button type="button" onclick="window.downloadMockPdfReport('${window._MOCK_SERIAL_ID}');" class="px-4 py-2 rounded-xl bg-amber-500 text-slate-950 text-xs font-extrabold cursor-pointer">Download PDF Marksheet</button>
-              <button type="button" onclick="window.applySyncedMockToTab6('${window._MOCK_SERIAL_ID}'); window.selectUnifiedTab(6);" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-extrabold cursor-pointer">View Present Standing in Tab 6 &rarr;</button>
+              <button type="button" onclick="window.applySyncedMockToTab6('${window._MOCK_SERIAL_ID}'); window.selectUnifiedTab(7);" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-extrabold cursor-pointer">View Present Standing in Tab 6 &rarr;</button>
               <button type="button" onclick="window.startFreshMockReset();" class="px-3.5 py-2 rounded-xl border text-xs font-extrabold cursor-pointer">New Full Mock</button>
             `}
           </div>
@@ -1037,6 +1037,313 @@
           </div>
         </div>
         ${ledgerHtml}
+      </div>`;
+  };
+
+  // ============================================================================
+  // TAB 5: DEDICATED SUBJECT-WISE & SECTIONAL TIMED PRACTICE MOCK ARENA (v36)
+  // ============================================================================
+  const PRAC_LOG_KEY = IS_JEE ? "goalisb_jee_practice_mock_ledger_v1" : "goalisb_neet_practice_mock_ledger_v1";
+  window._PM_SCOPE = window._PM_SCOPE || (IS_JEE ? "PHYSICS" : "BIOLOGY");
+  window._PM_SERIAL = window._PM_SERIAL || ((IS_JEE ? "JEE-PRAC-" : "NEET-PRAC-") + Math.floor(1000 + Math.random() * 9000));
+  window._PM_STARTED = !!window._PM_STARTED;
+  window._PM_SUBMITTED = !!window._PM_SUBMITTED;
+  window._PM_IDX = Number(window._PM_IDX || 0);
+  window._PM_ANS = window._PM_ANS || {};
+  window._PM_REVIEW = window._PM_REVIEW || {};
+  window._PM_VISITED = window._PM_VISITED || { 0: true };
+  if (typeof window._PM_SEC_LEFT !== "number") window._PM_SEC_LEFT = (IS_JEE ? 60 : 90) * 60;
+  window._PM_TIMER_ID = window._PM_TIMER_ID || null;
+
+  function getPracticeMeta(sc) {
+    const scope = (sc || window._PM_SCOPE || (IS_JEE ? "PHYSICS" : "BIOLOGY")).toUpperCase();
+    if (IS_JEE) {
+      if (scope === "CHEMISTRY") return { scope: "CHEMISTRY", label: "Chemistry Sectional Practice Mock (25 Qs)", qs: 25, maxMarks: 100, mins: 60 };
+      if (scope === "MATHEMATICS") return { scope: "MATHEMATICS", label: "Mathematics Sectional Practice Mock (25 Qs)", qs: 25, maxMarks: 100, mins: 60 };
+      return { scope: "PHYSICS", label: "Physics Sectional Practice Mock (25 Qs)", qs: 25, maxMarks: 100, mins: 60 };
+    } else {
+      if (scope === "PHYSICS") return { scope: "PHYSICS", label: "Physics Sectional Practice Mock (45 Qs)", qs: 45, maxMarks: 180, mins: 45 };
+      if (scope === "CHEMISTRY") return { scope: "CHEMISTRY", label: "Chemistry Sectional Practice Mock (45 Qs)", qs: 45, maxMarks: 180, mins: 45 };
+      if (scope === "BOTANY") return { scope: "BOTANY", label: "Botany Sectional Practice Mock (45 Qs)", qs: 45, maxMarks: 180, mins: 45 };
+      if (scope === "ZOOLOGY") return { scope: "ZOOLOGY", label: "Zoology Sectional Practice Mock (45 Qs)", qs: 45, maxMarks: 180, mins: 45 };
+      return { scope: "BIOLOGY", label: "Full Biology (Botany + Zoology) Practice Mock (90 Qs)", qs: 90, maxMarks: 360, mins: 90 };
+    }
+  }
+
+  function getPracticeLogs() {
+    try {
+      const arr = JSON.parse(localStorage.getItem(PRAC_LOG_KEY) || "[]");
+      return Array.isArray(arr) ? arr : [];
+    } catch (_) { return []; }
+  }
+
+  function savePracticeLog(entry) {
+    const logs = getPracticeLogs();
+    logs.unshift(entry);
+    localStorage.setItem(PRAC_LOG_KEY, JSON.stringify(logs.slice(0, 40)));
+  }
+
+  function ensurePracticeTimer() {
+    if (window._PM_TIMER_ID) return;
+    window._PM_TIMER_ID = setInterval(() => {
+      if (!window._PM_STARTED || window._PM_SUBMITTED) return;
+      const el = document.getElementById("pm-clock");
+      if (!el) return;
+      if (window._PM_SEC_LEFT > 0) window._PM_SEC_LEFT--;
+      const h = String(Math.floor(window._PM_SEC_LEFT / 3600)).padStart(2, "0");
+      const m = String(Math.floor((window._PM_SEC_LEFT % 3600) / 60)).padStart(2, "0");
+      const s = String(window._PM_SEC_LEFT % 60).padStart(2, "0");
+      el.textContent = `${h}:${m}:${s}`;
+    }, 1000);
+  }
+
+  function buildPracticePaper() {
+    const meta = getPracticeMeta();
+    const key = window._PM_SERIAL + "_" + meta.scope;
+    if (window._PM_PAPER && window._PM_PAPER_KEY === key && window._PM_PAPER.length === meta.qs) {
+      return window._PM_PAPER;
+    }
+    let paper = [];
+    if (IS_JEE) {
+      const mcqs = window._SCI_QUESTIONS.filter(q => q.subject === meta.scope && q.question_type !== "NUMERICAL_INT");
+      const nums = window._SCI_QUESTIONS.filter(q => q.subject === meta.scope && q.question_type === "NUMERICAL_INT");
+      pickRandomDistinct(mcqs, 20).forEach(b => paper.push({ ...b, mock_sec: "Section A (MCQ)", mock_subj: meta.scope }));
+      pickRandomDistinct(nums, 5).forEach(b => paper.push({ ...b, mock_sec: "Section B (Numerical)", mock_subj: meta.scope }));
+    } else {
+      const subjs = meta.scope === "BIOLOGY" ? ["BOTANY", "ZOOLOGY"] : [meta.scope];
+      subjs.forEach(s => {
+        const pool = window._SCI_QUESTIONS.filter(q => q.subject === s && Array.isArray(q.options_json) && q.options_json.length >= 4);
+        pickRandomDistinct(pool, 45).forEach(b => paper.push({ ...b, mock_sec: "Compulsory MCQ", mock_subj: s }));
+      });
+    }
+    if (paper.length === meta.qs) {
+      window._PM_PAPER = paper;
+      window._PM_PAPER_KEY = key;
+    }
+    return paper;
+  }
+
+  window.setPracticeScope = function (sc) {
+    if (window._PM_STARTED && !window._PM_SUBMITTED) {
+      alert("Submit or Reset your active practice mock before changing subject.");
+      return;
+    }
+    window._PM_SCOPE = sc;
+    window._PM_PAPER = null;
+    window._PM_SUBMITTED = false;
+    window._PM_ANS = {};
+    window._PM_REVIEW = {};
+    window._PM_IDX = 0;
+    window._PM_SEC_LEFT = getPracticeMeta(sc).mins * 60;
+    window.renderScienceTab5();
+  };
+
+  window.launchPracticeMock = async function () {
+    const meta = getPracticeMeta();
+    try {
+      const res = await fetch("/api/science/mock-paper?exam=" + EXAM + "&scope=" + meta.scope + "&ts=" + Date.now(), { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.paper) && data.paper.length === meta.qs) {
+          window._PM_PAPER = data.paper.map(q => ({
+            ...q,
+            options_json: typeof q.options_json === "string" ? JSON.parse(q.options_json) : q.options_json
+          }));
+          window._PM_PAPER_KEY = window._PM_SERIAL + "_" + meta.scope;
+        }
+      }
+    } catch (_) {}
+    window._PM_STARTED = true;
+    window._PM_SUBMITTED = false;
+    window._PM_SEC_LEFT = meta.mins * 60;
+    window._PM_IDX = 0;
+    window._PM_VISITED = { 0: true };
+    window.renderScienceTab5();
+  };
+
+  window.submitPracticeMock = function () {
+    const meta = getPracticeMeta();
+    const paper = buildPracticePaper();
+    let score = 0, c = 0, w = 0, att = 0;
+    paper.forEach((item, idx) => {
+      const raw = window._PM_ANS[idx];
+      if (raw !== undefined && String(raw).trim() !== "") {
+        att++;
+        const ok = (item.question_type === "NUMERICAL_INT" || !Array.isArray(item.options_json))
+          ? (Number(String(raw).trim()) === Number(item.correct_answer) || String(raw).trim() === String(item.correct_answer).trim())
+          : (String(Number(raw)) === String(item.correct_answer).trim());
+        if (ok) { score += 4; c++; } else { score -= 1; w++; }
+      }
+    });
+    const unatt = paper.length - att;
+    const acc = att > 0 ? ((c / att) * 100).toFixed(1) : "0.0";
+    const elapsed = Math.max(1, meta.mins * 60 - window._PM_SEC_LEFT);
+    window._PM_SUBMITTED = true;
+    savePracticeLog({
+      sessionId: window._PM_SERIAL,
+      timestamp: new Date().toLocaleString(),
+      blueprint: meta.label,
+      scope: meta.scope,
+      totalScore: score,
+      maxScore: meta.maxMarks,
+      accuracy: acc,
+      counts: `${c}C / ${w}W / ${unatt}U`,
+      timeTaken: Math.floor(elapsed / 60) + "m " + (elapsed % 60) + "s"
+    });
+    window.renderScienceTab5();
+  };
+
+  window.resetPracticeMock = function () {
+    window._PM_SERIAL = (IS_JEE ? "JEE-PRAC-" : "NEET-PRAC-") + Math.floor(1000 + Math.random() * 9000);
+    window._PM_PAPER = null;
+    window._PM_STARTED = false;
+    window._PM_SUBMITTED = false;
+    window._PM_ANS = {};
+    window._PM_REVIEW = {};
+    window._PM_VISITED = { 0: true };
+    window._PM_IDX = 0;
+    window._PM_SEC_LEFT = getPracticeMeta().mins * 60;
+    window.renderScienceTab5();
+  };
+
+  window.renderScienceTab5 = async function (el) {
+    const accent = IS_JEE ? "indigo" : "emerald";
+    enforceScienceBrand();
+    const target = getTarget(el);
+    if (!target) return;
+    await hydrateFromNeon();
+    ensurePracticeTimer();
+
+    const meta = getPracticeMeta();
+    const paper = buildPracticePaper();
+    const pLogs = getPracticeLogs();
+    const scopes = IS_JEE
+      ? [["PHYSICS", "Physics Sectional (25 Qs • 60m)"], ["CHEMISTRY", "Chemistry Sectional (25 Qs • 60m)"], ["MATHEMATICS", "Mathematics Sectional (25 Qs • 60m)"]]
+      : [["BIOLOGY", "Full Biology 90-Q (Bot+Zoo • 90m)"], ["PHYSICS", "Physics Sectional (45 Qs • 45m)"], ["CHEMISTRY", "Chemistry Sectional (45 Qs • 45m)"], ["BOTANY", "Botany Sectional (45 Qs • 45m)"], ["ZOOLOGY", "Zoology Sectional (45 Qs • 45m)"]];
+
+    const scopeBar = `
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div class="text-xs font-extrabold uppercase tracking-wider text-${accent}-600">5. SUBJECT-WISE &amp; SECTIONAL TIMED PRACTICE MOCKS (NEON RANDOM EXTRACTION)</div>
+            <h2 class="text-xl font-black text-slate-900 mt-0.5">Isolated Sectional Practice Arena (Does Not Alter Tab 4 Full-Mock Ledger or Tab 7 Forecast)</h2>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-extrabold">Practice Mode (+4 / -1)</span>
+        </div>
+        <div class="flex flex-wrap gap-2 pt-1">
+          ${scopes.map(([k, lbl]) => `
+            <button type="button" onclick="window.setPracticeScope('${k}');"
+              class="px-4 py-2 rounded-xl text-xs font-extrabold border transition cursor-pointer ${meta.scope === k
+                ? `bg-${accent}-600 text-white border-${accent}-600 shadow-sm`
+                : "bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-400"}">${lbl}</button>
+          `).join("")}
+        </div>
+      </div>`;
+
+    const pracLedger = `
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm">
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-extrabold text-slate-900">Subject Practice Mock History (${pLogs.length} Sessions)</h3>
+          <button type="button" onclick="localStorage.removeItem('${PRAC_LOG_KEY}'); window.renderScienceTab5();" class="px-3 py-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold cursor-pointer">Clear Practice Log</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead><tr class="border-b border-slate-200 text-[11px] font-extrabold uppercase text-slate-500"><th class="py-2 pr-3">PRACTICE ID</th><th class="py-2 pr-3">DATE &amp; TIME</th><th class="py-2 pr-3">SUBJECT BLUEPRINT</th><th class="py-2 pr-3">SCORE</th><th class="py-2 pr-3">ACCURACY</th><th class="py-2">TIME</th></tr></thead>
+            <tbody>
+              ${!pLogs.length ? `<tr><td colspan="6" class="py-4 text-slate-500">No subject practice mocks completed yet. Select a subject above and launch a timed practice mock.</td></tr>`
+              : pLogs.map(x => `<tr class="border-b border-slate-100"><td class="py-2.5 pr-3 font-mono font-extrabold">${x.sessionId}</td><td class="py-2.5 pr-3 text-slate-600">${x.timestamp}</td><td class="py-2.5 pr-3 font-bold">${x.blueprint}</td><td class="py-2.5 pr-3 font-black text-${accent}-700">${x.totalScore} / ${x.maxScore}</td><td class="py-2.5 pr-3 font-semibold">${x.accuracy}% (${x.counts})</td><td class="py-2.5">${x.timeTaken}</td></tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+
+    if (!window._PM_STARTED && !window._PM_SUBMITTED) {
+      target.innerHTML = `
+        <div class="max-w-7xl mx-auto pt-4 pb-10 space-y-5">
+          ${scopeBar}
+          <div class="bg-white border-2 border-${accent}-200 rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+            <div class="space-y-1">
+              <span class="px-3 py-1 rounded-full bg-${accent}-100 text-${accent}-800 text-[11px] font-extrabold uppercase">READY TO LAUNCH &bull; ${window._PM_SERIAL}</span>
+              <h3 class="text-2xl font-black text-slate-900 pt-1">${meta.label} (${meta.mins} Mins)</h3>
+              <p class="text-xs text-slate-600">Dynamically extracts ${meta.qs} random ${meta.scope} items from Neon PostgreSQL (${window._SCI_QUESTIONS.length} live bank items).</p>
+            </div>
+            <button type="button" onclick="window.launchPracticeMock();" class="px-6 py-3.5 rounded-2xl bg-${accent}-600 hover:bg-${accent}-500 text-white text-sm font-extrabold shadow-md cursor-pointer">&#9654; Start ${meta.scope} Practice Mock (${meta.mins} Mins)</button>
+          </div>
+          ${pracLedger}
+        </div>`;
+      return;
+    }
+
+    const totalQs = paper.length;
+    const qIdx = Math.min(totalQs - 1, Math.max(0, Number(window._PM_IDX || 0)));
+    window._PM_VISITED[qIdx] = true;
+    const q = paper[qIdx];
+    const h = String(Math.floor(window._PM_SEC_LEFT / 3600)).padStart(2, "0");
+    const m = String(Math.floor((window._PM_SEC_LEFT % 3600) / 60)).padStart(2, "0");
+    const s = String(window._PM_SEC_LEFT % 60).padStart(2, "0");
+
+    target.innerHTML = `
+      <div class="max-w-7xl mx-auto pt-4 pb-10 space-y-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-xl bg-slate-100 border font-mono text-xs font-extrabold">${window._PM_SERIAL}</span>
+            <span class="px-3 py-1.5 rounded-xl bg-${accent}-600 text-white text-xs font-extrabold">${meta.label}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="px-3.5 py-1.5 rounded-xl bg-slate-900 text-amber-300 font-mono text-sm font-extrabold"><span id="pm-clock">${h}:${m}:${s}</span></div>
+            ${!window._PM_SUBMITTED ? `
+              <button type="button" onclick="window.resetPracticeMock();" class="px-3.5 py-2 rounded-xl bg-rose-50 border border-rose-300 text-rose-700 text-xs font-extrabold cursor-pointer">Abort &amp; Reset</button>
+              <button type="button" onclick="window.submitPracticeMock();" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold cursor-pointer">Submit Practice Mock</button>
+            ` : `
+              <button type="button" onclick="window.resetPracticeMock();" class="px-4 py-2 rounded-xl bg-${accent}-600 text-white text-xs font-extrabold cursor-pointer">New Practice Mock</button>
+            `}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div class="lg:col-span-8 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div><span class="text-xs font-extrabold uppercase text-${accent}-600">Question ${qIdx + 1} of ${totalQs} &bull; ${q.mock_subj} &bull; ${q.mock_sec}</span><div class="text-[11px] text-slate-500">Code: ${q.question_code} &bull; ${q.chapter_name}</div></div>
+              <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-extrabold">+4 / -1</span>
+            </div>
+            <div class="text-sm font-bold text-slate-900 leading-relaxed whitespace-pre-line min-h-[90px]">${q.prompt}</div>
+            ${q.question_type === "NUMERICAL_INT" ? `
+              <div class="space-y-2 pt-2"><label class="block text-xs font-extrabold text-slate-600">Enter Exact Numerical Value:</label><input id="pm-num-box" type="text" value="${window._PM_ANS[qIdx] || ""}" onchange="window._PM_ANS[${qIdx}]=this.value.trim();" placeholder="Type numerical answer..." class="w-56 rounded-xl border border-slate-300 px-4 py-2.5 text-base font-mono font-extrabold" /></div>
+            ` : `
+              <div class="grid grid-cols-1 gap-2.5 text-xs pt-1">
+                ${(q.options_json || []).map((opt, oi) => {
+                  const selected = String(window._PM_ANS[qIdx]) === String(oi);
+                  return `<button type="button" onclick="window._PM_ANS[${qIdx}]='${oi}'; window.renderScienceTab5();" class="text-left p-3.5 rounded-xl border transition cursor-pointer ${selected ? `bg-${accent}-600 text-white border-${accent}-600 font-bold` : "bg-slate-50 border-slate-200 text-slate-900"}"><strong>(${String.fromCharCode(65 + oi)})</strong> ${opt}</button>`;
+                }).join("")}
+              </div>
+            `}
+            ${window._PM_SUBMITTED ? `<div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950"><strong>Official Answer:</strong> ${q.options_json ? q.options_json[Number(q.correct_answer)] : q.correct_answer}<br/><strong>Solution:</strong> ${q.explanation}</div>` : ""}
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-4 border-t border-slate-100">
+              <div class="flex gap-2">
+                <button type="button" onclick="const nb=document.getElementById('pm-num-box'); if(nb) window._PM_ANS[${qIdx}]=nb.value.trim(); if(window._PM_IDX<${totalQs - 1}) window._PM_IDX++; window.renderScienceTab5();" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold cursor-pointer">Save &amp; Next</button>
+                <button type="button" onclick="window._PM_REVIEW[${qIdx}]=true; if(window._PM_IDX<${totalQs - 1}) window._PM_IDX++; window.renderScienceTab5();" class="px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-extrabold cursor-pointer">Mark &amp; Next</button>
+                <button type="button" onclick="delete window._PM_ANS[${qIdx}]; delete window._PM_REVIEW[${qIdx}]; window.renderScienceTab5();" class="px-3.5 py-2 rounded-xl border text-xs font-bold cursor-pointer">Clear</button>
+              </div>
+              <div class="flex gap-1.5">
+                <button type="button" onclick="if(window._PM_IDX>0){window._PM_IDX--; window.renderScienceTab5();}" class="px-3 py-2 rounded-xl border text-xs font-bold cursor-pointer">&larr; Prev</button>
+                <button type="button" onclick="if(window._PM_IDX<${totalQs - 1}){window._PM_IDX++; window.renderScienceTab5();}" class="px-3 py-2 rounded-xl border text-xs font-bold cursor-pointer">Next &rarr;</button>
+              </div>
+            </div>
+          </div>
+          <div class="lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
+            <div class="text-xs font-extrabold uppercase text-slate-700">PRACTICE PALETTE (${totalQs} Qs)</div>
+            <div class="max-h-[340px] overflow-y-auto pr-1 grid grid-cols-6 gap-1.5">
+              ${paper.map((_, idx) => {
+                const hasAns = window._PM_ANS[idx] !== undefined && String(window._PM_ANS[idx]).trim() !== "";
+                const isRev = !!window._PM_REVIEW[idx], isVis = !!window._PM_VISITED[idx];
+                let cls = isRev ? "bg-purple-600 text-white border-purple-600" : hasAns ? "bg-emerald-600 text-white border-emerald-600" : isVis ? "bg-rose-500 text-white border-rose-500" : "bg-slate-100 text-slate-700 border-slate-300";
+                if (idx === qIdx) cls += " ring-2 ring-indigo-500 ring-offset-1";
+                return `<button type="button" onclick="window._PM_IDX=${idx}; window.renderScienceTab5();" class="h-7 rounded-lg text-[11px] font-extrabold border cursor-pointer ${cls}">${idx + 1}</button>`;
+              }).join("")}
+            </div>
+          </div>
+        </div>
+        ${pracLedger}
       </div>`;
   };
 
@@ -1210,7 +1517,7 @@
     window.updateScienceTab6();
   };
 
-  window.renderScienceTab6 = function (el) {
+  window.renderScienceTab7 = function (el) {
     enforceScienceBrand();
     window.applySyncedMockToTab6();
     const target = getTarget(el);
@@ -1251,7 +1558,7 @@
               ? `<strong>&#10003; Verified Present Level:</strong> Calibrated from Full Mock <strong>${window._T6_SYNCED_ID}</strong>`
               : `<strong>What-If Target Sandbox:</strong> Comparing target against Full Mock <strong>${window._T6_SYNCED_ID}</strong>`}</span>
             ${window._T6_MODE !== "VERIFIED"
-              ? `<button type="button" onclick="window.applySyncedMockToTab6(); window.renderScienceTab6();" class="underline font-extrabold cursor-pointer">Restore Present Level</button>`
+              ? `<button type="button" onclick="window.applySyncedMockToTab6(); window.renderScienceTab7();" class="underline font-extrabold cursor-pointer">Restore Present Level</button>`
               : `<span class="px-2 py-0.5 rounded bg-emerald-600 text-white text-[10px] font-extrabold">OFFICIAL STANDING</span>`}
           </div>
           <div class="text-[11px] opacity-90">Full Mocks Completed: <strong>${vLogs.length}</strong> &bull; Rolling Average: <strong>${avgScore}/${MAX_MARKS}</strong> &bull; Best Full Mock: <strong>${bestScore}/${MAX_MARKS}</strong></div>
@@ -1267,7 +1574,7 @@
                 <h2 class="text-xl font-extrabold text-slate-900 mt-0.5">${IS_JEE ? "Subject Marks & Shift Simulator" : "PCB Subject Marks & AIR Simulator"}</h2>
                 <div class="text-[11px] font-semibold text-emerald-700 mt-1">Synced with Tab 4 Full-Mock Ledger (Adjust sliders or click Sync Mock)</div>
               </div>
-              <button type="button" onclick="if(window.applySyncedMockToTab6()){ window.renderScienceTab6(); } else { alert('No submitted Tab 4 Full Mock found in ledger yet. Submit a complete Tab 4 Full Mock first.'); }"
+              <button type="button" onclick="if(window.applySyncedMockToTab6()){ window.renderScienceTab7(); } else { alert('No submitted Tab 4 Full Mock found in ledger yet. Submit a complete Tab 4 Full Mock first.'); }"
                 class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-sm cursor-pointer shrink-0">
                 &#8635; Sync Mock
               </button>
@@ -1360,23 +1667,47 @@
     renderMockSimulator4: window.renderScienceTab4,
     renderTab5: window.renderScienceTab5,
     renderTrapClinic5: window.renderScienceTab5,
-    renderTab6: window.renderScienceTab6
+    renderTab6: window.renderScienceTab6,
+    renderTab7: window.renderScienceTab7
   };
   Object.entries(tabMap).forEach(([k, fn]) => {
     Object.defineProperty(window, k, { get: () => fn, set: () => {}, configurable: true });
   });
 
   // ============================================================================
-  // SINGLE-CLICK CAPTURE-PHASE TAB ROUTER (BLOCKS LEGACY APP.JS OVERWRITES)
+  // SINGLE-CLICK CAPTURE-PHASE 7-TAB ROUTER
   // ============================================================================
   window._ACTIVE_SCI_TAB = window._ACTIVE_SCI_TAB || 1;
 
+  function ensureSevenTabButtons() {
+    let tab6Btn = null;
+    let tab5Exists = false;
+    document.querySelectorAll("button").forEach(btn => {
+      const t = (btn.textContent || "").trim();
+      if (t.startsWith("5. Subject Practice Mocks")) tab5Exists = true;
+      if (t.startsWith("6. GRE Score Forecaster") || t.startsWith("6. JEE Percentile") || t.startsWith("6. NEET AIR") || t.startsWith("7. ")) {
+        tab6Btn = btn;
+      }
+    });
+    if (!tab5Exists && tab6Btn && tab6Btn.parentElement) {
+      const p5 = tab6Btn.cloneNode(true);
+      p5.textContent = TABS[4];
+      tab6Btn.parentElement.insertBefore(p5, tab6Btn);
+    }
+    document.querySelectorAll("button").forEach(btn => {
+      const t = (btn.textContent || "").trim();
+      if (t.startsWith("5. Trap Doctor")) btn.textContent = TABS[5];
+      else if (t.startsWith("6. GRE Score Forecaster") || t.startsWith("6. JEE Percentile") || t.startsWith("6. NEET AIR")) btn.textContent = TABS[6];
+    });
+  }
+
   function syncTabPillVisuals(tabNum) {
+    ensureSevenTabButtons();
     const isJee = (EXAM === "JEE");
     const bgActive = isJee ? "#4f46e5" : "#059669";
     document.querySelectorAll("button").forEach(btn => {
       const txt = (btn.textContent || "").trim();
-      const m = txt.match(/^([1-6])\.\s+/);
+      const m = txt.match(/^([1-7])\.\s+/);
       if (!m) return;
       const n = Number(m[1]);
       if (TABS[n - 1] && txt !== TABS[n - 1]) btn.textContent = TABS[n - 1];
@@ -1393,11 +1724,11 @@
   }
 
   window.selectUnifiedTab = function (tabNum) {
-    const n = Math.min(6, Math.max(1, Number(tabNum) || 1));
+    const n = Math.min(7, Math.max(1, Number(tabNum) || 1));
     window._ACTIVE_SCI_TAB = n;
     syncTabPillVisuals(n);
     const target = getTarget();
-    if (target && !window._SCI_HYDRATED && n <= 4) {
+    if (target && !window._SCI_HYDRATED && n <= 5) {
       target.innerHTML = `<div class="max-w-7xl mx-auto pt-8 text-center text-xs font-extrabold uppercase tracking-wider text-slate-500">Loading Tab ${n} from Neon PostgreSQL...</div>`;
     }
     const fns = {
@@ -1406,7 +1737,8 @@
       3: window.renderScienceTab3,
       4: window.renderScienceTab4,
       5: window.renderScienceTab5,
-      6: window.renderScienceTab6
+      6: window.renderScienceTab6,
+      7: window.renderScienceTab7
     };
     if (typeof fns[n] === "function") fns[n](target);
   };
@@ -1415,7 +1747,7 @@
     const btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
     if (!btn) return;
     const txt = (btn.textContent || "").trim();
-    const m = txt.match(/^([1-6])\.\s+/);
+    const m = txt.match(/^([1-7])\.\s+/);
     if (!m) return;
     ev.preventDefault();
     ev.stopPropagation();
@@ -1425,14 +1757,14 @@
 
   window.addEventListener("DOMContentLoaded", () => {
     enforceScienceBrand();
+    ensureSevenTabButtons();
     if (window._ACTIVE_SCI_TAB === 1) {
       window.selectUnifiedTab(1);
     }
     setTimeout(() => {
       enforceScienceBrand();
-      if (window._ACTIVE_SCI_TAB === 1) {
-        syncTabPillVisuals(1);
-      }
+      ensureSevenTabButtons();
+      syncTabPillVisuals(window._ACTIVE_SCI_TAB || 1);
     }, 350);
   });
 })();

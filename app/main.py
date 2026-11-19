@@ -2108,14 +2108,16 @@ def _get_science_engine():
 
 
 @app.get("/api/science/mock-paper")
-def get_dynamic_mock_paper(exam: str = "JEE"):
+def get_dynamic_mock_paper(exam: str = "JEE", scope: str = "FULL"):
     from sqlalchemy import text as _sa_text
     exam_code = exam.strip().upper()
+    sc = scope.strip().upper()
     eng = _get_science_engine()
     paper = []
     with eng.connect() as conn:
         if exam_code == "JEE":
-            for subj in ("PHYSICS", "CHEMISTRY", "MATHEMATICS"):
+            subjs = ("PHYSICS", "CHEMISTRY", "MATHEMATICS") if sc == "FULL" else (sc,)
+            for subj in subjs:
                 mcqs = conn.execute(_sa_text("""
                     SELECT id, question_code, subject, ncert_class, chapter_name, topic_tag,
                            exam_tags, question_type, difficulty_tier, prompt,
@@ -2137,7 +2139,13 @@ def get_dynamic_mock_paper(exam: str = "JEE"):
                 for r in nums:
                     d = dict(r); d["mock_sec"] = "Section B (Numerical)"; d["mock_subj"] = subj; paper.append(d)
         else:
-            for subj in ("PHYSICS", "CHEMISTRY", "BOTANY", "ZOOLOGY"):
+            if sc == "FULL":
+                subjs = ("PHYSICS", "CHEMISTRY", "BOTANY", "ZOOLOGY")
+            elif sc == "BIOLOGY":
+                subjs = ("BOTANY", "ZOOLOGY")
+            else:
+                subjs = (sc,)
+            for subj in subjs:
                 rows = conn.execute(_sa_text("""
                     SELECT id, question_code, subject, ncert_class, chapter_name, topic_tag,
                            exam_tags, question_type, difficulty_tier, prompt,
@@ -2148,8 +2156,7 @@ def get_dynamic_mock_paper(exam: str = "JEE"):
                 """), {"s": subj}).mappings().all()
                 for r in rows:
                     d = dict(r); d["mock_sec"] = "Compulsory MCQ"; d["mock_subj"] = subj; paper.append(d)
-    return {"ok": True, "exam": exam_code, "count": len(paper), "paper": paper}
-
+    return {"ok": True, "exam": exam_code, "scope": sc, "count": len(paper), "paper": paper}
 
 @app.get("/api/science/questions")
 def get_science_questions(exam: str = "JEE", subject: str = "", limit: int = 200):
