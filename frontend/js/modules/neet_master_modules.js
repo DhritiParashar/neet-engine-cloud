@@ -123,7 +123,7 @@
           <div class="text-xs font-extrabold uppercase tracking-wider text-emerald-600">NEET PCB MODULES (6 CHAPTERS • 12x12 NEON BANK)</div>
           ${mods.map((item, idx) => `
             <button type="button" onclick="window._SCI_MOD_IDX=${idx}; window._SCI_QIDX=0; window.renderScienceTab1();"
-              class="w-full text-left p-4 rounded-2xl border transition cursor-pointer ${idx === modIdx
+              class="w-full text-left p-4 rounded-2xl border cursor-pointer ${idx === modIdx
                 ? "bg-emerald-50/90 dark:bg-emerald-950/60 border-emerald-500 shadow-sm"
                 : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-emerald-300"}">
               <div class="text-[10px] font-extrabold uppercase text-emerald-600">${item.subject} &bull; NCERT CLASS ${item.ncert_class}</div>
@@ -271,7 +271,7 @@
           <div class="text-xs font-extrabold uppercase tracking-wider text-emerald-600">NCERT LINE-BY-LINE BIO VAULT (6 CHAPTERS &bull; 12&times;12 NEON BANK)</div>
           ${mods.map((item, idx) => `
             <button type="button" onclick="window._NT2_MOD_IDX=${idx}; window._NT2_QIDX=0; window.renderScienceTab2();"
-              class="w-full text-left p-4 rounded-2xl border transition cursor-pointer ${idx === modIdx
+              class="w-full text-left p-4 rounded-2xl border cursor-pointer ${idx === modIdx
                 ? "bg-emerald-50/90 border-emerald-500 shadow-sm"
                 : "bg-white border-slate-200 hover:border-emerald-300"}">
               <div class="text-[10px] font-extrabold uppercase text-emerald-600">${item.subject} &bull; NCERT CLASS ${item.ncert_class}</div>
@@ -462,7 +462,7 @@
                         }
                         return `
                           <button type="button" onclick="window._NT3_ANS['${qKey}']='${oi}'; window._NT3_RES['${qKey}']=(String(${oi})==='${q.correct_answer}'); window.renderScienceTab3();"
-                            class="text-left p-3 rounded-xl border transition cursor-pointer ${btnCls}">
+                            class="text-left p-3 rounded-xl border cursor-pointer ${btnCls}">
                             <strong>(${String.fromCharCode(65 + oi)})</strong> ${opt}
                           </button>
                         `;
@@ -666,22 +666,25 @@
     return false;
   }
 
-  window.launchProctoredMockSession = async function () {
+  window.launchProctoredMockSession = function () {
     const chk = document.getElementById("cbt-launch-decl");
     if (chk && !chk.checked) {
-      alert("Please check the NTA Candidate Honor-Code Declaration box before launching the proctored session.");
+      alert("Please check the NTA Candidate Honor-Code Declaration box before launching the session.");
       return;
     }
-    await fetchDynamicMockFromPostgres();
+    const meta = getScopeMeta();
     window._CBT_STARTED = true;
     window._CBT_SUBMITTED = false;
-    window._CBT_SEC_LEFT = 180 * 60;
+    window._CBT_SEC_LEFT = meta.mins * 60;
     window._CBT_IDX = 0;
     window._CBT_VISITED = { 0: true };
     window.renderScienceTab4();
+    fetchDynamicMockFromPostgres().then(ok => {
+      if (ok && window._CBT_STARTED && !window._CBT_SUBMITTED && Object.keys(window._CBT_ANS).length === 0) {
+        window.renderScienceTab4();
+      }
+    });
   };
-
-
 
   window.submitMockAndSync = function () {
     const paper = buildFullMockPaper();
@@ -1001,7 +1004,7 @@
               <div class="grid grid-cols-1 gap-2.5 text-xs pt-1">
                 ${(q.options_json || []).map((opt, oi) => {
                   const selected = String(window._CBT_ANS[qIdx]) === String(oi);
-                  return `<button type="button" onclick="window._CBT_ANS[${qIdx}]='${oi}'; window.renderScienceTab4();" class="text-left p-3.5 rounded-xl border transition cursor-pointer ${selected ? `bg-${accent}-600 text-white border-${accent}-600 font-bold shadow-sm` : "bg-slate-50 border-slate-200 text-slate-900"}"><strong>(${String.fromCharCode(65 + oi)})</strong> ${opt}</button>`;
+                  return `<button type="button" onclick="window._CBT_ANS[${qIdx}]='${oi}'; window.renderScienceTab4();" class="text-left p-3.5 rounded-xl border cursor-pointer ${selected ? `bg-${accent}-600 text-white border-${accent}-600 font-bold shadow-sm` : "bg-slate-50 border-slate-200 text-slate-900"}"><strong>(${String.fromCharCode(65 + oi)})</strong> ${opt}</button>`;
                 }).join("")}
               </div>
             `}
@@ -1139,27 +1142,26 @@
     window.renderScienceTab5();
   };
 
-  window.launchPracticeMock = async function () {
+  window.launchPracticeMock = function () {
     const meta = getPracticeMeta();
-    try {
-      const res = await fetch("/api/science/mock-paper?exam=" + EXAM + "&scope=" + meta.scope + "&ts=" + Date.now(), { cache: "no-store" });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.ok && Array.isArray(data.paper) && data.paper.length === meta.qs) {
-          window._PM_PAPER = data.paper.map(q => ({
-            ...q,
-            options_json: typeof q.options_json === "string" ? JSON.parse(q.options_json) : q.options_json
-          }));
-          window._PM_PAPER_KEY = window._PM_SERIAL + "_" + meta.scope;
-        }
-      }
-    } catch (_) {}
     window._PM_STARTED = true;
     window._PM_SUBMITTED = false;
     window._PM_SEC_LEFT = meta.mins * 60;
     window._PM_IDX = 0;
     window._PM_VISITED = { 0: true };
     window.renderScienceTab5();
+    fetch("/api/science/mock-paper?exam=" + EXAM + "&scope=" + meta.scope + "&ts=" + Date.now(), { cache: "no-store" })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && data.ok && Array.isArray(data.paper) && data.paper.length === meta.qs && window._PM_STARTED && !window._PM_SUBMITTED && Object.keys(window._PM_ANS).length === 0) {
+          window._PM_PAPER = data.paper.map(q => ({
+            ...q,
+            options_json: typeof q.options_json === "string" ? JSON.parse(q.options_json) : q.options_json
+          }));
+          window._PM_PAPER_KEY = window._PM_SERIAL + "_" + meta.scope;
+          window.renderScienceTab5();
+        }
+      }).catch(() => {});
   };
 
   window.submitPracticeMock = function () {
@@ -1233,7 +1235,7 @@
         <div class="flex flex-wrap gap-2 pt-1">
           ${scopes.map(([k, lbl]) => `
             <button type="button" onclick="window.setPracticeScope('${k}');"
-              class="px-4 py-2 rounded-xl text-xs font-extrabold border transition cursor-pointer ${meta.scope === k
+              class="px-4 py-2 rounded-xl text-xs font-extrabold border cursor-pointer ${meta.scope === k
                 ? `bg-${accent}-600 text-white border-${accent}-600 shadow-sm`
                 : "bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-400"}">${lbl}</button>
           `).join("")}
@@ -1313,7 +1315,7 @@
               <div class="grid grid-cols-1 gap-2.5 text-xs pt-1">
                 ${(q.options_json || []).map((opt, oi) => {
                   const selected = String(window._PM_ANS[qIdx]) === String(oi);
-                  return `<button type="button" onclick="window._PM_ANS[${qIdx}]='${oi}'; window.renderScienceTab5();" class="text-left p-3.5 rounded-xl border transition cursor-pointer ${selected ? `bg-${accent}-600 text-white border-${accent}-600 font-bold` : "bg-slate-50 border-slate-200 text-slate-900"}"><strong>(${String.fromCharCode(65 + oi)})</strong> ${opt}</button>`;
+                  return `<button type="button" onclick="window._PM_ANS[${qIdx}]='${oi}'; window.renderScienceTab5();" class="text-left p-3.5 rounded-xl border cursor-pointer ${selected ? `bg-${accent}-600 text-white border-${accent}-600 font-bold` : "bg-slate-50 border-slate-200 text-slate-900"}"><strong>(${String.fromCharCode(65 + oi)})</strong> ${opt}</button>`;
                 }).join("")}
               </div>
             `}
