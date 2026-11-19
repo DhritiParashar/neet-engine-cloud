@@ -646,12 +646,31 @@
     return { totalScore, totalCorrect, totalWrong, totalAttempted, unattempted, accuracy, pacePerQ, verdict, subjStats, projection, minsTaken, itemsAudit };
   }
 
-  window.launchProctoredMockSession = function () {
+  async function fetchDynamicMockFromPostgres() {
+    try {
+      const res = await fetch("/api/science/mock-paper?exam=" + EXAM + "&ts=" + Date.now(), { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.paper) && data.paper.length === REQUIRED_QS) {
+          window._ACTIVE_MOCK_PAPER = data.paper.map(q => ({
+            ...q,
+            options_json: typeof q.options_json === "string" ? JSON.parse(q.options_json) : q.options_json
+          }));
+          window._ACTIVE_MOCK_PAPER_ID = window._MOCK_SERIAL_ID;
+          return true;
+        }
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  window.launchProctoredMockSession = async function () {
     const chk = document.getElementById("cbt-launch-decl");
     if (chk && !chk.checked) {
       alert("Please check the NTA Candidate Honor-Code Declaration box before launching the proctored session.");
       return;
     }
+    await fetchDynamicMockFromPostgres();
     window._CBT_STARTED = true;
     window._CBT_SUBMITTED = false;
     window._CBT_SEC_LEFT = 180 * 60;
@@ -659,6 +678,8 @@
     window._CBT_VISITED = { 0: true };
     window.renderScienceTab4();
   };
+
+
 
   window.submitMockAndSync = function () {
     const paper = buildFullMockPaper();

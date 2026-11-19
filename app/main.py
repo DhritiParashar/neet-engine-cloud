@@ -2106,6 +2106,51 @@ def _get_science_engine():
         db_url = "postgresql://" + db_url[len("postgres://"):]
     return _sa_create_engine(db_url, pool_pre_ping=True)
 
+
+@app.get("/api/science/mock-paper")
+def get_dynamic_mock_paper(exam: str = "JEE"):
+    from sqlalchemy import text as _sa_text
+    exam_code = exam.strip().upper()
+    eng = _get_science_engine()
+    paper = []
+    with eng.connect() as conn:
+        if exam_code == "JEE":
+            for subj in ("PHYSICS", "CHEMISTRY", "MATHEMATICS"):
+                mcqs = conn.execute(_sa_text("""
+                    SELECT id, question_code, subject, ncert_class, chapter_name, topic_tag,
+                           exam_tags, question_type, difficulty_tier, prompt,
+                           options_json, correct_answer, explanation
+                    FROM jee_neet_questions
+                    WHERE 'JEE' = ANY(exam_tags) AND subject = :s AND question_type != 'NUMERICAL_INT'
+                    ORDER BY RANDOM() LIMIT 20
+                """), {"s": subj}).mappings().all()
+                nums = conn.execute(_sa_text("""
+                    SELECT id, question_code, subject, ncert_class, chapter_name, topic_tag,
+                           exam_tags, question_type, difficulty_tier, prompt,
+                           options_json, correct_answer, explanation
+                    FROM jee_neet_questions
+                    WHERE 'JEE' = ANY(exam_tags) AND subject = :s AND question_type = 'NUMERICAL_INT'
+                    ORDER BY RANDOM() LIMIT 5
+                """), {"s": subj}).mappings().all()
+                for r in mcqs:
+                    d = dict(r); d["mock_sec"] = "Section A (MCQ)"; d["mock_subj"] = subj; paper.append(d)
+                for r in nums:
+                    d = dict(r); d["mock_sec"] = "Section B (Numerical)"; d["mock_subj"] = subj; paper.append(d)
+        else:
+            for subj in ("PHYSICS", "CHEMISTRY", "BOTANY", "ZOOLOGY"):
+                rows = conn.execute(_sa_text("""
+                    SELECT id, question_code, subject, ncert_class, chapter_name, topic_tag,
+                           exam_tags, question_type, difficulty_tier, prompt,
+                           options_json, correct_answer, explanation
+                    FROM jee_neet_questions
+                    WHERE 'NEET' = ANY(exam_tags) AND subject = :s
+                    ORDER BY RANDOM() LIMIT 45
+                """), {"s": subj}).mappings().all()
+                for r in rows:
+                    d = dict(r); d["mock_sec"] = "Compulsory MCQ"; d["mock_subj"] = subj; paper.append(d)
+    return {"ok": True, "exam": exam_code, "count": len(paper), "paper": paper}
+
+
 @app.get("/api/science/questions")
 def get_science_questions(exam: str = "JEE", subject: str = "", limit: int = 200):
     try:
