@@ -1517,6 +1517,57 @@
     window.updateScienceTab6();
   };
 
+  window.renderScienceTab6 = window.renderScienceTab6 || function (el) {
+    const accent = IS_JEE ? "indigo" : "emerald";
+    enforceScienceBrand();
+    const target = getTarget(el);
+    if (!target) return;
+    const allLogs = getAllLedgerLogs();
+    const wrongItems = [];
+    allLogs.forEach(lg => {
+      (lg.itemsAudit || []).forEach(it => {
+        if (it.hasAns && !it.isCorrect) wrongItems.push({ session: lg.sessionId, ...it });
+      });
+    });
+
+    target.innerHTML = `
+      <div class="max-w-6xl mx-auto pt-4 pb-10 space-y-5">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <div class="text-xs font-extrabold uppercase tracking-wider text-${accent}-600">6. NEGATIVE-MARKING TRAP DOCTOR &amp; ERROR AUTOPSY</div>
+              <h2 class="text-xl font-black text-slate-900 mt-0.5">${IS_JEE ? "JEE Main / Adv -1 Trap & Silly-Error Clinic" : "NEET UG NCERT Assertion-Reason & -1 Trap Clinic"}</h2>
+            </div>
+            <span class="px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-extrabold">${wrongItems.length} Logged -1 Errors</span>
+          </div>
+          <p class="text-xs text-slate-600">Automatically extracts every incorrect (-1) response from your submitted Full Mocks (Tab 4) and Subject Practice Mocks (Tab 5) so you can eliminate negative marking.</p>
+        </div>
+
+        ${!wrongItems.length ? `
+          <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center space-y-2 shadow-sm">
+            <div class="text-sm font-extrabold text-slate-800">Zero -1 Errors Recorded Yet</div>
+            <p class="text-xs text-slate-500">Complete a Full Mock in Tab 4 or a Subject Practice Mock in Tab 5 to populate your personalized negative-marking autopsy.</p>
+          </div>
+        ` : `
+          <div class="space-y-3">
+            ${wrongItems.slice(0, 30).map((it, idx) => `
+              <div class="bg-white border border-rose-200 rounded-2xl p-5 space-y-2 text-xs shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <span class="font-extrabold text-rose-700">#${idx + 1} &bull; ${it.session} &bull; ${it.subj} (${it.chapter})</span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 font-extrabold">-1 Mark Lost</span>
+                </div>
+                <div class="text-sm font-bold text-slate-900 whitespace-pre-line">${it.prompt}</div>
+                <div class="text-rose-700"><strong>Your Answer:</strong> ${it.userText}</div>
+                <div class="text-emerald-700"><strong>Official Answer:</strong> ${it.officialText}</div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700"><strong>Fix &amp; Concept Rule:</strong> ${it.explanation}</div>
+              </div>
+            `).join("")}
+          </div>
+        `}
+      </div>
+    `;
+  };
+
   window.renderScienceTab7 = function (el) {
     enforceScienceBrand();
     window.applySyncedMockToTab6();
@@ -1680,25 +1731,25 @@
   window._ACTIVE_SCI_TAB = window._ACTIVE_SCI_TAB || 1;
 
   function ensureSevenTabButtons() {
-    let tab6Btn = null;
-    let tab5Exists = false;
+    let tab1Btn = null;
     document.querySelectorAll("button").forEach(btn => {
       const t = (btn.textContent || "").trim();
-      if (t.startsWith("5. Subject Practice Mocks")) tab5Exists = true;
-      if (t.startsWith("6. GRE Score Forecaster") || t.startsWith("6. JEE Percentile") || t.startsWith("6. NEET AIR") || t.startsWith("7. ")) {
-        tab6Btn = btn;
-      }
+      if (t.startsWith("1. ")) tab1Btn = btn;
     });
-    if (!tab5Exists && tab6Btn && tab6Btn.parentElement) {
-      const p5 = tab6Btn.cloneNode(true);
-      p5.textContent = TABS[4];
-      tab6Btn.parentElement.insertBefore(p5, tab6Btn);
+    if (!tab1Btn || !tab1Btn.parentElement) return;
+    const bar = tab1Btn.parentElement;
+
+    // Remove any existing 2..7 buttons and rebuild exact 1..7 sequence from TABS
+    Array.from(bar.querySelectorAll("button")).forEach(b => {
+      const txt = (b.textContent || "").trim();
+      if (/^[2-7]\.\s+/.test(txt)) b.remove();
+    });
+
+    for (let i = 1; i < TABS.length; i++) {
+      const clone = tab1Btn.cloneNode(true);
+      clone.textContent = TABS[i];
+      bar.appendChild(clone);
     }
-    document.querySelectorAll("button").forEach(btn => {
-      const t = (btn.textContent || "").trim();
-      if (t.startsWith("5. Trap Doctor")) btn.textContent = TABS[5];
-      else if (t.startsWith("6. GRE Score Forecaster") || t.startsWith("6. JEE Percentile") || t.startsWith("6. NEET AIR")) btn.textContent = TABS[6];
-    });
   }
 
   function syncTabPillVisuals(tabNum) {
