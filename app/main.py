@@ -2095,45 +2095,63 @@ async def api_resend_otp(request: Request):
 # ==============================================================================
 # SHARED JEE & NEET SCIENCE BANK ENDPOINTS (NEON POSTGRESQL)
 # ==============================================================================
-from sqlalchemy import text as _sa_text
+import os as _sa_os
+from sqlalchemy import create_engine as _sa_create_engine, text as _sa_text
+
+def _get_science_engine():
+    if "engine" in globals() and globals()["engine"] is not None:
+        return globals()["engine"]
+    db_url = _sa_os.getenv("DATABASE_URL", "")
+    if db_url.startswith("postgres://"):
+        db_url = "postgresql://" + db_url[len("postgres://"):]
+    return _sa_create_engine(db_url, pool_pre_ping=True)
 
 @app.get("/api/science/questions")
 def get_science_questions(exam: str = "JEE", subject: str = "", limit: int = 200):
-    exam_code = exam.strip().upper()
-    subj_code = subject.strip().upper()
-    sql = """
-        SELECT id, question_code, subject, ncert_class, chapter_name, topic_tag,
-               exam_tags, question_type, difficulty_tier, prompt,
-               options_json, correct_answer, explanation
-        FROM jee_neet_questions
-        WHERE :exam_code = ANY(exam_tags)
-          AND (:subj_code = '' OR subject = :subj_code)
-        ORDER BY ncert_class, subject, question_code
-        LIMIT :lim
-    """
-    with engine.connect() as conn:
-        rows = conn.execute(
-            _sa_text(sql),
-            {"exam_code": exam_code, "subj_code": subj_code, "lim": max(1, min(limit, 1000))}
-        ).mappings().all()
-    return {"ok": True, "exam": exam_code, "count": len(rows), "questions": [dict(r) for r in rows]}
+    try:
+        exam_code = exam.strip().upper()
+        subj_code = subject.strip().upper()
+        sql = """
+            SELECT id, question_code, subject, ncert_class, chapter_name, topic_tag,
+                   exam_tags, question_type, difficulty_tier, prompt,
+                   options_json, correct_answer, explanation
+            FROM jee_neet_questions
+            WHERE CAST(:exam_code AS TEXT) = ANY(exam_tags)
+              AND (:subj_code = '' OR subject = :subj_code)
+            ORDER BY ncert_class, subject, question_code
+            LIMIT :lim
+        """
+        eng = _get_science_engine()
+        with eng.connect() as conn:
+            rows = conn.execute(
+                _sa_text(sql),
+                {"exam_code": exam_code, "subj_code": subj_code, "lim": max(1, min(limit, 1000))}
+            ).mappings().all()
+        return {"ok": True, "exam": exam_code, "count": len(rows), "questions": [dict(r) for r in rows]}
+    except Exception as e:
+        return {"ok": False, "error": str(e), "questions": []}
 
 @app.get("/api/science/modules")
 def get_science_modules(exam: str = "JEE", subject: str = ""):
-    exam_code = exam.strip().upper()
-    subj_code = subject.strip().upper()
-    sql = """
-        SELECT id, module_code, subject, ncert_class, chapter_title, subtitle,
-               exam_tags, weightage_label, target_pace, strategy_tag,
-               overview, concept_bridge, laws_json, worked_examples_json
-        FROM jee_neet_study_modules
-        WHERE :exam_code = ANY(exam_tags)
-          AND (:subj_code = '' OR subject = :subj_code)
-        ORDER BY ncert_class, subject, module_code
-    """
-    with engine.connect() as conn:
-        rows = conn.execute(
-            _sa_text(sql),
-            {"exam_code": exam_code, "subj_code": subj_code}
-        ).mappings().all()
-    return {"ok": True, "exam": exam_code, "count": len(rows), "modules": [dict(r) for r in rows]}
+    try:
+        exam_code = exam.strip().upper()
+        subj_code = subject.strip().upper()
+        sql = """
+            SELECT id, module_code, subject, ncert_class, chapter_title, subtitle,
+                   exam_tags, weightage_label, target_pace, strategy_tag,
+                   overview, concept_bridge, laws_json, worked_examples_json
+            FROM jee_neet_study_modules
+            WHERE CAST(:exam_code AS TEXT) = ANY(exam_tags)
+              AND (:subj_code = '' OR subject = :subj_code)
+            ORDER BY ncert_class, subject, module_code
+        """
+        eng = _get_science_engine()
+        with eng.connect() as conn:
+            rows = conn.execute(
+                _sa_text(sql),
+                {"exam_code": exam_code, "subj_code": subj_code}
+            ).mappings().all()
+        return {"ok": True, "exam": exam_code, "count": len(rows), "modules": [dict(r) for r in rows]}
+    except Exception as e:
+        return {"ok": False, "error": str(e), "modules": []}
+
