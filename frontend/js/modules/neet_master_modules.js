@@ -60,7 +60,7 @@
     try {
       const [mRes, qRes] = await Promise.all([
         fetch("/api/science/modules?exam=" + EXAM),
-        fetch("/api/science/questions?exam=" + EXAM + "&limit=500")
+        fetch("/api/science/questions?exam=" + EXAM + "&limit=2500")
       ]);
       if (mRes.ok) {
         const md = await mRes.json();
@@ -536,35 +536,54 @@
   if (typeof window._CBT_SEC_LEFT !== "number") window._CBT_SEC_LEFT = 180 * 60;
   window._CBT_TIMER_ID = window._CBT_TIMER_ID || null;
 
+  function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function pickRandomDistinct(pool, count) {
+    if (!pool.length) return [];
+    const out = [];
+    while (out.length < count) {
+      const batch = shuffleArray(pool);
+      for (let i = 0; i < batch.length && out.length < count; i++) {
+        out.push(batch[i]);
+      }
+    }
+    return out;
+  }
+
   function buildFullMockPaper() {
+    // Cache the paper per Serial Mock ID so switching questions/tabs preserves the active paper,
+    // while every new Serial Mock ID generates a fresh randomized exam!
+    if (window._ACTIVE_MOCK_PAPER && window._ACTIVE_MOCK_PAPER_ID === window._MOCK_SERIAL_ID && window._ACTIVE_MOCK_PAPER.length === REQUIRED_QS) {
+      return window._ACTIVE_MOCK_PAPER;
+    }
+    let paper = [];
     if (IS_JEE) {
       const subjects = ["PHYSICS", "CHEMISTRY", "MATHEMATICS"];
-      const paper = [];
       subjects.forEach(subj => {
         const mcqs = window._SCI_QUESTIONS.filter(q => q.subject === subj && q.question_type !== "NUMERICAL_INT");
         const nums = window._SCI_QUESTIONS.filter(q => q.subject === subj && q.question_type === "NUMERICAL_INT");
-        for (let i = 0; i < 20; i++) {
-          const base = mcqs[i % Math.max(1, mcqs.length)];
-          if (base) paper.push({ ...base, mock_sec: "Section A (MCQ)", mock_subj: subj });
-        }
-        for (let i = 0; i < 5; i++) {
-          const base = nums[i % Math.max(1, nums.length)];
-          if (base) paper.push({ ...base, mock_sec: "Section B (Numerical)", mock_subj: subj });
-        }
+        pickRandomDistinct(mcqs, 20).forEach(base => paper.push({ ...base, mock_sec: "Section A (MCQ)", mock_subj: subj }));
+        pickRandomDistinct(nums, 5).forEach(base => paper.push({ ...base, mock_sec: "Section B (Numerical)", mock_subj: subj }));
       });
-      return paper;
     } else {
       const sections = [["PHYSICS", 45], ["CHEMISTRY", 45], ["BOTANY", 45], ["ZOOLOGY", 45]];
-      const paper = [];
       sections.forEach(([subj, count]) => {
         const pool = window._SCI_QUESTIONS.filter(q => q.subject === subj && Array.isArray(q.options_json) && q.options_json.length >= 4);
-        for (let i = 0; i < count; i++) {
-          const base = pool[i % Math.max(1, pool.length)];
-          if (base) paper.push({ ...base, mock_sec: "Compulsory MCQ", mock_subj: subj });
-        }
+        pickRandomDistinct(pool, count).forEach(base => paper.push({ ...base, mock_sec: "Compulsory MCQ", mock_subj: subj }));
       });
-      return paper;
     }
+    if (paper.length === REQUIRED_QS) {
+      window._ACTIVE_MOCK_PAPER = paper;
+      window._ACTIVE_MOCK_PAPER_ID = window._MOCK_SERIAL_ID;
+    }
+    return paper;
   }
 
   function ensureMockTimer() {
@@ -890,7 +909,7 @@
               <div class="p-4 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[10px] font-extrabold uppercase text-slate-400">QUESTION COUNT</div><div class="text-base font-black text-slate-900 mt-0.5">${totalQs} Compulsory Qs</div></div>
               <div class="p-4 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[10px] font-extrabold uppercase text-slate-400">PROCTORED CLOCK</div><div class="text-base font-black text-amber-600 mt-0.5">180:00 Minutes (Paused)</div></div>
               <div class="p-4 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[10px] font-extrabold uppercase text-slate-400">LEDGER POLICY</div><div class="text-base font-black text-indigo-700 mt-0.5">Full Mocks Only</div></div>
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[10px] font-extrabold uppercase text-slate-400">POSTGRESQL BANK</div><div class="text-base font-black text-emerald-600 mt-0.5">${window._SCI_QUESTIONS.length} Live DB Items</div></div>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[10px] font-extrabold uppercase text-slate-400">POSTGRESQL BANK</div><div class="text-base font-black text-emerald-600 mt-0.5">${window._SCI_QUESTIONS.length} Items (${(window._SCI_QUESTIONS.length / REQUIRED_QS).toFixed(1)}&times; Mock)</div></div>
             </div>
             <label class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-2.5 text-xs text-slate-700 cursor-pointer">
               <input id="cbt-launch-decl" type="checkbox" checked class="mt-0.5 w-4 h-4 accent-${accent}-600" />
