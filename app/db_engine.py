@@ -795,7 +795,7 @@ def get_pyq_questions_from_db(exam: str = "ALL", year: str = "ALL") -> list:
 
 with engine.begin() as conn:
     conn.execute(text("""
-        UPDATE ipm_questions
+        SELECT 1 -- UPDATE ipm_questions /* SKIP_LEGACY_IPM_UPDATE */
         SET pyq_exam = CASE
             WHEN q_code LIKE '%IIMB%' OR pyq_exam LIKE '%Bangalore%' OR pyq_exam LIKE '%IIMB%' THEN 'IIM Bangalore'
             WHEN q_code LIKE '%ROH%'  OR pyq_exam LIKE '%Rohtak%' THEN 'IPMAT Rohtak'
