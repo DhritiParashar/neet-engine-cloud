@@ -427,8 +427,11 @@
     renderQuantTab: window.renderScienceTab1,
     renderTab2: window.renderScienceTab2,
     renderTab3: window.renderScienceTab3,
+    renderVerbalStudio3: window.renderScienceTab3,
     renderTab4: window.renderScienceTab4,
+    renderMockSimulator4: window.renderScienceTab4,
     renderTab5: window.renderScienceTab5,
+    renderTrapClinic5: window.renderScienceTab5,
     renderTab6: window.renderScienceTab6
   };
   Object.entries(tabMap).forEach(([k, fn]) => {
