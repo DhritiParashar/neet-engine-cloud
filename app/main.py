@@ -2227,11 +2227,9 @@ def _ensure_10x_science_question_bank():
                     p, opts, ans, exp = fn(i)
                     qt = qtypes[i % 3]
                     if qt == "ASSERTION_REASON":
-                        p = f"Assertion (A): {p}
-Reason (R): This follows directly from standard NCERT Class {cls} {subj.title()} principles."
+                        p = f"Assertion (A): {p}\nReason (R): This follows directly from standard NCERT Class {cls} {subj.title()} principles."
                     elif qt == "STATEMENT_I_II":
-                        p = f"Statement I: {p}
-Statement II: Quantitative stoichiometry and NCERT laws govern this result."
+                        p = f"Statement I: {p}\nStatement II: Quantitative stoichiometry and NCERT laws govern this result."
                     rows.append((f"NEET-10X-{subj[:3]}-{i:03d}", subj, cls, chap, tag, ["NEET"], qt, tiers[i % 3], p, _json.dumps(opts), ans, exp))
 
             stmt = _sa_text("""
