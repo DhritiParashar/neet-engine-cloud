@@ -7,7 +7,9 @@
   const MODES = [{'label': 'NEET UG Full 180-Q (720 Marks)', 'sub': '(NTA Standard)', 'sections': 'Physics (45 Qs) &bull; Chemistry (45 Qs) &bull; Botany (45 Qs) &bull; Zoology (45 Qs)'}, {'label': 'NCERT Line-by-Line Biology Vault', 'sub': '(360 Marks Core)', 'sections': 'Class 11 & 12 Botany + Zoology Verbatim NCERT Statements, Diagrams & Cycles'}, {'label': 'Assertion-Reason & Statement Clinic', 'sub': '(Trap Clinic)', 'sections': 'Statement I & II + Assertion-Reason Drills across Biology, Organic & Inorganic'}];
   const TABS = ['1. Physics, Chem & Biology (12x12)', '2. NCERT Line-by-Line Bio Vault', '3. Assertion-Reason Studio', '4. 180-Q / 720-Mark NEET Mock', '5. Subject Practice Mocks', '6. Trap Doctor & AI Doubts', '7. NEET AIR & AIIMS/GMC Forecaster'];
 
-  function enforceScienceBrand() {
+  function enforceScienceBrand(force) {
+    if (window._BRAND_ENFORCED && !force) return;
+    window._BRAND_ENFORCED = true;
     document.documentElement.classList.remove("dark"); document.body.classList.remove("dark"); document.title = "GOALisB NEET UG Master";
     document.querySelectorAll("div, span, h1, p").forEach(el => {
       const t = (el.textContent || "").trim();
@@ -844,10 +846,9 @@
 
   window.renderScienceTab4 = async function (el) {
     const accent = IS_JEE ? "indigo" : "emerald";
-    enforceScienceBrand();
     const target = getTarget(el);
     if (!target) return;
-    await hydrateFromNeon();
+    if (!window._SCI_HYDRATED && window._CBT_STARTED) await hydrateFromNeon(); else if (!window._SCI_HYDRATED) hydrateFromNeon();
     ensureMockTimer();
 
     window._MOCK_SERIAL_ID = window._MOCK_SERIAL_ID || newSerialId();
@@ -1208,10 +1209,9 @@
 
   window.renderScienceTab5 = async function (el) {
     const accent = IS_JEE ? "indigo" : "emerald";
-    enforceScienceBrand();
     const target = getTarget(el);
     if (!target) return;
-    await hydrateFromNeon();
+    if (!window._SCI_HYDRATED && window._PM_STARTED) await hydrateFromNeon(); else if (!window._SCI_HYDRATED) hydrateFromNeon();
     ensurePracticeTimer();
 
     const meta = getPracticeMeta();
@@ -1726,11 +1726,13 @@
   });
 
   // ============================================================================
-  // SINGLE-CLICK CAPTURE-PHASE 7-TAB ROUTER
+  // SINGLE-CLICK CAPTURE-PHASE 7-TAB ROUTER (ZERO-LAG v38)
   // ============================================================================
   window._ACTIVE_SCI_TAB = window._ACTIVE_SCI_TAB || 1;
+  window._TAB_BAR_BUILT = false;
 
   function ensureSevenTabButtons() {
+    if (window._TAB_BAR_BUILT) return;
     let tab1Btn = null;
     document.querySelectorAll("button").forEach(btn => {
       const t = (btn.textContent || "").trim();
@@ -1739,7 +1741,6 @@
     if (!tab1Btn || !tab1Btn.parentElement) return;
     const bar = tab1Btn.parentElement;
 
-    // Remove any existing 2..7 buttons and rebuild exact 1..7 sequence from TABS
     Array.from(bar.querySelectorAll("button")).forEach(b => {
       const txt = (b.textContent || "").trim();
       if (/^[2-7]\.\s+/.test(txt)) b.remove();
@@ -1750,6 +1751,7 @@
       clone.textContent = TABS[i];
       bar.appendChild(clone);
     }
+    window._TAB_BAR_BUILT = true;
   }
 
   function syncTabPillVisuals(tabNum) {
@@ -1762,6 +1764,7 @@
       if (!m) return;
       const n = Number(m[1]);
       if (TABS[n - 1] && txt !== TABS[n - 1]) btn.textContent = TABS[n - 1];
+      btn.style.transition = "none";
       if (n === tabNum) {
         btn.style.setProperty("background-color", bgActive, "important");
         btn.style.setProperty("color", "#ffffff", "important");
@@ -1779,9 +1782,6 @@
     window._ACTIVE_SCI_TAB = n;
     syncTabPillVisuals(n);
     const target = getTarget();
-    if (target && !window._SCI_HYDRATED && n <= 5) {
-      target.innerHTML = `<div class="max-w-7xl mx-auto pt-8 text-center text-xs font-extrabold uppercase tracking-wider text-slate-500">Loading Tab ${n} from Neon PostgreSQL...</div>`;
-    }
     const fns = {
       1: window.renderScienceTab1,
       2: window.renderScienceTab2,
@@ -1814,8 +1814,9 @@
     }
     setTimeout(() => {
       enforceScienceBrand();
+      window._TAB_BAR_BUILT = false;
       ensureSevenTabButtons();
       syncTabPillVisuals(window._ACTIVE_SCI_TAB || 1);
-    }, 350);
+    }, 300);
   });
 })();
