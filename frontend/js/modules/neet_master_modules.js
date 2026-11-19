@@ -597,6 +597,11 @@
       return;
     }
 
+    window._MOCK_SESSION_ID = window._MOCK_SESSION_ID || newSessionId();
+    window._CBT_ANS = window._CBT_ANS || {};
+    window._CBT_REVIEW = window._CBT_REVIEW || {};
+    window._CBT_VISITED = window._CBT_VISITED || { 0: true };
+    if (typeof window._CBT_SEC_LEFT !== "number") window._CBT_SEC_LEFT = 180 * 60;
     const totalQs = paper.length;
     const qIdx = Math.min(totalQs - 1, Math.max(0, Number(window._CBT_IDX || 0)));
     window._CBT_VISITED[qIdx] = true;
