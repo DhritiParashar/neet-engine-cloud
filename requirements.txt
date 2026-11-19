@@ -1,0 +1,10 @@
+fastapi
+feedparser
+google-genai
+httpx
+psycopg[binary]
+psycopg2-binary
+pydantic
+python-dotenv
+sqlalchemy
+uvicorn[standard]

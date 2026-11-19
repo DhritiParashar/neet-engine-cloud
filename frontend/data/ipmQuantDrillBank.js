@@ -1,0 +1,98 @@
+window.IPM_QUANT_DRILL_BANK = {
+  qc_01: [
+    { id: "qc01_p5", type: "MCQ", prompt: "If A's salary is 25% more than B's salary, by what percentage is B's salary less than A's?", options: ["25%", "20%", "16.67%", "30%"], answer: 1, explanation: "+25% = +1/4 (B=4, A=5). B is less than A by 1/5 = 20%." },
+    { id: "qc01_p6", type: "SA_NUMERIC", prompt: "A trader marks up goods by 50% and allows a discount of 20%. What is his exact profit percentage? (Enter number only)", answer: "20", explanation: "Net % = +50 - 20 + (50 * -20)/100 = 30 - 10 = 20%." },
+    { id: "qc01_p7", type: "MCQ", prompt: "By selling 33 meters of cloth, a merchant gains the selling price of 11 meters. Find his gain percentage.", options: ["33.33%", "50%", "25%", "40%"], answer: 1, explanation: "Profit = SP(33) - CP(33) = SP(11) => CP(33) = SP(22) => SP/CP = 33/22 = 3/2 => 50% profit." },
+    { id: "qc01_p8", type: "MCQ", prompt: "The population of a town increases by 10% in the first year and decreases by 10% in the second year. If the current population is 19,800, what was it 2 years ago?", options: ["20,000", "19,800", "20,200", "21,000"], answer: 0, explanation: "P * 1.10 * 0.90 = 0.99 * P = 19,800 => P = 20,000." },
+    { id: "qc01_p9", type: "SA_NUMERIC", prompt: "The difference between CI and SI on Rs. 80,000 for 2 years is Rs. 200. Find the annual rate of interest (%).", answer: "5", explanation: "200 = 80000 * (R/100)^2 => (R/100)^2 = 1/400 => R/100 = 1/20 => R = 5%." },
+    { id: "qc01_p10", type: "MCQ", prompt: "A single discount equivalent to three successive discounts of 20%, 25%, and 10% is:", options: ["55%", "46%", "44%", "50%"], answer: 1, explanation: "Remaining factor = 0.80 * 0.75 * 0.90 = 0.54 => Discount = (1 - 0.54) * 100 = 46%." },
+    { id: "qc01_p11", type: "MCQ", prompt: "In an election between two candidates, 10% of voters did not cast their votes and 10% of polled votes were declared invalid. The winner got 54% of valid votes and won by 1,620 votes. Find total enrolled voters.", options: ["20,000", "25,000", "30,000", "18,000"], answer: 1, explanation: "Valid votes = 0.90 * 0.90 * V = 0.81V. Winner margin = (54% - 46%) of 0.81V = 0.08 * 0.81V = 0.0648V = 1620 => V = 25,000." },
+    { id: "qc01_p12", type: "SA_NUMERIC", prompt: "A dishonest milkman sells milk at CP but mixes water so he gains 25%. What percentage of the final mixture is water?", answer: "20", explanation: "Gain 25% => Water : Milk = 25 : 100 = 1 : 4. Water % in mixture = (1 / 5) * 100 = 20%." }
+  ],
+  qc_02: [
+    { id: "qc02_p4", type: "MCQ", prompt: "If a : b = 3 : 4 and b : c = 6 : 7, find a : b : c.", options: ["9 : 12 : 14", "3 : 6 : 7", "6 : 8 : 14", "9 : 12 : 28"], answer: 0, explanation: "Equalize b to LCM(4,6)=12: a:b = 9:12, b:c = 12:14 => 9 : 12 : 14." },
+    { id: "qc02_p5", type: "SA_NUMERIC", prompt: "A bag contains Rs. 1, 50p, and 25p coins in ratio 2 : 3 : 4 totaling Rs. 180. How many 50p coins are in the bag?", answer: "120", explanation: "Value ratio = 2(1) : 3(0.5) : 4(0.25) = 2 : 1.5 : 1 = 4.5 parts = Rs. 180 => 1 part = 40. Number of 50p coins = 3 * 40 = 120." },
+    { id: "qc02_p6", type: "MCQ", prompt: "In what ratio must Rs. 30/kg sugar be mixed with Rs. 45/kg sugar so that the mixture costs Rs. 36/kg?", options: ["3 : 2", "2 : 3", "3 : 5", "5 : 3"], answer: 0, explanation: "By Alligation: (45 - 36) : (36 - 30) = 9 : 6 = 3 : 2." },
+    { id: "qc02_p7", type: "MCQ", prompt: "Two alloys contain gold and copper in ratios 7:2 and 7:11. Equal quantities are melted to form a third alloy. Find the ratio of gold to copper.", options: ["5 : 7", "7 : 5", "1 : 1", "9 : 7"], answer: 1, explanation: "Alloy 1 = 7/9 gold; Alloy 2 = 7/18 gold. Average gold = (14/18 + 7/18)/2 = 21/36 = 7/12 => Gold : Copper = 7 : 5." },
+    { id: "qc02_p8", type: "SA_NUMERIC", prompt: "A 40L mixture has milk and water in ratio 3:1. How many liters of water must be added to make the ratio 1:1?", answer: "20", explanation: "Initial Milk = 30L, Water = 10L. For 1:1 ratio, Water must equal 30L => Add 30 - 10 = 20 liters." },
+    { id: "qc02_p9", type: "MCQ", prompt: "A, B, C rent a pasture. A puts 10 oxen for 7 months, B puts 12 oxen for 5 months, C puts 15 oxen for 3 months. If total rent is Rs. 175, find C's share.", options: ["Rs. 45", "Rs. 50", "Rs. 60", "Rs. 70"], answer: 0, explanation: "Ratio = 70 : 60 : 45 = 14 : 12 : 9 (sum = 35). C's share = (9/35) * 175 = Rs. 45." },
+    { id: "qc02_p10", type: "MCQ", prompt: "Find the fourth proportional to 6, 8, and 15.", options: ["18", "20", "24", "12"], answer: 1, explanation: "6 / 8 = 15 / x => x = (8 * 15) / 6 = 20." },
+    { id: "qc02_p11", type: "SA_NUMERIC", prompt: "If (3x + 2y) : (3x - 2y) = 5 : 2, find the integer value of (9x) / (2y).", answer: "7", explanation: "By Componendo-Dividendo: (3x)/(2y) = (5 + 2)/(5 - 2) = 7/3 => (9x)/(2y) = 3 * (7/3) = 7." },
+    { id: "qc02_p12", type: "MCQ", prompt: "From 100L of pure alcohol, 10L is replaced with water twice. What percentage of alcohol remains?", options: ["80%", "81%", "79%", "82%"], answer: 1, explanation: "(1 - 10/100)^2 = (0.9)^2 = 0.81 = 81%." }
+  ],
+  qc_03: [
+    { id: "qc03_p4", type: "MCQ", prompt: "Two trains 140m and 160m long run toward each other on parallel tracks at 40 km/h and 50 km/h. How many seconds do they take to cross each other completely?", options: ["10 s", "12 s", "15 s", "18 s"], answer: 1, explanation: "Total distance = 300m. Relative speed = 90 km/h = 25 m/s. Time = 300 / 25 = 12 seconds." },
+    { id: "qc03_p5", type: "SA_NUMERIC", prompt: "A man rows 18 km downstream in 3 hours and returns upstream in 6 hours. Find his rowing speed in still water (km/h).", answer: "4.5", explanation: "Downstream D = 6 km/h, Upstream U = 3 km/h. Still water speed = (6 + 3)/2 = 4.5 km/h." },
+    { id: "qc03_p6", type: "MCQ", prompt: "A can finish a job in 20 days and B in 30 days. They work together for 6 days, then B leaves. How many more days does A need to finish?", options: ["8 days", "10 days", "12 days", "14 days"], answer: 1, explanation: "Work = 60 units (A=3, B=2). In 6 days: 6 * 5 = 30 units done. Remaining 30 units / 3 = 10 days." },
+    { id: "qc03_p7", type: "MCQ", prompt: "Two pipes A and B fill a cistern in 24 mins and 32 mins. Both open together; after how many minutes should B be closed so the cistern fills in 18 minutes total?", options: ["6 mins", "8 mins", "10 mins", "12 mins"], answer: 1, explanation: "Capacity = 96 (A=4/min, B=3/min). A runs full 18 mins -> 18 * 4 = 72 units. Remaining 24 units filled by B in 24 / 3 = 8 mins." },
+    { id: "qc03_p8", type: "SA_NUMERIC", prompt: "In a 500m race, A beats B by 50m and B beats C by 100m. By how many meters does A beat C?", answer: "140", explanation: "A:B = 500:450 = 10:9; B:C = 500:400 = 5:4 => A:B:C = 50:45:36. When A runs 500m, C runs 360m -> margin = 140m." },
+    { id: "qc03_p9", type: "MCQ", prompt: "A cyclist covers half a journey at 20 km/h and the remaining half at 30 km/h. If total time is 5 hours, find total distance.", options: ["100 km", "120 km", "125 km", "150 km"], answer: 1, explanation: "Avg speed = 2*20*30 / 50 = 24 km/h. Distance = 24 * 5 = 120 km." },
+    { id: "qc03_p10", type: "MCQ", prompt: "15 workers working 8 hours/day build a dam in 20 days. How many days will 20 workers working 10 hours/day take?", options: ["10 days", "12 days", "15 days", "16 days"], answer: 1, explanation: "15 * 8 * 20 = 20 * 10 * D => D = 2400 / 200 = 12 days." },
+    { id: "qc03_p11", type: "SA_NUMERIC", prompt: "Excluding stoppages, a train averages 80 km/h; including stoppages, it averages 60 km/h. How many minutes per hour does it stop?", answer: "15", explanation: "[(80 - 60) / 80] * 60 = (1/4) * 60 = 15 minutes." },
+    { id: "qc03_p12", type: "MCQ", prompt: "Two runners start from the same point on a 400m circular track in the SAME direction at 8 m/s and 6 m/s. When do they meet at the starting point for the first time?", options: ["100 s", "200 s", "400 s", "800 s"], answer: 1, explanation: "Lap times: T1 = 400/8 = 50s, T2 = 400/6 = 200/3 s. LCM(50, 200/3) = 200 seconds." }
+  ],
+  qc_04: [
+    { id: "qc04_p4", type: "MCQ", prompt: "What is the remainder when 7^84 is divided by 342?", options: ["0", "1", "7", "341"], answer: 1, explanation: "7^3 = 343 ≡ 1 (mod 342). Since 84 = 3 * 28, (7^3)^28 ≡ 1^28 = 1 (mod 342)." },
+    { id: "qc04_p5", type: "SA_NUMERIC", prompt: "Find the total number of odd positive factors of 540.", answer: "8", explanation: "540 = 2^2 * 3^3 * 5^1. Exclude powers of 2: odd factors = (3 + 1)(1 + 1) = 4 * 2 = 8." },
+    { id: "qc04_p6", type: "MCQ", prompt: "If 4-digit number 52x4 is divisible by 11, what is the digit x?", options: ["1", "3", "5", "7"], answer: 0, explanation: "(5 + x) - (2 + 4) = x - 1 must be 0 or 11 => x = 1 (5214 / 11 = 474)." },
+    { id: "qc04_p7", type: "MCQ", prompt: "The area of an equilateral triangle is 16*sqrt(3) cm^2. Find its perimeter.", options: ["12 cm", "18 cm", "24 cm", "36 cm"], answer: 2, explanation: "(sqrt(3)/4)a^2 = 16*sqrt(3) => a^2 = 64 => a = 8 cm => Perimeter = 24 cm." },
+    { id: "qc04_p8", type: "SA_NUMERIC", prompt: "Two chords AB and CD of a circle intersect internally at P. If AP = 6 cm, PB = 4 cm, and CP = 3 cm, find PD (in cm).", answer: "8", explanation: "AP * PB = CP * PD => 6 * 4 = 3 * PD => PD = 8 cm." },
+    { id: "qc04_p9", type: "MCQ", prompt: "Find the number of trailing zeros in 125!", options: ["28", "30", "31", "32"], answer: 2, explanation: "floor(125/5) + floor(125/25) + floor(125/125) = 25 + 5 + 1 = 31." },
+    { id: "qc04_p10", type: "MCQ", prompt: "If the radius of a sphere is doubled, by what percentage does its surface area increase?", options: ["100%", "200%", "300%", "400%"], answer: 2, explanation: "Area scales as r^2: (2r)^2 = 4r^2 => Increase = (4 - 1) * 100 = 300%." },
+    { id: "qc04_p11", type: "SA_NUMERIC", prompt: "Find the sum of all positive factors of 28.", answer: "56", explanation: "Factors of 28: 1 + 2 + 4 + 7 + 14 + 28 = 56 (28 is a perfect number!)." },
+    { id: "qc04_p12", type: "MCQ", prompt: "Find the circumradius (in cm) of a right triangle with sides 5 cm, 12 cm, and 13 cm.", options: ["2 cm", "5 cm", "6.5 cm", "13 cm"], answer: 2, explanation: "Circumradius of a right triangle = Hypotenuse / 2 = 13 / 2 = 6.5 cm." }
+  ],
+  qc_05: [
+    { id: "qc05_p5", type: "MCQ", prompt: "If α and β are roots of x^2 - 5x + 6 = 0, find 1/α + 1/β.", options: ["5/6", "6/5", "1/6", "5"], answer: 0, explanation: "1/α + 1/β = (α + β)/(αβ) = 5 / 6." },
+    { id: "qc05_p6", type: "SA_NUMERIC", prompt: "Find the maximum value of f(x) = -x^2 + 10x - 16 for all real x.", answer: "9", explanation: "Vertex at x = -10 / (-2) = 5 => f(5) = -25 + 50 - 16 = 9." },
+    { id: "qc05_p7", type: "MCQ", prompt: "How many real solutions exist for |x - 3| = -4?", options: ["0", "1", "2", "Infinite"], answer: 0, explanation: "Absolute value |x - 3| is always >= 0, so it can never equal -4 -> 0 solutions." },
+    { id: "qc05_p8", type: "MCQ", prompt: "For what values of x is (x - 1)(x - 5) > 0?", options: ["1 < x < 5", "x < 1 or x > 5", "x > 5 only", "x < 1 only"], answer: 1, explanation: "By wavy curve, product of two factors is positive outside the roots: x < 1 or x > 5." },
+    { id: "qc05_p9", type: "SA_NUMERIC", prompt: "If x + 1/x = 4, find the exact value of x^3 + 1/x^3.", answer: "52", explanation: "x^3 + 1/x^3 = (x + 1/x)^3 - 3(x + 1/x) = 64 - 12 = 52." },
+    { id: "qc05_p10", type: "MCQ", prompt: "If one root of 2x^2 + kx - 6 = 0 is 2, find the other root.", options: ["-3/2", "3/2", "-3", "3"], answer: 0, explanation: "Product of roots αβ = c/a = -6/2 = -3. Since α = 2, β = -3/2." },
+    { id: "qc05_p11", type: "MCQ", prompt: "How many integer solutions satisfy |x - 2| <= 3?", options: ["5", "6", "7", "8"], answer: 2, explanation: "-3 <= x - 2 <= 3 => -1 <= x <= 5 => Integers {-1, 0, 1, 2, 3, 4, 5} = 7 integers." },
+    { id: "qc05_p12", type: "SA_NUMERIC", prompt: "Find the sum of all real roots of |x|^2 - 7|x| + 12 = 0.", answer: "0", explanation: "Roots are ±3 and ±4; by symmetry their sum is (-3 + 3) + (-4 + 4) = 0." }
+  ],
+  hm_01: [
+    { id: "hm01_p5", type: "MCQ", prompt: "Evaluate log_5(125) - log_4(64) + log_2(16).", options: ["2", "3", "4", "5"], answer: 2, explanation: "3 - 3 + 4 = 4." },
+    { id: "hm01_p6", type: "SA_NUMERIC", prompt: "Find the 15th term of the AP: 4, 9, 14, 19, ...", answer: "74", explanation: "T15 = 4 + 14(5) = 74." },
+    { id: "hm01_p7", type: "MCQ", prompt: "If 3, x, 27 are in Geometric Progression with x > 0, find x.", options: ["6", "9", "12", "15"], answer: 1, explanation: "x = sqrt(3 * 27) = sqrt(81) = 9." },
+    { id: "hm01_p8", type: "MCQ", prompt: "Find the sum of the infinite GP: 1 - 1/2 + 1/4 - 1/8 + ...", options: ["1/2", "2/3", "3/4", "1"], answer: 1, explanation: "a = 1, r = -1/2 => S_inf = 1 / (1 - (-1/2)) = 1 / (3/2) = 2/3." },
+    { id: "hm01_p9", type: "SA_NUMERIC", prompt: "Solve for x: log_2(log_3(x)) = 1.", answer: "9", explanation: "log_3(x) = 2^1 = 2 => x = 3^2 = 9." },
+    { id: "hm01_p10", type: "MCQ", prompt: "If log_10(2) = 0.3010 and log_10(3) = 0.4771, find log_10(18).", options: ["1.2552", "1.0791", "0.7781", "1.3010"], answer: 0, explanation: "log(2 * 3^2) = 0.3010 + 2(0.4771) = 1.2552." },
+    { id: "hm01_p11", type: "MCQ", prompt: "Find the sum of squares of the first 10 natural numbers.", options: ["330", "385", "420", "550"], answer: 1, explanation: "n(n+1)(2n+1)/6 = (10 * 11 * 21)/6 = 385." },
+    { id: "hm01_p12", type: "SA_NUMERIC", prompt: "Find the minimum value of 25x + 1/x for x > 0.", answer: "10", explanation: "2 * sqrt(25 * 1) = 2 * 5 = 10." }
+  ],
+  hm_02: [
+    { id: "hm02_p4", type: "MCQ", prompt: "In how many ways can 5 distinct books be arranged on a shelf?", options: ["24", "60", "120", "720"], answer: 2, explanation: "5! = 120." },
+    { id: "hm02_p5", type: "SA_NUMERIC", prompt: "How many handshakes occur when 12 delegates shake hands with each other once?", answer: "66", explanation: "C(12, 2) = (12 * 11) / 2 = 66." },
+    { id: "hm02_p6", type: "MCQ", prompt: "A coin is tossed 4 times. Find the probability of getting at least 1 head.", options: ["15/16", "1/16", "7/8", "3/4"], answer: 0, explanation: "1 - P(all tails) = 1 - (1/2)^4 = 15/16." },
+    { id: "hm02_p7", type: "MCQ", prompt: "In how many ways can 6 people sit around a circular dining table?", options: ["720", "120", "60", "24"], answer: 1, explanation: "(6 - 1)! = 5! = 120." },
+    { id: "hm02_p8", type: "SA_NUMERIC", prompt: "How many non-negative integer solutions exist for a + b + c = 8?", answer: "45", explanation: "C(8 + 3 - 1, 3 - 1) = C(10, 2) = 45." },
+    { id: "hm02_p9", type: "MCQ", prompt: "From 5 men and 4 women, a committee of 3 is chosen. Find the probability it has 2 men and 1 woman.", options: ["10/21", "5/21", "20/63", "1/2"], answer: 0, explanation: "[C(5,2) * C(4,1)] / C(9,3) = (10 * 4) / 84 = 40 / 84 = 10 / 21." },
+    { id: "hm02_p10", type: "MCQ", prompt: "How many 3-letter words (with or without meaning) can be formed from 'CANDLE' without repetition?", options: ["60", "120", "216", "20"], answer: 1, explanation: "P(6, 3) = 6 * 5 * 4 = 120." },
+    { id: "hm02_p11", type: "SA_NUMERIC", prompt: "What is the number of derangements of 4 distinct items (D_4)?", answer: "9", explanation: "D_4 = 4! * (1 - 1/1! + 1/2! - 1/3! + 1/4!) = 24 * (12 - 4 + 1)/24 = 9." },
+    { id: "hm02_p12", type: "MCQ", prompt: "If P(A) = 0.4, P(B) = 0.5, and A & B are independent, find P(A U B).", options: ["0.9", "0.7", "0.2", "0.8"], answer: 1, explanation: "P(A U B) = 0.4 + 0.5 - (0.4 * 0.5) = 0.9 - 0.2 = 0.7." }
+  ],
+  hm_03: [
+    { id: "hm03_p4", type: "MCQ", prompt: "If A is a 2x2 matrix with |A| = 7, find |4A|.", options: ["28", "56", "112", "14"], answer: 2, explanation: "|4A| = 4^2 * |A| = 16 * 7 = 112." },
+    { id: "hm03_p5", type: "SA_NUMERIC", prompt: "Evaluate lim(x -> 3) (x^2 - 9) / (x - 3).", answer: "6", explanation: "Factor as (x - 3)(x + 3)/(x - 3) = x + 3 -> at x = 3, limit = 6." },
+    { id: "hm03_p6", type: "MCQ", prompt: "What is the determinant of any 3x3 skew-symmetric matrix?", options: ["1", "-1", "0", "Undefined"], answer: 2, explanation: "Determinant of any odd-order skew-symmetric matrix is always 0." },
+    { id: "hm03_p7", type: "MCQ", prompt: "If f(x) = x^2 + 1 and g(x) = 3x - 2, find g(f(2)).", options: ["13", "17", "11", "15"], answer: 0, explanation: "f(2) = 5 => g(5) = 3(5) - 2 = 13." },
+    { id: "hm03_p8", type: "SA_NUMERIC", prompt: "Find the slope of the tangent to y = x^3 - 2x + 5 at x = 2.", answer: "10", explanation: "dy/dx = 3x^2 - 2 => at x = 2, slope = 3(4) - 2 = 10." },
+    { id: "hm03_p9", type: "MCQ", prompt: "Find the range of f(x) = x^2 + 4 for all real x.", options: ["[0, inf)", "[4, inf)", "(-inf, 4]", "All reals"], answer: 1, explanation: "Since x^2 >= 0, x^2 + 4 >= 4 => [4, inf)." },
+    { id: "hm03_p10", type: "MCQ", prompt: "If |A| = 5 for an invertible matrix A, what is |A^(-1)|?", options: ["5", "-5", "1/5", "25"], answer: 2, explanation: "|A^(-1)| = 1 / |A| = 1/5." },
+    { id: "hm03_p11", type: "SA_NUMERIC", prompt: "How many bijective (one-one and onto) functions exist from a 4-element set to itself?", answer: "24", explanation: "4! = 24." },
+    { id: "hm03_p12", type: "MCQ", prompt: "Total Revenue is TR(q) = 60q - 3q^2. At what output q is Total Revenue maximized?", options: ["5", "10", "15", "20"], answer: 1, explanation: "MR = d(TR)/dq = 60 - 6q = 0 => q = 10." }
+  ],
+  hm_04: [
+    { id: "hm04_p4", type: "MCQ", prompt: "Find the median of {14, 9, 22, 18, 11, 25}.", options: ["14", "16", "18", "15"], answer: 1, explanation: "Sorted: {9, 11, 14, 18, 22, 25}. Median = (14 + 18)/2 = 16." },
+    { id: "hm04_p5", type: "SA_NUMERIC", prompt: "The mean of 6 numbers is 12. If a 7th number 26 is added, find the new mean.", answer: "14", explanation: "New sum = 72 + 26 = 98 => New mean = 98 / 7 = 14." },
+    { id: "hm04_p6", type: "MCQ", prompt: "If Variance of X is 16, what is Standard Deviation of (3X - 5)?", options: ["12", "7", "48", "144"], answer: 0, explanation: "SD(X) = 4 => SD(3X - 5) = 3 * 4 = 12." },
+    { id: "hm04_p7", type: "MCQ", prompt: "Which measure of central tendency is least affected by extreme outliers?", options: ["Arithmetic Mean", "Median", "Range", "Variance"], answer: 1, explanation: "Median depends only on middle rank position, making it robust to outliers." },
+    { id: "hm04_p8", type: "SA_NUMERIC", prompt: "If Mean = 50 and Mode = 44 in a moderately skewed distribution, estimate the Median.", answer: "48", explanation: "Mode = 3*Median - 2*Mean => 44 = 3*Median - 100 => 3*Median = 144 => Median = 48." },
+    { id: "hm04_p9", type: "MCQ", prompt: "What is the arithmetic mean of the first 21 natural numbers?", options: ["10", "10.5", "11", "11.5"], answer: 2, explanation: "(n + 1)/2 = 22 / 2 = 11." },
+    { id: "hm04_p10", type: "MCQ", prompt: "If two variables X and Y move in exact opposite linear proportion, their correlation coefficient r is:", options: ["0", "+1", "-1", "-0.5"], answer: 2, explanation: "Perfect negative linear correlation gives r = -1." },
+    { id: "hm04_p11", type: "SA_NUMERIC", prompt: "Find the range of the dataset {42, 19, 67, 23, 81, 35}.", answer: "62", explanation: "Range = Max - Min = 81 - 19 = 62." },
+    { id: "hm04_p12", type: "MCQ", prompt: "Dataset A has Mean 50, SD 5; Dataset B has Mean 100, SD 8. Which dataset is more consistent?", options: ["Dataset A", "Dataset B", "Both equally consistent", "Cannot be determined"], answer: 1, explanation: "CV(A) = 5/50 = 10%; CV(B) = 8/100 = 8%. Lower CV (Dataset B) is more consistent." }
+  ]
+};

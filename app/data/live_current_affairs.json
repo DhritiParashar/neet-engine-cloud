@@ -1,0 +1,486 @@
+[
+  {
+    "id": "rss_social_1794638820_3",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Social",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Social Briefing (Week 46, 2026)",
+    "category": "Social Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'The Skilling Imperative in India: The Bridge Between Women and Work'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_international_1794638820_3",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "International",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live International Briefing (Week 46, 2026)",
+    "category": "International Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'Global South Can Gain as Trump Tariffs Redraw Global Power Map'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_economic_1794638428_0",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Economic",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Economic Briefing (Week 46, 2026)",
+    "category": "Economic Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'Annual Report'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_economic_1794638428_1",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Economic",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Economic Briefing (Week 46, 2026)",
+    "category": "Economic Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'Economic Survey 2025-26'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_economic_1794638428_2",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Economic",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Economic Briefing (Week 46, 2026)",
+    "category": "Economic Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'The Outlook for India’s Economy in 2026 amid A New US Trade Deal'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_economic_1794638428_3",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Economic",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Economic Briefing (Week 46, 2026)",
+    "category": "Economic Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'Economic Survey 2025-26, Analysis and Key Findings'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_social_1794638428_0",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Social",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Social Briefing (Week 46, 2026)",
+    "category": "Social Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'Women Account for 43% of Overall Ayush Services Workforce; Representation Exceeds 50% Across Several Organised Segments'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_social_1794638428_1",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Social",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Social Briefing (Week 46, 2026)",
+    "category": "Social Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'PIB Backgrounder'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_social_1794638428_2",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Social",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Social Briefing (Week 46, 2026)",
+    "category": "Social Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'International Women's Day 2026'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_social_1794638428_3",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Social",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Social Briefing (Week 46, 2026)",
+    "category": "Social Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'A shift in direction for education and employment'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_civic_1794638428_0",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Civic",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Civic Briefing (Week 46, 2026)",
+    "category": "Civic Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'Sustainable urban development in Ahmedabad'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_civic_1794638428_1",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Civic",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Civic Briefing (Week 46, 2026)",
+    "category": "Civic Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'Beyond Housing for All: How Punjab Can Create Inclusive and Affordable Urban Communities'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_civic_1794638428_2",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Civic",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Civic Briefing (Week 46, 2026)",
+    "category": "Civic Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'Bridging the Civic Infrastructure and Governance Deficit'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_civic_1794638428_3",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Civic",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Civic Briefing (Week 46, 2026)",
+    "category": "Civic Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'Issues of Civic Infrastructure in India'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_domestic_1794638428_0",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Domestic",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Domestic Briefing (Week 46, 2026)",
+    "category": "Domestic Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'Industrial renewal in the East: Why West Bengal matters again'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_domestic_1794638428_1",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Domestic",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Domestic Briefing (Week 46, 2026)",
+    "category": "Domestic Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'Forging a Phoenix from the Ashes: An Agenda for Bengal’s Economic Reset'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_domestic_1794638428_2",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Domestic",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Domestic Briefing (Week 46, 2026)",
+    "category": "Domestic Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'GST Federalism Crisis 2026: How States Lost Fiscal Power'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_domestic_1794638428_3",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "Domestic",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live Domestic Briefing (Week 46, 2026)",
+    "category": "Domestic Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'India's Union Budget FY 2026-27: Key highlights'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_international_1794638428_0",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "International",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live International Briefing (Week 46, 2026)",
+    "category": "International Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'India and a Changing Global Order: Foreign Policy in the Trump 2.0 Era'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_international_1794638428_1",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "International",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live International Briefing (Week 46, 2026)",
+    "category": "International Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'India's Strategic Autonomy'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_international_1794638428_2",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "International",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live International Briefing (Week 46, 2026)",
+    "category": "International Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'Sanctions and the geopolitics of trade'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  },
+  {
+    "id": "rss_international_1794638428_3",
+    "exams": [
+      "ALL_IIM_MASTER",
+      "IPMAT_INDORE_RANCHI",
+      "IPMAT_ROHTAK",
+      "JIPMAT_BG_JAMMU",
+      "IIMB_UG_ECON_DS_DBE",
+      "IIMM_IIML_TECH_MGMT"
+    ],
+    "group": "Current Affairs & Policy",
+    "subDomain": "International",
+    "dateTag": "Week 46, 2026 (2026-11-14)",
+    "campus": "Live International Briefing (Week 46, 2026)",
+    "category": "International Policy & Governance",
+    "prompt": "[2026-11-14 Live Issue] 'The infinite connection: How to make the India-Middle East-Europe economic corridor happen'. Analyze the economic, social, and governance implications of this development for India's stakeholders.",
+    "rubricHints": [
+      "Identify primary stakeholders affected (consumers, businesses, regulators).",
+      "Evaluate short-term fiscal/operational trade-offs vs. long-term structural impact.",
+      "Conclude with a balanced, data-backed policy recommendation."
+    ]
+  }
+]

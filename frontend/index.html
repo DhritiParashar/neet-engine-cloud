@@ -1,0 +1,1478 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GOALisB GRE Master</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+<style id="goal-high-legibility-theme">
+  /* Crisp WCAG AA+ typography on low-contrast / high-gamma laptop displays without altering layout or color palette */
+  body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  .text-slate-400 { color: #475569 !important; } /* Elevated from #94a3b8 -> slate-600 */
+  .text-slate-500 { color: #334155 !important; } /* Elevated from #64748b -> slate-700 */
+  .text-slate-600 { color: #1e293b !important; } /* Elevated from #475569 -> slate-800 */
+  .text-gray-400  { color: #4b5563 !important; }
+  .text-gray-500  { color: #374151 !important; }
+  .border-slate-200 { border-color: #cbd5e1 !important; } /* Subtle border definition on bright screens */
+
+  /* Dark mode high-legibility equivalents */
+  .dark .text-slate-400 { color: #cbd5e1 !important; }
+  .dark .text-slate-500 { color: #e2e8f0 !important; }
+  .dark .text-slate-600 { color: #f1f5f9 !important; }
+  .dark .border-slate-800 { border-color: #334155 !important; }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
+  <header class="border-b border-slate-800 bg-slate-900/90 sticky top-0 z-30 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 py-3 space-y-2.5">
+      <div class="flex flex-wrap lg:flex-nowrap items-center justify-between gap-2">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center font-extrabold text-white shadow" text-[11px] tracking-tight">GRE</div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="font-bold text-base text-white">GOALisB GRE Master</h1>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">GRE 340</span>
+            </div>
+            <p class="text-[11px] text-slate-400">MIT &bull; Stanford &bull; UC Berkeley &bull; CMU &bull; ETH Zurich &bull; Oxford &bull; Cambridge &bull; Georgia Tech</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap lg:flex-nowrap items-center gap-1.5 shrink-0"><div id="header-profile-summary" class="hidden px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs"></div><button id="plan-upgrade-btn" type="button" onclick="window.openPaymentModal()" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-sm cursor-pointer">&#11088; Go Pro Learner</button><button id="auth-header-btn" type="button" onclick="window.openAuthModal()" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-sm cursor-pointer">&#128100; Free Demo Login / 2-Step Register</button><button id="theme-toggle-btn" type="button" onclick="window.toggleThemeMode()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-amber-300 shadow-sm transition cursor-pointer">&#127769; Dark Mode</button></div>
+      </div>
+
+      <div id="exam-mode-pills" class="flex flex-wrap gap-2"></div>
+      <div id="exam-meta-banner" class="bg-slate-950/90 border border-slate-800 rounded-xl p-2.5"></div>
+
+      <nav class="flex flex-wrap gap-1.5 pt-1">
+        <button data-tab-btn="tab1" onclick="window.switchTab('tab1')">1. Quantitative Reasoning (QC &amp; PS)</button>
+        <button data-tab-btn="tab2" onclick="window.switchTab('tab2')">2. Data Interpretation &amp; Analysis</button>
+        <button data-tab-btn="tab3" onclick="window.switchTab('tab3')">3. Verbal Studio (TC, SE &amp; RC)</button>
+        <button data-tab-btn="tab8" onclick="window.switchTab('tab8')">4. Section-Adaptive Mock</button>
+        <button data-tab-btn="tab4" onclick="window.switchTab('tab4')">5. Trap Doctor &amp; AI Doubts</button>
+        <button data-tab-btn="tab6" onclick="window.switchTab('tab6')">6. GRE Score Forecaster</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="tab-content" class="max-w-7xl mx-auto px-4 py-6"></main>
+
+  <script src="/data/ipmManifest.js"></script>
+  <script src="/data/ipmQuantCore.js"></script>
+  <script src="/data/ipmHigherMath.js"></script>
+  <script src="/data/ipmDilr.js"></script>
+  <script src="/data/ipmVarc.js"></script>
+  <script src="/data/ipmDeepModules.js"></script>
+  <script src="/data/ipmInterviewPi.js"></script>
+  <script src="/data/ipmPyqArchive.js"></script>
+  <script src="/data/ipmRefreshers.js"></script>
+  <script src="/data/ipmRefreshersQuant.js"></script>
+  <script src="/data/ipmRefreshersHigherDilrVarc.js"></script>
+  
+  <script src="/data/ipmQuantShortcuts.js"></script>
+  <script src="/data/ipmQuantDrillBank.js"></script>
+  <script src="/data/ipmDilrVarcBank.js"></script>
+  <script src="/data/ipmTrapsAndPiBank.js"></script>
+  
+  
+  
+  
+  
+  
+  <script src="/data/greOfficialBank.js"></script>
+  <script src="/js/examSwitcher.js"></script>
+  <script src="/js/app.js"></script>
+
+  <style id="theme-overrides">
+    .pane-scroll::-webkit-scrollbar { width: 6px; }
+    .pane-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 9999px; }
+    .pane-scroll::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.45); border-radius: 9999px; }
+    .pane-scroll::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.8); }
+
+    body.light-mode { background-color: #f1f5f9 !important; color: #0f172a !important; }
+    body.light-mode header { background-color: rgba(255, 255, 255, 0.96) !important; border-color: #cbd5e1 !important; }
+    body.light-mode #exam-meta-banner { background-color: #f8fafc !important; border-color: #cbd5e1 !important; color: #1e293b !important; }
+    body.light-mode [class*="bg-slate-950"] { background-color: #f8fafc !important; }
+    body.light-mode [class*="bg-slate-900"],
+    body.light-mode [class*="bg-slate-800"] { background-color: #ffffff !important; }
+    body.light-mode [class*="border-slate-800"],
+    body.light-mode [class*="border-slate-700"] { border-color: #cbd5e1 !important; }
+    body.light-mode .text-white { color: #0f172a !important; }
+    body.light-mode .text-slate-100,
+    body.light-mode .text-slate-200 { color: #1e293b !important; }
+    body.light-mode .text-slate-300 { color: #334155 !important; }
+    body.light-mode .text-slate-400 { color: #64748b !important; }
+    body.light-mode .text-indigo-300,
+    body.light-mode .text-indigo-400 { color: #4338ca !important; }
+    body.light-mode .text-cyan-300,
+    body.light-mode .text-cyan-400 { color: #0e7490 !important; }
+    body.light-mode .text-purple-300,
+    body.light-mode .text-purple-400 { color: #7e22ce !important; }
+    body.light-mode .text-amber-300 { color: #b45309 !important; }
+    body.light-mode [class*="text-emerald-"] { color: #047857 !important; }
+    body.light-mode [class*="text-rose-"] { color: #be123c !important; }
+    body.light-mode [class*="bg-emerald-950"] { background-color: #ecfdf5 !important; }
+    body.light-mode [class*="bg-rose-950"] { background-color: #fff1f2 !important; }
+    body.light-mode [class*="bg-indigo-950"] { background-color: #eef2ff !important; }
+    body.light-mode [class*="bg-cyan-950"] { background-color: #ecfeff !important; }
+    body.light-mode [class*="bg-purple-950"] { background-color: #faf5ff !important; }
+    /* Preserve white text on solid primary buttons */
+    body.light-mode .bg-indigo-600,
+    body.light-mode .bg-cyan-600,
+    body.light-mode .bg-purple-600,
+    body.light-mode .bg-emerald-600,
+    body.light-mode .bg-rose-600 { color: #ffffff !important; }
+    body.light-mode input,
+    body.light-mode textarea { background-color: #ffffff !important; color: #0f172a !important; border-color: #94a3b8 !important; }
+    body.light-mode .pane-scroll::-webkit-scrollbar-track { background: #e2e8f0; }
+    body.light-mode .pane-scroll::-webkit-scrollbar-thumb { background: #94a3b8; }
+    /* Keep dark showcase panel readable in Light Mode */
+    body.light-mode #login-dashboard-gate [class*="from-indigo-950"] .text-white,
+    body.light-mode #login-dashboard-gate [class*="from-indigo-950"] .text-slate-200,
+    body.light-mode #login-dashboard-gate [class*="from-indigo-950"] .text-slate-300 { color: #f8fafc !important; }
+    body.light-mode #login-dashboard-gate [class*="from-indigo-950"] .text-slate-400 { color: #cbd5e1 !important; }
+    body.light-mode #reg-otp-banner { background-color: #eef2ff !important; color: #1e1b4b !important; }
+  
+
+/* Universal Independent Left & Right Split-Pane Scrolling for Tabs 1, 2 & 3 */
+@media (min-width: 1024px) {
+  .split-pane-layout {
+    height: calc(100vh - 215px) !important;
+    min-height: 520px !important;
+    max-height: calc(100vh - 215px) !important;
+    overflow: hidden !important;
+    align-items: stretch !important;
+  }
+  .split-pane-left,
+  .split-pane-right {
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    padding-right: 0.4rem;
+  }
+}</style>
+
+  <script>
+    window.applyTheme = function (mode) {
+      const isLight = mode === "light";
+      document.body.classList.toggle("light-mode", isLight);
+      const btn = document.getElementById("theme-toggle-btn");
+      if (btn) btn.innerHTML = isLight ? "&#127769; Dark Mode" : "&#9728;&#65039; Light Mode";
+      localStorage.setItem("gre_tutor_theme", mode);
+    };
+    window.toggleThemeMode = function () {
+      const next = document.body.classList.contains("light-mode") ? "dark" : "light";
+      window.applyTheme(next);
+    };
+    window.applyTheme(localStorage.getItem("gre_tutor_theme") || "light");
+  </script>
+      <!-- FULL-SCREEN STUDENT LOGIN / FORGOT PASSWORD / FRESH REGISTRATION DASHBOARD GATE -->
+  <div id="login-dashboard-gate" class="fixed inset-0 z-50 bg-slate-950 overflow-y-auto flex items-center justify-center p-4">
+    <div class="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+      <!-- Left Branding & Curriculum Showcase -->
+      <div class="lg:col-span-5 bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 p-7 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-800">
+        <div class="space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-[11px] font-bold">
+            GRE GENERAL TEST &bull; 260–340 ADAPTIVE + AWA 6.0 MASTER ENGINE
+          </div>
+          <h1 class="text-2xl font-extrabold text-white leading-snug">
+            GOALisB GRE General (260–340 + AWA) Prep Dashboard
+          </h1>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Section-adaptive preparation for <strong>GRE General (260–340 Scale + AWA 6.0) • MIT, Stanford, UC Berkeley, CMU &amp; Oxford</strong>.
+          </p>
+          <ul class="space-y-2 text-xs text-slate-200 pt-2">
+            <li>&#9989; <strong>Free Demo Start:</strong> Instant access upon Email OTP verification</li>
+            <li>&#9989; <strong>360+ Worked Examples:</strong> GRE Quant (QC &amp; PS), Higher Math & Graduate MS, MEng, PhD & MBA (Stanford, MIT, CMU, ETH)</li>
+            <li>&#9989; <strong>56 Interactive Trap Clinics:</strong> +4 / -1 / 0 Expected-Value Simulators</li>
+            <li>&#9989; <strong>Live AI Panel Grader:</strong> Weekly + 6-12M Landmark Current Affairs</li>
+          </ul>
+        </div>
+        <div class="pt-6 text-[11px] text-slate-400 border-t border-slate-800/80">
+          Neon PostgreSQL Encrypted Student Portal &bull; 2-Step OTP Protected
+        </div>
+      </div>
+
+      <!-- Right Auth Card: Login | Forgot Password | Fresh Registration -->
+      <div class="lg:col-span-7 p-7 space-y-5">
+        <div class="flex gap-2">
+          <button id="tab-btn-login" onclick="window.switchDashboardView('login')" class="flex-1 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow">
+            Student Login
+          </button>
+          <button id="tab-btn-reg" onclick="window.switchDashboardView('register')" class="flex-1 py-2 rounded-xl bg-slate-950 text-slate-300 border border-slate-800 text-xs font-bold">
+            Fresh Registration (Free Demo)
+          </button>
+          <button id="tab-btn-forgot" onclick="window.switchDashboardView('forgot')" class="flex-1 py-2 rounded-xl bg-slate-950 text-slate-300 border border-slate-800 text-xs font-bold">
+            Forgot Password
+          </button>
+        </div>
+
+        <!-- 1. STUDENT LOGIN VIEW -->
+        <div id="dash-login-box" class="space-y-3.5">
+          <div>
+            <h2 class="text-lg font-bold text-white">Welcome Back, Aspirant</h2>
+            <p class="text-xs text-slate-400">Log in to resume your Free Demo or Pro Learner workspace</p>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Registered Email Address</label>
+            <input id="login-email" type="email" placeholder="student@example.com" class="w-full rounded-xl bg-slate-950 border border-slate-700 p-3 text-xs text-white">
+          </div>
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-xs font-semibold text-slate-300">Password</label>
+              <button type="button" onclick="window.switchDashboardView('forgot')" class="text-[11px] text-amber-300 hover:underline font-semibold">
+                Forgot Password? Reset via OTP &rarr;
+              </button>
+            </div>
+            <input id="login-pass" type="password" placeholder="Enter your password" class="w-full rounded-xl bg-slate-950 border border-slate-700 p-3 text-xs text-white">
+          </div>
+          <button onclick="window.handleDashboardLogin()" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-extrabold text-white shadow">
+            Login to GOALisB Workspace &rarr;
+          </button>
+        </div>
+
+        <!-- 2. FRESH REGISTRATION VIEW (2-STEP EMAIL + PHONE OTP) -->
+        <div id="dash-reg-box" class="hidden space-y-3">
+          <div>
+            <h2 class="text-lg font-bold text-white">Create Student Account (Starts as Free Demo)</h2>
+            <p class="text-xs text-slate-400">Email OTP verification unlocks your Free Demo immediately</p>
+          </div>
+
+          <div id="reg-step1" class="space-y-2.5">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-300 mb-1">Student Full Name</label>
+              <input id="reg-name" type="text" placeholder="e.g. Suresh Sharma" class="w-full rounded-xl bg-slate-950 border border-slate-700 p-2.5 text-xs text-white">
+            </div>
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="block text-[11px] font-semibold text-sky-300 mb-1">Undergrad CGPA (10-Pt Scale)</label>
+                <input id="reg-c10" type="number" step="0.1" value="9.25" class="w-full rounded-xl bg-slate-950 border border-slate-700 p-2.5 text-xs text-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-emerald-300 mb-1">Full-Time Work / Research (Months)</label>
+                <input id="reg-c12" type="number" step="0.1" value="24" class="w-full rounded-xl bg-slate-950 border border-slate-700 p-2.5 text-xs text-white">
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-300 mb-1">Mobile Number (+91 for Phone OTP)</label>
+                <input id="reg-phone" type="tel" placeholder="+91 9876543210" class="w-full rounded-xl bg-slate-950 border border-slate-700 p-2.5 text-xs text-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-300 mb-1">Email Address (For Email OTP)</label>
+                <input id="reg-email" type="email" placeholder="student@example.com" class="w-full rounded-xl bg-slate-950 border border-slate-700 p-2.5 text-xs text-white">
+              </div>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-300 mb-1">Create Password</label>
+              <input id="reg-pass" type="password" placeholder="Minimum 4 characters" class="w-full rounded-xl bg-slate-950 border border-slate-700 p-2.5 text-xs text-white">
+            </div>
+            <button onclick="window.handleRegStep1()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-extrabold text-white">
+              Step 1: Send Email & Phone OTPs &rarr;
+            </button>
+          </div>
+
+          <div id="reg-step2" class="hidden space-y-3">
+            <div id="reg-otp-banner" class="p-3 rounded-xl bg-indigo-950/70 border border-indigo-500/40 text-xs text-indigo-200 leading-relaxed"></div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-sky-300 mb-1">6-Digit Email OTP</label>
+                <input id="reg-email-otp" type="text" maxlength="6" placeholder="123456" class="w-full rounded-xl bg-slate-950 border border-sky-500/50 p-2.5 text-sm font-mono text-center text-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-emerald-300 mb-1">6-Digit Phone OTP</label>
+                <input id="reg-phone-otp" type="text" maxlength="6" placeholder="654321" class="w-full rounded-xl bg-slate-950 border border-emerald-500/50 p-2.5 text-sm font-mono text-center text-white">
+              </div>
+            </div>
+            <button onclick="window.handleRegStep2Verify()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-extrabold text-white">
+              Step 2: Verify Both OTPs & Enter Free Demo &rarr;
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. FORGOT PASSWORD (OTP RECOVERY) VIEW -->
+        <div id="dash-forgot-box" class="hidden space-y-3">
+          <div>
+            <h2 class="text-lg font-bold text-white">Reset Forgotten Password via OTP</h2>
+            <p class="text-xs text-slate-400">Verify your registered email with a 6-digit OTP to set a new password</p>
+          </div>
+          <div id="fp-step1" class="space-y-3">
+            <input id="fp-email" type="email" placeholder="Enter your registered email" class="w-full rounded-xl bg-slate-950 border border-slate-700 p-3 text-xs text-white">
+            <button onclick="window.handleForgotStep1()" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold">
+              Send Password Reset OTP &rarr;
+            </button>
+          </div>
+          <div id="fp-step2" class="hidden space-y-3">
+            <div id="fp-otp-banner" class="p-3 rounded-xl bg-amber-500/15 border border-amber-500/40 text-xs text-slate-900 dark:text-amber-100"></div>
+            <input id="fp-otp" type="text" maxlength="6" placeholder="Enter 6-Digit Reset OTP" class="w-full rounded-xl bg-slate-950 border border-amber-500/50 p-2.5 text-sm font-mono text-center text-white">
+            <input id="fp-new-pass" type="password" placeholder="Enter New Password" class="w-full rounded-xl bg-slate-950 border border-slate-700 p-2.5 text-xs text-white">
+            <button onclick="window.handleForgotStep2()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-extrabold text-white">
+              Confirm OTP & Update Password &rarr;
+            </button>
+          </div>
+        </div>
+
+        <div id="dash-msg" class="text-xs text-rose-300 font-medium"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FREE DEMO VS PRO LEARNER PAYMENT CHECKOUT MODAL -->
+  <div id="payment-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-amber-500/50 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-extrabold uppercase">Pro Learner Upgrade Gate</span>
+          <h3 class="text-lg font-bold text-white mt-1">Upgrade from Free Demo to Pro Learner</h3>
+        </div>
+        <button onclick="window.closePaymentModal()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+      </div>
+
+            <p id="pay-gate-reason" class="text-xs text-slate-900 dark:text-amber-100 bg-amber-500/10 border border-amber-500/30 rounded-xl p-2.5"></p>
+
+      <!-- TIME-BOUND BETA APPROVAL VOUCHER REDEMPTION BAR -->
+      <div class="p-3.5 rounded-xl bg-indigo-950/60 border border-indigo-500/40 flex flex-wrap items-center justify-between gap-2">
+        <div class="text-xs">
+          <div class="font-bold text-indigo-200">&#129514; Beta Testing Approval Voucher</div>
+          <div class="text-[11px] text-slate-400">Have a time-bound approval code? Redeem for instant full Pro access (Try: <code class="text-amber-300">BETA-7DAY-PASS</code>)</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <input id="beta-voucher-input" type="text" placeholder="e.g. BETA-7DAY-PASS" class="rounded-xl bg-slate-950 border border-indigo-500/50 px-3 py-2 text-xs font-mono uppercase text-white">
+          <button onclick="window.redeemBetaVoucherCode()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-extrabold text-white shadow">
+            Activate Voucher
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+          <div class="font-bold text-rose-300 uppercase">Free Demo (Current Plan)</div>
+          <div class="text-xl font-extrabold text-white">&#8377;0 <span class="text-xs font-normal text-slate-400">/ Limited Demo</span></div>
+          <ul class="list-disc list-inside text-slate-400 space-y-1">
+            <li>Quant, DILR & VARC Core Foundations</li>
+            <li>Sample Trap Doctor & Socratic Doubts</li>
+            <li>1 Diagnostic Mock Test</li>
+            <li class="text-rose-400">Locked: 8-IIM Call Predictor & 5-Yr PYQ Vault</li>
+          </ul>
+          <button onclick="window.closePaymentModal()" class="w-full mt-2 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold">
+            Stay on Free Demo
+          </button>
+        </div>
+
+        <div class="p-4 rounded-xl bg-indigo-950/50 border-2 border-amber-400 space-y-2">
+          <div class="font-bold text-amber-300 uppercase">&#11088; Pro Learner (Full Season Pass)</div>
+          <div class="text-xl font-extrabold text-white">&#8377;1,999 <span class="text-xs font-normal text-slate-300">/ Full GRE General & UG Season</span></div>
+          <ul class="list-disc list-inside text-slate-200 space-y-1">
+            <li>All 360 Worked Quant & Higher Math Drills</li>
+            <li>56 Interactive Trap Doctor Clinics + EV Sim</li>
+            <li>Unlimited AI PI/WAT Grading + Live Weekly News</li>
+            <li>8-IIM Composite Call Predictor + 2022–26 PYQs</li>
+            <li>Unlimited Non-Repeating PostgreSQL Mocks</li>
+          </ul>
+          <div class="grid grid-cols-2 gap-2 pt-2">
+            <button onclick="window.completeProPayment('UPI / Instant QR')" class="py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold">
+              Pay via UPI / QR
+            </button>
+            <button onclick="window.completeProPayment('Credit/Debit Card / NetBanking')" class="py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold">
+              Pay via Card
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/js/authAndBilling.js?v=20261119final"></script>
+<!-- LIVE POSTGRES PYQ TAB9 OVERRIDE -->
+<script>
+(function () {
+  window.PYQ_EXAM_FILTER = "ALL";
+  window.PYQ_YEAR_FILTER = "ALL";
+  window.PYQ_REVEALED = {};
+  window.PYQ_PG_CACHE = null;
+
+  window.fetchAllPyqFromPostgres = async function () {
+    try {
+      const res = await fetch("/api/pyq?exam=ALL&year=ALL&t=" + Date.now());
+      const data = await res.json();
+      if (Array.isArray(data.questions) && data.questions.length > 0) {
+        window.PYQ_PG_CACHE = data.questions;
+        if (window.IPM_STATE && window.IPM_STATE.activeTab === "tab9") {
+          window.renderActiveTab();
+        }
+      }
+    } catch (e) {
+      console.error("PYQ fetch error:", e);
+    }
+  };
+
+  window.setPyqExamFilter = function (ex) {
+    window.PYQ_EXAM_FILTER = ex;
+    if (ex !== "ALL" && ex !== "GRE General" && window.PYQ_YEAR_FILTER === "ARCHIVE_2019_2021") {
+      window.PYQ_YEAR_FILTER = "ALL";
+    }
+    if (ex === "IIM Bangalore" && ["2022", "2023"].includes(window.PYQ_YEAR_FILTER)) {
+      window.PYQ_YEAR_FILTER = "ALL";
+    }
+    if ((ex === "IIM Mumbai & Lucknow" || ex === "IIM Kozhikode BMS") && ["2022", "2023", "2024"].includes(window.PYQ_YEAR_FILTER)) {
+      window.PYQ_YEAR_FILTER = "ALL";
+    }
+    window.renderActiveTab();
+  };
+
+  window.setPyqYearFilter = function (yr) {
+    window.PYQ_YEAR_FILTER = yr;
+    window.renderActiveTab();
+  };
+
+    window.launchPyqAsTimedMock = function () {
+    const pool = (window.PYQ_PG_CACHE && window.PYQ_PG_CACHE.length) ? window.PYQ_PG_CACHE : [];
+    const normEx = (s) => String(s || "").toLowerCase().replace("iimb", "iim bangalore").trim();
+    const filtered = pool.filter(q => {
+      const exMatch = window.PYQ_EXAM_FILTER === "ALL" || normEx(q.exam).includes(normEx(window.PYQ_EXAM_FILTER));
+      const qYr = String(q.year || "").trim();
+      const yrMatch = window.PYQ_YEAR_FILTER === "ALL"
+        ? true
+        : window.PYQ_YEAR_FILTER === "ARCHIVE_2019_2021"
+          ? ["2019", "2020", "2021"].includes(qYr)
+          : qYr === String(window.PYQ_YEAR_FILTER);
+      return exMatch && yrMatch;
+    });
+    if (!filtered.length) return;
+    window.CUSTOM_PYQ_MOCK_POOL = filtered;
+    if (typeof window.startCustomPyqMock === "function") {
+      window.startCustomPyqMock(filtered, `${window.PYQ_EXAM_FILTER} (${window.PYQ_YEAR_FILTER}) PYQ Drill`);
+    } else if (window.IPM_STATE) {
+      window.IPM_STATE.activeTab = "tab8";
+      window.renderActiveTab();
+    }
+  };
+  window.togglePyqSolution = function (qid) {
+    window.PYQ_REVEALED[qid] = !window.PYQ_REVEALED[qid];
+    window.renderActiveTab();
+  };
+
+  window.renderTab9 = function (el) {
+    if (!window.PYQ_PG_CACHE) {
+      window.fetchAllPyqFromPostgres();
+    }
+    const pool = (window.PYQ_PG_CACHE && window.PYQ_PG_CACHE.length) ? window.PYQ_PG_CACHE : (window.IPM_PYQ_ARCHIVE || []);
+    const exams = ["ALL", "GRE General", "GRE General Rohtak", "OMETs", "IIM Bangalore", "IIM Mumbai & Lucknow", "IIM Kozhikode BMS", "CUET-UG"];
+    const years = ["ALL", "2026", "2025", "2024", "2023", "2022", "ARCHIVE_2019_2021"];
+
+    const normEx = (s) => String(s || "").toLowerCase().replace("iimb", "iim bangalore").trim();
+    const filtered = pool.filter(q => {
+      const exMatch = window.PYQ_EXAM_FILTER === "ALL" || normEx(q.exam).includes(normEx(window.PYQ_EXAM_FILTER));
+      const qYr = String(q.year || "").trim();
+      const yrMatch = window.PYQ_YEAR_FILTER === "ALL"
+        ? true
+        : window.PYQ_YEAR_FILTER === "ARCHIVE_2019_2021"
+          ? ["2019", "2020", "2021"].includes(qYr)
+          : qYr === String(window.PYQ_YEAR_FILTER);
+      return exMatch && yrMatch;
+    });
+
+    const isIimb = window.PYQ_EXAM_FILTER === "IIM Bangalore";
+    const isNewUg2025 = (window.PYQ_EXAM_FILTER === "IIM Mumbai & Lucknow" || window.PYQ_EXAM_FILTER === "IIM Kozhikode BMS");
+    const archiveAllowed = (window.PYQ_EXAM_FILTER === "ALL" || window.PYQ_EXAM_FILTER === "GRE General");
+
+    el.innerHTML = `
+      <div class="space-y-4">
+        <div class="bg-slate-900/95 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-lg">
+          <div class="flex flex-wrap lg:flex-nowrap items-center justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-lg font-bold text-white">Master Solved PYQ Archive (2019 – 2026) &bull; ${filtered.length} Questions</h2>
+                <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold">PostgreSQL Live (${pool.length} Total)</span>
+                <button type="button" onclick="window.launchPyqAsTimedMock()" class="text-[11px] px-3 py-1 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow transition">Practice Filtered Set in Tab 8 Mock &rarr;</button>
+              </div>
+              <p class="text-xs text-slate-400">
+                Complete 2022–2026 vault across GRE General (+ 2019–21 Official Archive), Rohtak, OMETs, IIMB (2024–26), IIMM/IIML/IIMK (2025–26) &amp; CUET-UG.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              ${years.map(yr => {
+                const disabledYr = (isIimb && ["2022", "2023"].includes(yr))
+                  || (isNewUg2025 && ["2022", "2023", "2024"].includes(yr))
+                  || (yr === "ARCHIVE_2019_2021" && !archiveAllowed);
+                const active = window.PYQ_YEAR_FILTER === yr;
+                const label = yr === "ALL" ? "All Years" : yr === "ARCHIVE_2019_2021" ? "Archive (2019–21)" : yr;
+                return `<button type="button" ${disabledYr ? "disabled" : ""} onclick="window.setPyqYearFilter('${yr}')"
+                  title="${disabledYr ? "Not applicable for selected exam" : ""}"
+                  class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                    disabledYr
+                      ? "bg-slate-950/40 text-slate-600 border border-slate-800/50 cursor-not-allowed line-through"
+                      : active
+                        ? "bg-amber-500 text-slate-950 shadow"
+                        : "bg-slate-950 text-slate-300 border border-slate-800 hover:border-amber-400"
+                  }">${label}</button>`;
+              }).join("")}
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            ${exams.map(ex => `
+              <button type="button" onclick="window.setPyqExamFilter('${ex}')"
+                class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+                  window.PYQ_EXAM_FILTER === ex
+                    ? "bg-indigo-600 text-white shadow"
+                    : "bg-slate-950 text-slate-300 border border-slate-800 hover:border-indigo-500"
+                }">${ex === "ALL" ? "All Exams" : ex}</button>
+            `).join("")}
+          </div>
+
+          ${isIimb ? `
+            <div class="p-3 rounded-xl bg-sky-500/10 border border-sky-500/30 text-xs text-sky-200">
+              <strong>Historical Timeline Note (IIM Bangalore UG):</strong> IIM Bangalore launched BBA (DBE) in <strong>2024</strong> and residential B.Sc. (Hons) Econ/DS in <strong>2026</strong>. Pre-2024 years are disabled.
+            </div>
+          ` : ""}
+
+          ${isNewUg2025 ? `
+            <div class="p-3 rounded-xl bg-sky-500/10 border border-sky-500/30 text-xs text-sky-200">
+              <strong>Historical Timeline Note (${window.PYQ_EXAM_FILTER}):</strong> These specialized UG programs launched in <strong>2025–2026</strong>. Pre-2025 years are disabled.
+            </div>
+          ` : ""}
+        </div>
+
+        <div class="space-y-3">
+          ${filtered.map((q) => `
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-0.5 rounded-lg bg-indigo-500/20 text-indigo-300 text-xs font-bold">${q.exam} &bull; ${q.year}</span>
+                  <span class="text-xs text-slate-400 font-semibold">${q.section || "PYQ"}${q.topic ? " (" + q.topic + ")" : ""}</span>
+                </div>
+                <span class="text-[11px] text-slate-500 font-mono">${q.id}</span>
+              </div>
+
+              <p class="text-xs md:text-sm text-slate-100 leading-relaxed whitespace-pre-line">${q.prompt || q.question || q.text || ""}</p>
+
+              ${Array.isArray(q.options) && q.options.length ? `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                  ${q.options.map((opt, oi) => `
+                    <div class="p-2.5 rounded-xl bg-slate-950 border ${window.PYQ_REVEALED[q.id] && q.answer === oi ? "border-emerald-500 text-emerald-300 font-bold" : "border-slate-800 text-slate-300"}">
+                      <span class="font-bold mr-1.5">${String.fromCharCode(65 + oi)}.</span> ${opt}
+                    </div>
+                  `).join("")}
+                </div>
+              ` : ""}
+
+              <div class="pt-1">
+                <button type="button" onclick="window.togglePyqSolution('${q.id}')"
+                  class="px-3.5 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 text-xs font-bold">
+                  ${window.PYQ_REVEALED[q.id] ? "Hide Official Solution" : "View Answer & Step-by-Step Solution"}
+                </button>
+              </div>
+
+              ${window.PYQ_REVEALED[q.id] ? `
+                <div class="p-3.5 rounded-xl bg-slate-950 border border-emerald-600/40 text-xs text-emerald-200 space-y-1">
+                  <div><strong>Correct Answer:</strong> ${Array.isArray(q.options) && q.options.length ? `${String.fromCharCode(65 + q.answer)} (${q.options[q.answer]})` : q.answer}</div>
+                  <div><strong>Step-by-Step Solution:</strong> ${q.explanation}</div>
+                </div>
+              ` : ""}
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  };
+})();
+</script>
+<!-- END LIVE POSTGRES PYQ TAB9 OVERRIDE -->
+
+<!-- LIVE POSTGRES TAB8 MOCK ENGINE -->
+<script>
+(function () {
+  window.PG_MOCK = {
+    started: false,
+    submitted: false,
+    title: "",
+    questions: [],
+    currentIndex: 0,
+    answers: {},
+    secondsLeft: 0,
+    timerId: null
+  };
+
+  // Stage a custom PYQ set in the lobby WITHOUT starting the timer or showing questions yet
+  window.startCustomPyqMock = function (questions, title) {
+    if (!Array.isArray(questions) || !questions.length) return;
+    if (window.PG_MOCK.timerId) clearInterval(window.PG_MOCK.timerId);
+    window.PG_MOCK = {
+      started: false,
+      submitted: false,
+      title: title || `Filtered PYQ Set (${questions.length} Qs)`,
+      questions: questions,
+      currentIndex: 0,
+      answers: {},
+      secondsLeft: Math.max(300, questions.length * 90),
+      timerId: null
+    };
+    if (window.IPM_STATE) {
+      window.IPM_STATE.activeTab = "tab8";
+      window.renderActiveTab();
+    }
+  };
+
+  // Fetch & stage a PostgreSQL mock in the lobby (or start immediately once user clicks Start)
+  window.preparePgMock = async function (examFilter, limitCount, label) {
+    try {
+      const url = `/api/questions?exam=${encodeURIComponent(examFilter || "ALL")}&limit=${limitCount || 30}&t=${Date.now()}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (Array.isArray(data.questions) && data.questions.length > 0) {
+        window.PG_MOCK = {
+          started: true,
+          submitted: false,
+          title: label || `${examFilter} Live PostgreSQL Mock (${data.questions.length} Qs)`,
+          questions: data.questions,
+          currentIndex: 0,
+          answers: {},
+          secondsLeft: Math.max(300, data.questions.length * 90),
+          timerId: null
+        };
+        window.beginPgMockTimer();
+        window.renderActiveTab();
+      } else {
+        alert("No questions returned for this filter. Try All-IIM Comprehensive Master.");
+      }
+    } catch (e) {
+      console.error("Mock fetch error:", e);
+    }
+  };
+
+  window.beginPgMockTimer = function () {
+    if (window.PG_MOCK.timerId) clearInterval(window.PG_MOCK.timerId);
+    window.PG_MOCK.started = true;
+    window.PG_MOCK.timerId = setInterval(() => {
+      if (!window.PG_MOCK.started || window.PG_MOCK.submitted) return;
+      window.PG_MOCK.secondsLeft--;
+      const clk = document.getElementById("pgMockClock");
+      if (clk) {
+        const m = String(Math.floor(window.PG_MOCK.secondsLeft / 60)).padStart(2, "0");
+        const s = String(window.PG_MOCK.secondsLeft % 60).padStart(2, "0");
+        clk.textContent = `${m}:${s}`;
+      }
+      if (window.PG_MOCK.secondsLeft <= 0) {
+        window.submitPgMock();
+      }
+    }, 1000);
+  };
+
+  window.startStagedPgMock = function () {
+    if (!window.PG_MOCK.questions || !window.PG_MOCK.questions.length) return;
+    window.PG_MOCK.secondsLeft = Math.max(300, window.PG_MOCK.questions.length * 90);
+    window.beginPgMockTimer();
+    window.renderActiveTab();
+  };
+
+  window.savePgMockAnswer = function (qid, val) {
+    window.PG_MOCK.answers[qid] = val;
+    window.renderActiveTab();
+  };
+
+  window.jumpPgMockQ = function (idx) {
+    if (idx >= 0 && idx < window.PG_MOCK.questions.length) {
+      window.PG_MOCK.currentIndex = idx;
+      window.renderActiveTab();
+    }
+  };
+
+  window.submitPgMock = function () {
+    if (window.PG_MOCK.timerId) clearInterval(window.PG_MOCK.timerId);
+    window.PG_MOCK.submitted = true;
+    window.renderActiveTab();
+  };
+
+  window.exitPgMock = function () {
+    if (window.PG_MOCK.timerId) clearInterval(window.PG_MOCK.timerId);
+    window.PG_MOCK = {
+      started: false,
+      submitted: false,
+      title: "",
+      questions: [],
+      currentIndex: 0,
+      answers: {},
+      secondsLeft: 0,
+      timerId: null
+    };
+    window.renderActiveTab();
+  };
+
+  window.renderTab8 = function (el) {
+    if (window.CUSTOM_PYQ_MOCK_POOL && window.CUSTOM_PYQ_MOCK_POOL.length) {
+      const pool = window.CUSTOM_PYQ_MOCK_POOL;
+      window.CUSTOM_PYQ_MOCK_POOL = null;
+      window.startCustomPyqMock(pool, `Filtered PYQ Drill (${pool.length} Qs)`);
+      return;
+    }
+
+    // LOBBY GATE: Questions are strictly hidden until user clicks a Start button
+    if (!window.PG_MOCK.started) {
+      const hasStaged = Array.isArray(window.PG_MOCK.questions) && window.PG_MOCK.questions.length > 0;
+      const stagedMins = hasStaged ? Math.ceil(Math.max(300, window.PG_MOCK.questions.length * 90) / 60) : 0;
+
+      el.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-slate-900/95 border border-slate-800 rounded-2xl p-6 space-y-5 shadow-lg">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h2 class="text-lg font-bold text-white">Timed Mock Engine &bull; Exam Lobby</h2>
+                  <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold">PostgreSQL &bull; 342+ Qs Pool</span>
+                </div>
+                <p class="text-xs text-slate-400">Questions remain hidden and the clock stays paused until you click <strong>Start</strong>. Marking: MCQ +4/-1 | SA +4/0.</p>
+              </div>
+            </div>
+
+            ${hasStaged ? `
+              <div class="p-5 rounded-2xl bg-indigo-950/60 border border-indigo-500/50 flex flex-wrap items-center justify-between gap-4">
+                <div class="space-y-1">
+                  <div class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-300">Ready from PYQ Vault</div>
+                  <div class="text-base font-bold text-white">${window.PG_MOCK.title}</div>
+                  <div class="text-xs text-slate-300">${window.PG_MOCK.questions.length} Questions &bull; ${stagedMins} Minutes &bull; Questions hidden until Start</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="window.startStagedPgMock()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs md:text-sm font-extrabold shadow-lg transition">
+                    Start Staged PYQ Mock &rarr;
+                  </button>
+                  <button type="button" onclick="window.exitPgMock()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">
+                    Clear
+                  </button>
+                </div>
+              </div>
+            ` : ""}
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
+                <div class="text-xs font-bold text-indigo-400">ALL-IIM COMPREHENSIVE MASTER</div>
+                <div class="text-sm font-bold text-white">30 Questions &bull; 45 Mins</div>
+                <p class="text-xs text-slate-400">Randomized Quant SA/MCQ, DILR, and VARC drawn from all 342+ PostgreSQL items.</p>
+                <button type="button" onclick="window.preparePgMock('ALL', 30, 'All-IIM Comprehensive Master (30 Qs)')" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold transition">
+                  Start 30-Q Master Mock &rarr;
+                </button>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
+                <div class="text-xs font-bold text-amber-400">GRE General INDORE &amp; RANCHI</div>
+                <div class="text-sm font-bold text-white">25 Questions &bull; 38 Mins</div>
+                <p class="text-xs text-slate-400">Higher Math, Short-Answer Numerics, and VARC calibrated to GRE General.</p>
+                <button type="button" onclick="window.preparePgMock('GRE General', 25, 'GRE General & Ranchi Mock (25 Qs)')" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold transition">
+                  Start GRE General Mock &rarr;
+                </button>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
+                <div class="text-xs font-bold text-sky-400">IIM BANGALORE &amp; NEW UG</div>
+                <div class="text-sm font-bold text-white">20 Questions &bull; 30 Mins</div>
+                <p class="text-xs text-slate-400">Micro/Macro, Stats, Linear Algebra, and Business DI across IIMB, IIMM, IIML &amp; IIMK.</p>
+                <button type="button" onclick="window.preparePgMock('IIM', 20, 'IIM Bangalore & New UG Mock (20 Qs)')" class="w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-extrabold transition">
+                  Start IIMB / UG Mock &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    const qs = window.PG_MOCK.questions;
+    if (window.PG_MOCK.submitted) {
+      let score = 0, maxScore = qs.length * 4, correct = 0, wrong = 0, skipped = 0;
+      qs.forEach(q => {
+        const u = window.PG_MOCK.answers[q.id];
+        const hasOpts = Array.isArray(q.options) && q.options.length > 0;
+        if (u === undefined || u === null || String(u).trim() === "") {
+          skipped++;
+        } else if (hasOpts ? Number(u) === Number(q.answer) : String(u).trim().toLowerCase() === String(q.answer).trim().toLowerCase()) {
+          correct++;
+          score += 4;
+        } else {
+          wrong++;
+          if (hasOpts) score -= 1;
+        }
+      });
+
+      el.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-slate-900/95 border border-emerald-500/40 rounded-2xl p-6 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h2 class="text-lg font-bold text-white">Scorecard: ${window.PG_MOCK.title}</h2>
+              <button type="button" onclick="window.exitPgMock()" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white">Back to Mock Lobby</button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800"><div class="text-xs text-slate-400">Net Score</div><div class="text-xl font-extrabold text-emerald-400">${score} / ${maxScore}</div></div>
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800"><div class="text-xs text-slate-400">Correct (+4)</div><div class="text-xl font-extrabold text-emerald-300">${correct}</div></div>
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800"><div class="text-xs text-slate-400">Incorrect (-1 MCQ / 0 SA)</div><div class="text-xl font-extrabold text-rose-400">${wrong}</div></div>
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800"><div class="text-xs text-slate-400">Unattempted</div><div class="text-xl font-extrabold text-slate-300">${skipped}</div></div>
+            </div>
+          </div>
+          <div class="space-y-3">
+            ${qs.map((q, idx) => {
+              const u = window.PG_MOCK.answers[q.id];
+              const hasOpts = Array.isArray(q.options) && q.options.length > 0;
+              const isRight = u !== undefined && String(u).trim() !== "" && (hasOpts ? Number(u) === Number(q.answer) : String(u).trim().toLowerCase() === String(q.answer).trim().toLowerCase());
+              return `
+                <div class="bg-slate-900/90 border ${isRight ? "border-emerald-500/40" : "border-slate-800"} rounded-2xl p-4 space-y-2 text-xs">
+                  <div class="flex justify-between font-bold">
+                    <span class="text-indigo-300">Q${idx + 1}. ${q.exam || q.section} ${q.year ? "(" + q.year + ")" : ""}</span>
+                    <span class="${isRight ? "text-emerald-400" : "text-amber-300"}">${isRight ? "+4 Correct" : (u === undefined || String(u).trim() === "" ? "0 Unattempted" : (hasOpts ? "-1 Wrong" : "0 SA Wrong"))}</span>
+                  </div>
+                  <p class="text-slate-100 text-sm">${q.prompt}</p>
+                  <div class="text-emerald-300"><strong>Correct:</strong> ${hasOpts ? `${String.fromCharCode(65 + Number(q.answer))} (${q.options[Number(q.answer)]})` : q.answer}</div>
+                  <div class="text-slate-300"><strong>Solution:</strong> ${q.explanation}</div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    const idx = window.PG_MOCK.currentIndex;
+    const q = qs[idx];
+    const hasOpts = Array.isArray(q.options) && q.options.length > 0;
+    const m = String(Math.floor(window.PG_MOCK.secondsLeft / 60)).padStart(2, "0");
+    const s = String(window.PG_MOCK.secondsLeft % 60).padStart(2, "0");
+
+    el.innerHTML = `
+      <div class="space-y-4">
+        <div class="bg-slate-900/95 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="text-sm font-bold text-white">${window.PG_MOCK.title}</div>
+            <div class="text-xs text-slate-400">Question ${idx + 1} of ${qs.length} &bull; ${hasOpts ? "MCQ (+4 / -1)" : "Short Answer (+4 / 0)"}</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span id="pgMockClock" class="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono font-extrabold text-sm">${m}:${s}</span>
+            <button type="button" onclick="window.submitPgMock()" class="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">Submit Test</button>
+            <button type="button" onclick="window.exitPgMock()" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold">Exit</button>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/95 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <span class="px-2.5 py-0.5 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold">${q.exam || q.section} ${q.year ? "• " + q.year : ""}</span>
+            <span class="font-mono">${q.id}</span>
+          </div>
+          <p class="text-sm md:text-base text-white leading-relaxed whitespace-pre-line">${q.prompt}</p>
+
+          ${hasOpts ? `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+              ${q.options.map((opt, oi) => {
+                const chosen = Number(window.PG_MOCK.answers[q.id]) === oi && window.PG_MOCK.answers[q.id] !== undefined;
+                return `
+                  <button type="button" onclick="window.savePgMockAnswer('${q.id}', ${oi})"
+                    class="text-left p-3 rounded-xl border text-xs md:text-sm transition ${
+                      chosen ? "bg-indigo-600/30 border-indigo-400 text-white font-bold" : "bg-slate-950 border-slate-800 text-slate-300 hover:border-indigo-500"
+                    }">
+                    <span class="font-bold mr-2">${String.fromCharCode(65 + oi)}.</span> ${opt}
+                  </button>
+                `;
+              }).join("")}
+            </div>
+          ` : `
+            <div class="max-w-xs space-y-1">
+              <label class="text-xs text-slate-400 font-bold">Enter Exact Numeric Answer (Zero Negative Marking):</label>
+              <input type="text" value="${window.PG_MOCK.answers[q.id] || ""}" onchange="window.savePgMockAnswer('${q.id}', this.value)"
+                placeholder="Type number..." class="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm font-mono" />
+            </div>
+          `}
+
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-800">
+            <div class="flex gap-2">
+              <button type="button" onclick="window.jumpPgMockQ(${idx - 1})" ${idx === 0 ? "disabled" : ""} class="px-3.5 py-1.5 rounded-xl bg-slate-800 disabled:opacity-40 text-xs font-bold text-white">&larr; Previous</button>
+              <button type="button" onclick="window.jumpPgMockQ(${idx + 1})" ${idx === qs.length - 1 ? "disabled" : ""} class="px-3.5 py-1.5 rounded-xl bg-indigo-600 disabled:opacity-40 text-xs font-bold text-white">Next &rarr;</button>
+            </div>
+            <div class="flex flex-wrap gap-1">
+              ${qs.map((item, qi) => {
+                const ansd = window.PG_MOCK.answers[item.id] !== undefined && String(window.PG_MOCK.answers[item.id]).trim() !== "";
+                return `<button type="button" onclick="window.jumpPgMockQ(${qi})" class="w-7 h-7 rounded-lg text-[11px] font-bold ${
+                  qi === idx ? "bg-amber-500 text-slate-950" : ansd ? "bg-emerald-600/40 text-emerald-200 border border-emerald-500/40" : "bg-slate-950 text-slate-400 border border-slate-800"
+                }">${qi + 1}</button>`;
+              }).join("")}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  // Ensure app.js cannot overwrite our lobby-gated renderTab8
+  const prevRenderActiveTab = window.renderActiveTab;
+  window.renderActiveTab = function () {
+    if (window.IPM_STATE && window.IPM_STATE.activeTab === "tab8") {
+      const container = document.getElementById("tabContent") || document.getElementById("activeTabContainer") || document.querySelector("[data-tab-content]");
+      if (container) {
+        window.renderTab8(container);
+        return;
+      }
+    }
+    if (typeof prevRenderActiveTab === "function") {
+      prevRenderActiveTab();
+    }
+  };
+})();
+</script>
+<!-- END LIVE POSTGRES TAB8 MOCK ENGINE -->
+
+<!-- LIVE POSTGRES PRACTICE & WORKED EXAMPLES (TABS 1-3) -->
+<script>
+(function () {
+  window.PG_STUDIO = {
+    tab: "",
+    topic: "ALL",
+    workedExamples: [],
+    practiceSet: [],
+    revealedWorked: {},
+    userAnswers: {},
+    checkedAnswers: {},
+    loading: false,
+    totalDbCount: 342
+  };
+
+  const TAB_SECTION_MAP = {
+    tab1: {
+      label: "GRE Quantitative Reasoning (QC & PS)",
+      sections: ["QUANT_SA", "QUANT_MCQ", "HIGHER_MATH", "QUANT_CORE"],
+      topics: ["ALL", "Quantitative Comparison", "Algebra", "Number Properties", "Geometry", "Data Analysis", "Percentages", "Ratios", "Probability"]
+    },
+    tab2: {
+      label: "GRE Data Interpretation & AWA Lab",
+      sections: ["DILR"],
+      topics: ["ALL", "Data Interpretation", "Multi-Year", "Admissions", "Patent", "Weighted", "Energy", "Quartiles"]
+    },
+    tab3: {
+      label: "GRE Verbal (TC, SE & RC) Studio",
+      sections: ["VARC"],
+      topics: ["ALL", "Reading", "Critical Reasoning", "Vocabulary", "Para", "Grammar", "Sentence", "Word", "Idioms"]
+    }
+  };
+
+  function getActiveTabKey() {
+    if (window.IPM_STATE && window.IPM_STATE.activeTab) return window.IPM_STATE.activeTab;
+    const activeBtn = document.querySelector("button.bg-indigo-600[onclick*='tab']");
+    if (activeBtn) {
+      const m = (activeBtn.getAttribute("onclick") || "").match(/tab[1-9]/);
+      if (m) return m[0];
+    }
+    return "";
+  }
+
+  function getTabMountParent() {
+    return document.getElementById("tabContent")
+      || document.getElementById("activeTabContainer")
+      || document.querySelector("[data-tab-content]")
+      || (document.querySelector("main") || document.body);
+  }
+
+  window.loadPgStudioData = async function (tabKey, topicFilter) {
+    const cfg = TAB_SECTION_MAP[tabKey];
+    if (!cfg) return;
+    window.PG_STUDIO.tab = tabKey;
+    window.PG_STUDIO.topic = topicFilter || "ALL";
+    window.PG_STUDIO.loading = true;
+    window.renderPgStudioPanel();
+
+    try {
+      const topParam = encodeURIComponent(window.PG_STUDIO.topic);
+      const workedPromises = cfg.sections.map(sec =>
+        fetch(`/api/questions?section=${encodeURIComponent(sec)}&topic=${topParam}&pyq_only=true&limit=6&t=${Date.now()}`).then(r => r.json())
+      );
+      const pracPromises = cfg.sections.map(sec =>
+        fetch(`/api/questions?section=${encodeURIComponent(sec)}&topic=${topParam}&pyq_only=false&limit=60&t=${Date.now()}`).then(r => r.json())
+      );
+
+      const [workedRes, pracRes] = await Promise.all([
+        Promise.all(workedPromises),
+        Promise.all(pracPromises)
+      ]);
+
+      const dedup = (arr) => {
+        const seen = new Set(); const seenStems = new Set();
+        return arr.filter(q => {
+          if (!q || !q.id || seen.has(q.id)) return false;
+          seen.add(q.id);
+          return true;
+        });
+      };
+
+            let wk = dedup(workedRes.flatMap(d => d.questions || []));
+      let pr = dedup(pracRes.flatMap(d => d.questions || []));
+      if (!wk.length || !pr.length) {
+        const fbRes = await Promise.all(cfg.sections.map(sec =>
+          fetch(`/api/questions?section=${encodeURIComponent(sec)}&topic=ALL&limit=60&t=${Date.now()}`).then(r => r.json())
+        ));
+        const fbAll = dedup(fbRes.flatMap(d => d.questions || []));
+        if (!wk.length) wk = fbAll.filter(q => q.is_pyq).slice(0, 6);
+        if (!wk.length) wk = fbAll.slice(0, 4);
+        if (!pr.length) pr = fbAll.slice(4, 12).length ? fbAll.slice(4, 12) : fbAll.slice(0, 6);
+      }
+      const shuffleArr = (arr) => {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      };
+      window.PG_STUDIO.workedExamples = shuffleArr(wk).slice(0, 6);
+      window.PG_STUDIO.practiceSet = shuffleArr(pr).slice(0, 8);
+    } catch (e) {
+      console.error("PG Studio load error:", e);
+    } finally {
+      window.PG_STUDIO.loading = false;
+      window.renderPgStudioPanel();
+    }
+  };
+
+  window.toggleStudioWorked = function (qid) {
+    window.PG_STUDIO.revealedWorked[qid] = !window.PG_STUDIO.revealedWorked[qid];
+    window.renderPgStudioPanel();
+  };
+
+  window.selectStudioAnswer = function (qid, val) {
+    window.PG_STUDIO.userAnswers[qid] = val;
+    window.renderPgStudioPanel();
+  };
+
+  window.checkStudioAnswer = function (qid) {
+    window.PG_STUDIO.checkedAnswers[qid] = true;
+    window.renderPgStudioPanel();
+  };
+
+  window.renderPgStudioPanel = function () {
+    const activeTab = getActiveTabKey();
+    const cfg = TAB_SECTION_MAP[activeTab];
+    const existing = document.getElementById("pgStudioLiveMount");
+    if (!cfg) {
+      if (existing) existing.remove();
+      return;
+    }
+
+    const parent = getTabMountParent();
+    if (!parent) return;
+
+    let mount = existing;
+    if (!mount || !parent.contains(mount)) {
+      if (mount) mount.remove();
+      mount = document.createElement("div");
+      mount.id = "pgStudioLiveMount";
+      mount.className = "max-w-7xl mx-auto px-4 mt-6 mb-10 space-y-5";
+      parent.appendChild(mount);
+    }
+
+    if (window.PG_STUDIO.tab !== activeTab && !window.PG_STUDIO.loading) {
+      window.loadPgStudioData(activeTab, "ALL");
+      return;
+    }
+
+    const worked = window.PG_STUDIO.workedExamples || [];
+    const prac = window.PG_STUDIO.practiceSet || [];
+
+    mount.innerHTML = `
+      <div class="bg-slate-900/95 border border-indigo-500/40 rounded-2xl p-5 space-y-4 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <h3 class="text-base md:text-lg font-bold text-white">${cfg.label} &bull; Live PostgreSQL Worked PYQs &amp; Practice</h3>
+              <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold">PostgreSQL Live &bull; 342+ Qs Pool</span>
+            </div>
+            <p class="text-xs text-slate-400">Select any topic below (or click any module card above) to load solved official PYQs and fresh randomized drills.</p>
+          </div>
+          <button type="button" onclick="window.loadPgStudioData('${activeTab}', '${window.PG_STUDIO.topic}')"
+            class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow transition">
+            Shuffle Fresh Set &#8635;
+          </button>
+        </div>
+
+        <div class="flex flex-wrap gap-1.5">
+          ${cfg.topics.map(tp => `
+            <button type="button" onclick="window.loadPgStudioData('${activeTab}', '${tp}')"
+              class="px-3 py-1 rounded-xl text-xs font-bold transition ${
+                window.PG_STUDIO.topic === tp
+                  ? "bg-amber-500 text-slate-950 shadow"
+                  : "bg-slate-950 text-slate-300 border border-slate-800 hover:border-amber-400"
+              }">${tp === "ALL" ? "All Topics" : tp}</button>
+          `).join("")}
+        </div>
+
+        ${window.PG_STUDIO.loading ? `
+          <div class="p-6 text-center text-xs text-slate-400">Fetching solved PYQs and practice drills from Neon PostgreSQL...</div>
+        ` : `
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-1">
+            <!-- WORKED EXAMPLE BLOCK (REAL PYQs) -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold uppercase tracking-wider text-amber-400">Worked Example Block (Official PYQs)</span>
+                <span class="text-[11px] text-slate-400">${worked.length} Solved PYQs Loaded</span>
+              </div>
+              ${worked.length ? worked.map(q => `
+                <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
+                  <div class="flex items-center justify-between text-[11px]">
+                    <span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 font-bold">${q.exam || "PYQ"} ${q.year ? "• " + q.year : ""}</span>
+                    <span class="text-slate-400">${q.topic || q.section}</span>
+                  </div>
+                  <p class="text-xs md:text-sm text-slate-100 leading-relaxed whitespace-pre-line">${q.prompt}</p>
+                  <button type="button" onclick="window.toggleStudioWorked('${q.id}')"
+                    class="px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-slate-900 dark:text-amber-100 text-xs font-bold">
+                    ${window.PG_STUDIO.revealedWorked[q.id] ? "Hide Step-by-Step Walkthrough" : "Show Worked Solution"}
+                  </button>
+                  ${window.PG_STUDIO.revealedWorked[q.id] ? `
+                    <div class="p-3 rounded-xl bg-slate-900 border border-amber-500/30 text-xs text-slate-900 dark:text-amber-100 space-y-1">
+                      <div><strong>Answer:</strong> ${Array.isArray(q.options) && q.options.length ? `${String.fromCharCode(65 + Number(q.answer))} (${q.options[Number(q.answer)]})` : q.answer}</div>
+                      <div><strong>Walkthrough:</strong> ${q.explanation}</div>
+                    </div>
+                  ` : ""}
+                </div>
+              `).join("") : `<div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400">No PYQ worked example matched this keyword—click All Topics.</div>`}
+            </div>
+
+            <!-- PRACTICE DRILL BLOCK (342+ DB POOL) -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-400">Interactive Practice Block (342+ DB Pool)</span>
+                <span class="text-[11px] text-slate-400">${prac.length} Drill Questions Loaded</span>
+              </div>
+              ${prac.length ? prac.map(q => {
+                const hasOpts = Array.isArray(q.options) && q.options.length > 0;
+                const u = window.PG_STUDIO.userAnswers[q.id];
+                const checked = !!window.PG_STUDIO.checkedAnswers[q.id];
+                const isCorrect = checked && u !== undefined && String(u).trim() !== "" && (hasOpts ? Number(u) === Number(q.answer) : String(u).trim().toLowerCase() === String(q.answer).trim().toLowerCase());
+                return `
+                  <div class="p-4 rounded-2xl bg-slate-950 border ${checked ? (isCorrect ? "border-emerald-500/50" : "border-rose-500/50") : "border-slate-800"} space-y-2.5">
+                    <div class="flex items-center justify-between text-[11px]">
+                      <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold">${q.topic || q.section}</span>
+                      <span class="text-slate-500 font-mono">${q.id}</span>
+                    </div>
+                    <p class="text-xs md:text-sm text-slate-100 leading-relaxed whitespace-pre-line">${q.prompt}</p>
+                    ${hasOpts ? `
+                      <div class="grid grid-cols-1 gap-1.5 text-xs">
+                        ${q.options.map((opt, oi) => {
+                          const selected = u !== undefined && Number(u) === oi;
+                          return `
+                            <button type="button" onclick="window.selectStudioAnswer('${q.id}', ${oi})"
+                              class="text-left px-3 py-2 rounded-xl border transition ${
+                                selected ? "bg-indigo-600/30 border-indigo-400 text-white font-bold" : "bg-slate-900 border-slate-800 text-slate-300 hover:border-indigo-500"
+                              }">
+                              <span class="font-bold mr-1.5">${String.fromCharCode(65 + oi)}.</span> ${opt}
+                            </button>
+                          `;
+                        }).join("")}
+                      </div>
+                    ` : `
+                      <input type="text" value="${u || ""}" onchange="window.selectStudioAnswer('${q.id}', this.value)"
+                        placeholder="Enter numeric answer..." class="w-full max-w-xs px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs font-mono" />
+                    `}
+                    <div class="flex items-center gap-2 pt-1">
+                      <button type="button" onclick="window.checkStudioAnswer('${q.id}')"
+                        class="px-3 py-1 rounded-lg bg-emerald-600/25 hover:bg-emerald-600/35 border border-emerald-500/40 text-emerald-300 text-xs font-bold">
+                        Check Answer
+                      </button>
+                      ${checked ? `<span class="text-xs font-bold ${isCorrect ? "text-emerald-400" : "text-rose-400"}">${isCorrect ? "Correct (+4)" : "Incorrect"}</span>` : ""}
+                    </div>
+                    ${checked ? `
+                      <div class="p-3 rounded-xl bg-slate-900 border border-emerald-500/30 text-xs text-emerald-200 space-y-1">
+                        <div><strong>Official Answer:</strong> ${hasOpts ? `${String.fromCharCode(65 + Number(q.answer))} (${q.options[Number(q.answer)]})` : q.answer}</div>
+                        <div><strong>Explanation:</strong> ${q.explanation}</div>
+                      </div>
+                    ` : ""}
+                  </div>
+                `;
+              }).join("") : `<div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400">No practice items matched—click All Topics.</div>`}
+            </div>
+          </div>
+        `}
+      </div>
+    `;
+  };
+
+  // Delegated listener: auto-sync whenever user switches tabs or clicks a syllabus module card
+  document.addEventListener("click", function (ev) {
+    const activeTab = getActiveTabKey();
+    if (TAB_SECTION_MAP[activeTab]) {
+      // Check if user clicked a syllabus module card (match first keyword against cfg.topics)
+      const card = ev.target.closest("[onclick*='openModule'], [onclick*='selectModule'], .cursor-pointer");
+      if (card) {
+        const txt = (card.textContent || "").trim();
+        const cfg = TAB_SECTION_MAP[activeTab];
+        const matchedTopic = cfg.topics.find(t => t !== "ALL" && txt.toLowerCase().includes(t.toLowerCase()));
+        if (matchedTopic) {
+          setTimeout(() => window.loadPgStudioData(activeTab, matchedTopic), 60);
+          return;
+        }
+      }
+      setTimeout(() => window.renderPgStudioPanel(), 60);
+    } else {
+      const existing = document.getElementById("pgStudioLiveMount");
+      if (existing) existing.remove();
+    }
+  });
+
+  // Initial mount on page load (defaults to Tab 1)
+  window.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => window.renderPgStudioPanel(), 250);
+  });
+  setTimeout(() => window.renderPgStudioPanel(), 400);
+})();
+</script>
+<!-- END LIVE POSTGRES PRACTICE & WORKED EXAMPLES (TABS 1-3) -->
+  
+
+<script id="pg-boot-auth-gate">
+(function () {
+  const CFG = {
+    badge: "NEET",
+    title: "GOALisB NEET UG Master",
+    tag: "NEET UG MEDICAL",
+    sub: "Physics (45 Qs &bull; 180m) &bull; Chemistry (45 Qs &bull; 180m) &bull; Biology: Botany &amp; Zoology (90 Qs &bull; 360m) &bull; 720 Marks Scale",
+    marking: "All 180 Compulsory MCQs: +4 Correct | -1 Incorrect",
+    pattern: "180 Qs | 180 Mins (3 Hrs) | NTA OMR / CBT Scale",
+    modes: [
+      {
+        "id": "NEET_FULL",
+        "label": "NEET UG Full 180-Q (720 Marks)",
+        "sub": "(NTA Standard)",
+        "sections": "Physics (45 Qs) &bull; Chemistry (45 Qs) &bull; Botany (45 Qs) &bull; Zoology (45 Qs)",
+        "pattern": "180 Compulsory MCQs | 180 Mins | High-Speed Accuracy Scale",
+        "marking": "+4 Correct | -1 Incorrect | 0 Unattempted",
+        "targetTab": 1
+      },
+      {
+        "id": "NEET_NCERT_BIO",
+        "label": "NCERT Line-by-Line Biology Vault",
+        "sub": "(360 Marks Core)",
+        "sections": "Class 11 & 12 Botany + Zoology Verbatim NCERT Statements, Diagrams & Cycles",
+        "pattern": "Sub-35s Biology Sprint Drills | Zero Silly-Slip Accuracy",
+        "marking": "+4 / -1 NCERT Precision Check",
+        "targetTab": 2
+      },
+      {
+        "id": "NEET_AR_CLINIC",
+        "label": "Assertion-Reason & Statement Clinic",
+        "sub": "(Trap Clinic)",
+        "sections": "Statement I & II + Assertion-Reason Drills across Biology, Organic & Inorganic",
+        "pattern": "Eliminates 'Both True but Not Correct Explanation' Traps",
+        "marking": "+4 Correct | -1 Incorrect",
+        "targetTab": 3
+      }
+    ],
+    tabs: [
+      "1. Physics, Chem & Biology (12x12)",
+      "2. NCERT Line-by-Line Bio Vault",
+      "3. Assertion-Reason Studio",
+      "4. 180-Q / 720-Mark NEET Mock",
+      "5. Trap Doctor & AI Doubts",
+      "6. NEET AIR & AIIMS/GMC Forecaster"
+    ],
+    defaultTel: "Target: 685/720 (AIIMS / Top GMC) &bull; Readiness: 632/720 (~AIR 4,800)"
+  };
+
+  window._ACTIVE_MODE_IDX = window._ACTIVE_MODE_IDX || 0;
+  window._ACTIVE_TAB_NUM  = window._ACTIVE_TAB_NUM  || 1;
+
+  function getUser() {
+    try {
+      const raw = localStorage.getItem("ipm_user_profile") || localStorage.getItem("goalisb_exam_prep_profile_v1") || localStorage.getItem("ipm_user");
+      if (!raw) return null;
+      const u = JSON.parse(raw);
+      if (u && u.full_name && !u.name) u.name = u.full_name;
+      return (u && (u.name || u.full_name)) ? u : null;
+    } catch (e) { return null; }
+  }
+
+  window.handlePostgradLogout = function () {
+    localStorage.removeItem("goalisb_exam_prep_profile_v1");
+    localStorage.removeItem("goalisb_postgrad_profile_v1");
+    localStorage.removeItem("ipm_user");
+    localStorage.removeItem("ipm_token");
+    window.IPM_USER = null;
+    window.location.reload();
+  };
+
+              window.selectExamMode = function (idx) {
+    window._ACTIVE_MODE_IDX = Number(idx);
+    const m = CFG.modes[window._ACTIVE_MODE_IDX] || CFG.modes[0];
+    CFG.sub = m.sections;
+    CFG.pattern = m.pattern;
+    CFG.marking = m.marking;
+    renderCleanHeader();
+    if (m.targetTab && typeof window.selectUnifiedTab === "function") {
+      window.selectUnifiedTab(m.targetTab);
+    }
+  };
+  window.selectUnifiedTab = function (tabNum) {
+    const n = Number(tabNum);
+    window._ACTIVE_TAB_NUM = n;
+    window.ACTIVE_TAB = n; window.IPM_STATE = window.IPM_STATE || {}; window.IPM_STATE.activeTab = (n === 4 ? "tab8" : (n === 5 ? "tab4" : "tab" + n)); window.scrollTo(0, 0); const oldPgMount = document.getElementById("pgStudioLiveMount"); if (oldPgMount && n >= 3) oldPgMount.remove();
+    renderCleanHeader();
+
+    const header = document.querySelector("header");
+    let el = document.getElementById("main-workspace") || document.querySelector("main") || document.getElementById("tab-content");
+    if (!el && header) {
+      let sib = header.nextElementSibling;
+      while (sib) {
+        if (sib.tagName !== "SCRIPT" && !sib.id.includes("modal") && !sib.id.includes("gate") && sib.offsetHeight > 80) {
+          el = sib;
+          break;
+        }
+        sib = sib.nextElementSibling;
+      }
+    }
+    if (!el) return;
+    el.id = "main-workspace";
+    window._LAST_TAB6_EL = el;
+
+    if (n === 1) {
+      if (typeof window.renderQuantTab === "function") { el.innerHTML = ""; window.renderQuantTab(el); return; }
+      if (typeof window.renderTab1 === "function") { el.innerHTML = ""; window.renderTab1(el); return; }
+    } else if (n === 2) {
+      el.innerHTML = ""; window.renderTab2(el);
+    } else if (n === 3) {
+      el.innerHTML = ""; window.renderVerbalStudio3(el);
+    } else if (n === 4) {
+      el.innerHTML = ""; window.renderMockSimulator4(el);
+    } else if (n === 5) {
+      el.innerHTML = ""; window.renderTrapClinic5(el);
+    } else if (n === 6) {
+      el.innerHTML = ""; window.renderTab6(el);
+    }
+  };
+
+  function renderCleanHeader() {
+    const header = document.querySelector("header");
+    if (!header) return;
+
+    const user = getUser();
+    const name = user ? user.name : "Guest Aspirant";
+    let hist = [];
+    try { hist = JSON.parse(localStorage.getItem("ipm_mock_history_v1") || "[]"); } catch (e) {}
+    const latest = hist[0];
+
+    let telemetry = CFG.defaultTel;
+    if (latest && latest.maxScore) {
+      const host = window.location.host.toLowerCase();
+      if (host.includes("gmat")) {
+        const est = Math.min(805, Math.max(205, Math.round((205 + (latest.score / latest.maxScore) * 600) / 10) * 10 + 5));
+        telemetry = `Mocks: ${hist.length} &bull; Latest Scaled: ${est}/805`;
+      } else if (host.includes("gre")) {
+        const est = Math.min(340, Math.max(260, Math.round(260 + (latest.score / latest.maxScore) * 80)));
+        telemetry = `Mocks: ${hist.length} &bull; Latest Scaled: ${est}/340`;
+      } else {
+        const scaled198 = Math.round((latest.score / latest.maxScore) * 198);
+        telemetry = `Mocks: ${hist.length} &bull; Latest Scaled: ${scaled198}/198`;
+      }
+    } else if (user && user.targetScore) {
+      telemetry = `Target: ${user.targetScore} &bull; Mocks: 0`;
+    }
+
+    const isDark = document.documentElement.classList.contains("dark");
+    const modePills = CFG.modes.map((m, idx) => {
+      const active = idx === window._ACTIVE_MODE_IDX;
+      return `<button type="button" onclick="window.selectExamMode(${idx});"
+        class="px-3.5 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${active ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:border-indigo-500'}">
+        ${m.label} <span class="opacity-75 font-normal text-[11px]">${m.sub}</span>
+      </button>`;
+    }).join("");
+
+    const tabPills = CFG.tabs.map((lbl, idx) => {
+      const num = idx + 1;
+      const active = num === window._ACTIVE_TAB_NUM;
+      return `<button type="button" onclick="window.selectUnifiedTab(${num})"
+        class="px-3.5 py-2 rounded-full text-xs font-bold transition cursor-pointer ${active ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:border-indigo-500'}">
+        ${lbl}
+      </button>`;
+    }).join("");
+
+    header.innerHTML = `
+      <div class="max-w-7xl mx-auto px-4 pt-3 pb-2 space-y-3">
+        <!-- Row 1: Brand Title + Candidate Readiness Pill + Action Buttons -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white font-black text-xs flex items-center justify-center shadow-md shrink-0">${CFG.badge}</div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-extrabold text-lg text-slate-900 dark:text-white tracking-tight">${CFG.title}</span>
+                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">${CFG.tag}</span>
+              </div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400">${CFG.sub}</div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <button type="button" onclick="if(typeof window.openPostgradAuthGate==='function') window.openPostgradAuthGate('REGISTER');"
+              title="Click to update Target Score"
+              class="px-3.5 py-1.5 rounded-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs flex items-center gap-1.5 hover:border-indigo-500 transition cursor-pointer">
+              <span class="font-bold text-slate-900 dark:text-white">&#128100; ${name}</span>
+              <span class="text-slate-400">|</span>
+              <span class="font-semibold text-indigo-600 dark:text-indigo-300">${telemetry}</span>
+            </button>
+
+            <button type="button" onclick="if(typeof window.openUpgradeModal==='function') window.openUpgradeModal();"
+              class="px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold shadow-sm cursor-pointer">
+              &#11088; Go Pro Learner
+            </button>
+
+            ${user ? `
+              <button type="button" onclick="window.handlePostgradLogout()"
+                class="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-sm cursor-pointer">
+                Exit / Logout
+              </button>
+            ` : `
+              <button type="button" onclick="if(typeof window.openPostgradAuthGate==='function') window.openPostgradAuthGate('REGISTER');"
+                class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-sm cursor-pointer">
+                Login / Register
+              </button>
+            `}
+
+            <button type="button" onclick="document.documentElement.classList.toggle('dark'); renderCleanHeader();"
+              class="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-200 cursor-pointer">
+              ${isDark ? "&#9728; Light Mode" : "&#127769; Dark Mode"}
+            </button>
+          </div>
+        </div>
+
+        <!-- Row 2: Exam Track Pills -->
+        <div class="flex flex-wrap items-center gap-2">${modePills}</div>
+
+        <!-- Row 3: Exam Sections & Marking Telemetry Box -->
+        <div class="px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div><strong class="text-indigo-700 dark:text-indigo-300">Exam Sections:</strong> <span class="text-slate-700 dark:text-slate-300">${CFG.sub}</span></div>
+          <div class="flex flex-wrap items-center gap-4 text-[11px]">
+            <span><strong class="text-emerald-700 dark:text-emerald-400">Pattern:</strong> ${CFG.pattern}</span>
+            <span><strong class="text-amber-700 dark:text-amber-400">Marking:</strong> ${CFG.marking}</span>
+          </div>
+        </div>
+
+        <!-- Row 4: 6 Main Navigation Tabs -->
+        <div class="flex flex-wrap items-center gap-2 pt-0.5">${tabPills}</div>
+      </div>
+    `;
+  }
+
+  window.renderCleanHeader = renderCleanHeader;
+  window.addEventListener("DOMContentLoaded", renderCleanHeader);
+  // Event-driven header rendering (zero polling CPU)
+})();
+</script>
+<script src="js/modules/tab1_mastery.js?v=3"></script>
+<script src="js/modules/tab2_error_finder.js?v=3"></script>
+<script src="js/modules/tab3_evaluator.js?v=3"></script>
+<script src="js/modules/tab3_varc_vocab.js?v=3"></script>
+<script src="js/modules/tab4_roadmap.js?v=3"></script>
+<script src="js/modules/tab4_trap_doctor.js?v=3"></script>
+<script src="js/modules/tab5_doubt.js?v=3"></script>
+<script src="js/modules/tab5_pi_evaluator.js?v=3"></script>
+<script src="js/modules/tab6_call_predictor.js?v=3"></script>
+<script src="js/modules/tab6_mock.js?v=3"></script>
+<script src="js/modules/tab7_doubt.js?v=3"></script>
+<script src="js/modules/tab8_mock.js?v=3"></script>
+<script src="js/modules/tab9_pyq.js?v=3"></script>
+<script src="js/modules/tab9_pyq_vault.js?v=3"></script>
+<script src="js/modules/tab2_dilr.js?v=20261117zero"></script>
+<script src="js/modules/tab3_verbal.js?v=20261117zero"></script>
+<script src="js/modules/tab5_traps.js?v=20261117zero"></script>
+<script src="js/modules/tab6_college_predictor.js?v=20261117zero"></script>
+  <script src="/js/modules/gre_master_enrichment.js?v=20261119rich"></script>
+  <script src="/js/modules/gre_tab1_12x12_override.js?v=20261119v1"></script>
+</body>
+</html>
