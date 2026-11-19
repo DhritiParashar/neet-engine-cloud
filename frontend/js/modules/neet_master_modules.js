@@ -8,41 +8,31 @@
 
   function enforceScienceBrand() {
     document.title = "GOALisB NEET UG Master";
-    document.querySelectorAll("*").forEach(el => {
-      if (el.children.length === 0 && el.textContent) {
-        const t = el.textContent.trim();
+    document.querySelectorAll("div, span, h1, p").forEach(el => {
+      const t = (el.textContent || "").trim();
+      if (el.children.length === 0) {
         if (t === "GRE") el.textContent = "NEET";
         else if (t === "GOALisB GRE Master") el.textContent = "GOALisB NEET UG Master";
         else if (t === "GRE GENERAL") el.textContent = "NEET UG MEDICAL";
         else if (t.startsWith("Quant (27 Qs")) el.innerHTML = `Physics (45 Qs &bull; 180m) &bull; Chemistry (45 Qs &bull; 180m) &bull; Biology: Botany &amp; Zoology (90 Qs &bull; 360m) &bull; 720 Marks Scale`;
-        else if (t.startsWith("Exam Sections: Quant")) el.innerHTML = `Exam Sections: ${MODES[0].sections}`;
-        else if (t.startsWith("Pattern: 54 Qs")) el.textContent = "Pattern: 180 Qs | 180 Mins (3 Hrs) | NTA OMR / CBT Scale";
-        else if (t.startsWith("Marking: MCQ +1/0")) el.textContent = "Marking: All 180 Compulsory MCQs: +4 Correct | -1 Incorrect";
       }
+      if (t.startsWith("Exam Sections: Quant")) el.innerHTML = `<span class="font-bold">Exam Sections:</span> ${MODES[0].sections}`;
+      else if (t.startsWith("Pattern: 54 Qs")) el.innerHTML = `<span class="font-bold">Pattern:</span> 180 Qs | 180 Mins (3 Hrs) | NTA OMR / CBT Scale`;
+      else if (t.startsWith("Marking: MCQ +1/0")) el.innerHTML = `<span class="font-bold text-rose-600">Marking:</span> All 180 Compulsory MCQs: +4 Correct | -1 Incorrect`;
+      else if (t.includes("Target: 332/340")) el.innerHTML = `Target: 685/720 (AIIMS / Top GMC) &bull; Readiness: 632/720 (~AIR 4,800)`;
     });
 
-    // Replace mode buttons if GRE labels are still present
     document.querySelectorAll("button").forEach(btn => {
       const txt = (btn.textContent || "").trim();
-      if (txt.includes("GRE General Standard")) {
-        btn.innerHTML = `${MODES[0].label} <span class="opacity-80 font-normal">${MODES[0].sub}</span>`;
-      } else if (txt.includes("Quant 170 Perfection")) {
-        btn.innerHTML = `${MODES[1].label} <span class="opacity-80 font-normal">${MODES[1].sub}</span>`;
-      } else if (txt.includes("Verbal 165+")) {
-        btn.innerHTML = `${MODES[2].label} <span class="opacity-80 font-normal">${MODES[2].sub}</span>`;
-      } else if (txt.startsWith("1. Quantitative Reasoning")) {
-        btn.textContent = TABS[0];
-      } else if (txt.startsWith("2. Data Interpretation")) {
-        btn.textContent = TABS[1];
-      } else if (txt.startsWith("3. Verbal Studio")) {
-        btn.textContent = TABS[2];
-      } else if (txt.startsWith("4. Section-Adaptive Mock")) {
-        btn.textContent = TABS[3];
-      } else if (txt.startsWith("5. Trap Doctor")) {
-        btn.textContent = TABS[4];
-      } else if (txt.startsWith("6. GRE Score Forecaster")) {
-        btn.textContent = TABS[5];
-      }
+      if (txt.includes("GRE General Standard")) btn.innerHTML = `${MODES[0].label} <span class="opacity-80 font-normal">${MODES[0].sub}</span>`;
+      else if (txt.includes("Quant 170 Perfection")) btn.innerHTML = `${MODES[1].label} <span class="opacity-80 font-normal">${MODES[1].sub}</span>`;
+      else if (txt.includes("Verbal 165+")) btn.innerHTML = `${MODES[2].label} <span class="opacity-80 font-normal">${MODES[2].sub}</span>`;
+      else if (txt.startsWith("1. Quantitative Reasoning")) btn.textContent = TABS[0];
+      else if (txt.startsWith("2. Data Interpretation")) btn.textContent = TABS[1];
+      else if (txt.startsWith("3. Verbal Studio")) btn.textContent = TABS[2];
+      else if (txt.startsWith("4. Section-Adaptive Mock")) btn.textContent = TABS[3];
+      else if (txt.startsWith("5. Trap Doctor")) btn.textContent = TABS[4];
+      else if (txt.startsWith("6. GRE Score Forecaster")) btn.textContent = TABS[5];
     });
   }
 
@@ -98,16 +88,10 @@
 
     const modIdx = Math.min(mods.length - 1, Math.max(0, Number(window._SCI_MOD_IDX || 0)));
     const m = mods[modIdx];
-
-    // Match drills strictly to the selected module prefix (e.g. PHY-11-ROT, PHY-12-ELC, CHM-11-EQM, BIO-12-GEN)
     const modPrefix = String(m.module_code || "").replace(/-MOD$/, "");
     let drills = window._SCI_QUESTIONS.filter(q => String(q.question_code || "").startsWith(modPrefix));
-    if (!drills.length) {
-      drills = window._SCI_QUESTIONS.filter(q => q.subject === m.subject && Number(q.ncert_class) === Number(m.ncert_class));
-    }
-    if (!drills.length) {
-      drills = window._SCI_QUESTIONS.filter(q => q.subject === m.subject);
-    }
+    if (!drills.length) drills = window._SCI_QUESTIONS.filter(q => q.subject === m.subject && Number(q.ncert_class) === Number(m.ncert_class));
+    if (!drills.length) drills = window._SCI_QUESTIONS.filter(q => q.subject === m.subject);
 
     const qIdx = Math.min(Math.max(0, drills.length - 1), Math.max(0, Number(window._SCI_QIDX || 0)));
     const d = drills[qIdx];
@@ -145,7 +129,7 @@
           </div>
 
           ${window._SCI_SUB === "THEORY" ? `
-            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2 text-xs leading-relaxed text-slate-700 dark:text-slate-300">
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2.5 text-xs leading-relaxed text-slate-700 dark:text-slate-300">
               <div class="flex items-center justify-between">
                 <span class="font-extrabold uppercase text-[11px] text-emerald-600">COMPREHENSIVE CHAPTER OVERVIEW &amp; CONCEPT BRIDGE</span>
                 <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">12&times;12 Master Guide</span>
@@ -233,12 +217,21 @@
     `;
   };
 
-  // Override all Tab 1 entry points so tab1_mastery.js never overwrites with GRE
-  window.renderTab1 = window.renderScienceMasterTab1;
-  window.renderQuantTab = window.renderScienceMasterTab1;
+  // Lock renderTab1 & renderQuantTab so tab1_mastery.js can never overwrite with GRE
+  Object.defineProperty(window, "renderTab1", {
+    get: () => window.renderScienceMasterTab1,
+    set: () => {},
+    configurable: true
+  });
+  Object.defineProperty(window, "renderQuantTab", {
+    get: () => window.renderScienceMasterTab1,
+    set: () => {},
+    configurable: true
+  });
+
   window.addEventListener("DOMContentLoaded", () => {
     enforceScienceBrand();
-    setTimeout(() => { enforceScienceBrand(); window.renderScienceMasterTab1(); }, 120);
-    setTimeout(() => { enforceScienceBrand(); window.renderScienceMasterTab1(); }, 450);
+    window.renderScienceMasterTab1();
+    setTimeout(() => { enforceScienceBrand(); window.renderScienceMasterTab1(); }, 350);
   });
 })();
