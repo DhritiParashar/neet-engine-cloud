@@ -8,7 +8,7 @@
   const TABS = ['1. Physics, Chem & Biology (12x12)', '2. NCERT Line-by-Line Bio Vault', '3. Assertion-Reason Studio', '4. 180-Q / 720-Mark NEET Mock', '5. Trap Doctor & AI Doubts', '6. NEET AIR & AIIMS/GMC Forecaster'];
 
   function enforceScienceBrand() {
-    document.title = "GOALisB NEET UG Master";
+    document.documentElement.classList.remove("dark"); document.body.classList.remove("dark"); document.title = "GOALisB NEET UG Master";
     document.querySelectorAll("div, span, h1, p").forEach(el => {
       const t = (el.textContent || "").trim();
       if (el.children.length === 0) {
