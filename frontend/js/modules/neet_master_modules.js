@@ -524,6 +524,80 @@
     localStorage.removeItem(SYNC_KEY);
     window.renderScienceTab4();
   };
+  function evaluateMockPaper(paper) {
+    let totalScore = 0, totalCorrect = 0, totalWrong = 0, totalAttempted = 0;
+    const subjStats = IS_JEE
+      ? { PHYSICS: { c: 0, w: 0, s: 0, max: 100 }, CHEMISTRY: { c: 0, w: 0, s: 0, max: 100 }, MATHEMATICS: { c: 0, w: 0, s: 0, max: 100 } }
+      : { PHYSICS: { c: 0, w: 0, s: 0, max: 180 }, CHEMISTRY: { c: 0, w: 0, s: 0, max: 180 }, BOTANY: { c: 0, w: 0, s: 0, max: 180 }, ZOOLOGY: { c: 0, w: 0, s: 0, max: 180 } };
+
+    const itemsAudit = paper.map((item, idx) => {
+      const rawAns = window._CBT_ANS[idx];
+      const hasAns = rawAns !== undefined && String(rawAns).trim() !== "";
+      let statusLabel = "Unattempted (0 Marks)";
+      let userText = "(No response submitted)";
+      let isCorrect = false;
+
+      const officialText = (item.question_type === "NUMERICAL_INT" || !Array.isArray(item.options_json))
+        ? String(item.correct_answer)
+        : `(${String.fromCharCode(65 + Number(item.correct_answer))}) ${item.options_json[Number(item.correct_answer)] || item.correct_answer}`;
+
+      if (hasAns) {
+        totalAttempted++;
+        if (item.question_type === "NUMERICAL_INT" || !Array.isArray(item.options_json)) {
+          userText = String(rawAns).trim();
+          isCorrect = (Number(userText) === Number(item.correct_answer)) || (userText === String(item.correct_answer).trim());
+        } else {
+          const oi = Number(rawAns);
+          userText = `(${String.fromCharCode(65 + oi)}) ${item.options_json[oi] || rawAns}`;
+          isCorrect = (String(oi) === String(item.correct_answer).trim());
+        }
+
+        if (isCorrect) {
+          totalScore += 4; totalCorrect++;
+          subjStats[item.mock_subj].c++; subjStats[item.mock_subj].s += 4;
+          statusLabel = "Correct (+4 Marks)";
+        } else {
+          totalScore -= 1; totalWrong++;
+          subjStats[item.mock_subj].w++; subjStats[item.mock_subj].s -= 1;
+          statusLabel = "Incorrect (-1 Mark)";
+        }
+      }
+
+      return {
+        num: idx + 1,
+        subj: item.mock_subj,
+        sec: item.mock_sec,
+        chapter: item.chapter_name || "",
+        prompt: item.prompt || "",
+        statusLabel,
+        isCorrect,
+        hasAns,
+        userText,
+        officialText,
+        explanation: item.explanation || ""
+      };
+    });
+
+    const unattempted = paper.length - totalAttempted;
+    const accuracy = totalAttempted > 0 ? ((totalCorrect / totalAttempted) * 100).toFixed(1) : "0.0";
+    const elapsedSec = Math.max(1, 180 * 60 - window._CBT_SEC_LEFT);
+    const pacePerQ = (elapsedSec / Math.max(1, paper.length)).toFixed(1) + "s/Q";
+    const minsTaken = Math.floor(elapsedSec / 60) + "m " + (elapsedSec % 60) + "s";
+    const verdict = totalAttempted < Math.round(paper.length * 0.25)
+      ? "Rushed / Partial Attempt (High Risk of Unattempted Loss)"
+      : (Number(accuracy) >= 82 ? "High Precision (AIR / 99+%ile Trajectory)" : "Moderate Accuracy (Audit -1 Traps in Tab 5)");
+
+    const projection = IS_JEE
+      ? (totalScore >= 250 ? "99.92+ %ile (NIT Trichy CSE / Adv Top 1,500)" : totalScore >= 210 ? "99.35 %ile (Top NITs Core)" : totalScore >= 170 ? "98.10 %ile (Top IIIT / NIT)" : "94.50+ %ile")
+      : (totalScore >= 695 ? "AIR < 350 (AIIMS New Delhi / MAMC)" : totalScore >= 660 ? "AIR ~3,200 (Top State Govt Medical College)" : totalScore >= 625 ? "AIR ~14,500 (Govt MBBS AIQ)" : "State Quota / NCERT Bio Sprint");
+
+    return {
+      totalScore, totalCorrect, totalWrong, unattempted, accuracy,
+      pacePerQ, verdict, subjStats, projection, minsTaken, itemsAudit
+    };
+  }
+
+
   window.submitMockAndSync = function () {
     const paper = buildFullMockPaper();
     const res = evaluateMockPaper(paper);
