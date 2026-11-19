@@ -747,6 +747,7 @@
   ];
 
   window.renderScienceTab5 = function (el) {
+    const accent = IS_JEE ? "indigo" : "emerald";
     enforceScienceBrand();
     const target = getTarget(el);
     if (!target) return;
@@ -776,7 +777,7 @@
             <div class="flex flex-wrap gap-1.5">
               ${subjs.map(s => `
                 <button type="button" onclick="window._T5_SUBJ='${s}'; window.renderScienceTab5();"
-                  class="px-3 py-1 rounded-full text-xs font-bold cursor-pointer ${window._T5_SUBJ === s ? "bg-" + "${accent}" + "-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}">${s}</button>
+                  class="px-3 py-1 rounded-full text-xs font-bold cursor-pointer ${window._T5_SUBJ === s ? `bg-${accent}-600 text-white` : "bg-slate-100 text-slate-700 hover:bg-slate-200"}">${s}</button>
               `).join("")}
             </div>
           </div>
