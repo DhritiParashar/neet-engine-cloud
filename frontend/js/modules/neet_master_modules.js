@@ -1550,49 +1550,56 @@
     window.updateScienceTab6();
   };
 
-  window.renderScienceTab6 = window.renderScienceTab6 || function (el) {
+  window.renderScienceTab6 = function (el) {
     const accent = IS_JEE ? "indigo" : "emerald";
-    enforceScienceBrand();
     const target = getTarget(el);
     if (!target) return;
-    const allLogs = getAllLedgerLogs();
+
+    const fullLogs = getAllLedgerLogs();
+    const pracLogs = typeof getPracticeLogs === "function" ? getPracticeLogs() : [];
     const wrongItems = [];
-    allLogs.forEach(lg => {
+
+    fullLogs.forEach(lg => {
       (lg.itemsAudit || []).forEach(it => {
-        if (it.hasAns && !it.isCorrect) wrongItems.push({ session: lg.sessionId, ...it });
+        if (it.hasAns && !it.isCorrect) wrongItems.push({ source: "Full Mock", session: lg.sessionId, ...it });
+      });
+    });
+    pracLogs.forEach(lg => {
+      (lg.itemsAudit || []).forEach(it => {
+        if (it.hasAns && !it.isCorrect) wrongItems.push({ source: "Subject Practice", session: lg.sessionId, ...it });
       });
     });
 
     target.innerHTML = `
-      <div class="max-w-6xl mx-auto pt-4 pb-10 space-y-5">
+      <div class="max-w-7xl mx-auto pt-4 pb-10 space-y-5">
         <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm">
-          <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
               <div class="text-xs font-extrabold uppercase tracking-wider text-${accent}-600">6. NEGATIVE-MARKING TRAP DOCTOR &amp; ERROR AUTOPSY</div>
-              <h2 class="text-xl font-black text-slate-900 mt-0.5">${IS_JEE ? "JEE Main / Adv -1 Trap & Silly-Error Clinic" : "NEET UG NCERT Assertion-Reason & -1 Trap Clinic"}</h2>
+              <h2 class="text-2xl font-black text-slate-900 mt-0.5">${IS_JEE ? "JEE Main / Adv -1 Trap & Silly-Error Clinic" : "NEET UG NCERT Assertion-Reason & -1 Trap Clinic"}</h2>
             </div>
-            <span class="px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-extrabold">${wrongItems.length} Logged -1 Errors</span>
+            <span class="px-3.5 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-extrabold">${wrongItems.length} Logged -1 Errors</span>
           </div>
-          <p class="text-xs text-slate-600">Automatically extracts every incorrect (-1) response from your submitted Full Mocks (Tab 4) and Subject Practice Mocks (Tab 5) so you can eliminate negative marking.</p>
+          <p class="text-xs text-slate-600">Automatically isolates every incorrect (-1) response across your submitted Full Mocks (Tab 4) and Subject Practice Mocks (Tab 5) so you can audit traps and eliminate negative marking.</p>
         </div>
 
         ${!wrongItems.length ? `
           <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center space-y-2 shadow-sm">
-            <div class="text-sm font-extrabold text-slate-800">Zero -1 Errors Recorded Yet</div>
-            <p class="text-xs text-slate-500">Complete a Full Mock in Tab 4 or a Subject Practice Mock in Tab 5 to populate your personalized negative-marking autopsy.</p>
+            <div class="text-base font-extrabold text-slate-800">Zero -1 Errors Recorded Yet</div>
+            <p class="text-xs text-slate-500">Submit a Full Mock in Tab 4 or a Subject Practice Mock in Tab 5 with any incorrect response to populate your personalized negative-marking autopsy here.</p>
           </div>
         ` : `
           <div class="space-y-3">
-            ${wrongItems.slice(0, 30).map((it, idx) => `
+            ${wrongItems.slice(0, 40).map((it, idx) => `
               <div class="bg-white border border-rose-200 rounded-2xl p-5 space-y-2 text-xs shadow-sm">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                  <span class="font-extrabold text-rose-700">#${idx + 1} &bull; ${it.session} &bull; ${it.subj} (${it.chapter})</span>
+                  <span class="font-extrabold text-rose-700">#${idx + 1} &bull; [${it.source}] ${it.session} &bull; ${it.subj} (${it.chapter})</span>
                   <span class="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 font-extrabold">-1 Mark Lost</span>
                 </div>
                 <div class="text-sm font-bold text-slate-900 whitespace-pre-line">${it.prompt}</div>
-                <div class="text-rose-700"><strong>Your Answer:</strong> ${it.userText}</div>
+                <div class="text-rose-700"><strong>Your Response:</strong> ${it.userText}</div>
                 <div class="text-emerald-700"><strong>Official Answer:</strong> ${it.officialText}</div>
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700"><strong>Fix &amp; Concept Rule:</strong> ${it.explanation}</div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700"><strong>Concept Fix &amp; Rule:</strong> ${it.explanation}</div>
               </div>
             `).join("")}
           </div>
