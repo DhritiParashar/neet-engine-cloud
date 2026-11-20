@@ -298,24 +298,24 @@
 })();
 
 // ==============================================================================
-// CAT-STYLE SPLIT 2-COLUMN TRAP DOCTOR & AI DOUBT SOLVER (JEE & NEET v12)
-// Left (8 Cols): Compact Subject/Chapter Trap Cards + 1-Click "Ask AI Doubt Doctor"
-// Right (4 Cols Sticky): Clean 2-Field "AI Doubt & Trap Breakdown" Panel
+// EXACT CAT-STYLE TRAP DOCTOR & AI DOUBT SOLVER FOR JEE & NEET (v14)
+// - Dynamic "Topic / Trap Focus" pill input (auto-updates to clicked trap title)
+// - "⚡ Ask AI Doubt Doctor About This Trap →" on every Trap Card
+// - Auto-populates prompt & triggers live Socratic breakdown + 30s shortcut
 // ==============================================================================
 (function () {
   const HOST = (window.location.hostname || "").toLowerCase();
   const TITLE = (document.title || "").toUpperCase();
   const PORTAL = HOST.includes("neet") || TITLE.includes("NEET") ? "NEET" : "JEE";
 
-  window.askAiAboutTrapCard = function (topic, trapTitle, ruleText) {
+  window.askAiAboutTrapCard = function (trapTitle, trapBodyText) {
     const topicEl = document.getElementById("jn-ai-doubt-topic");
     const qEl = document.getElementById("jn-ai-doubt-q");
     if (topicEl) {
-      const opt = Array.from(topicEl.options).find(o => o.value.toLowerCase().includes(topic.toLowerCase()));
-      if (opt) topicEl.value = opt.value;
+      topicEl.value = trapTitle;
     }
     if (qEl) {
-      qEl.value = `${trapTitle}\nContext: ${ruleText}\n\nBreak down why students fall into this -1 trap, show a worked exam example, and give a 30-second verification shortcut.`;
+      qEl.value = `Explain this ${PORTAL} trap with a worked example and show how to avoid it under exam pressure:\n${trapTitle}\n${trapBodyText}`;
       qEl.focus();
     }
     window.submitJeeNeetAiDoubt();
@@ -330,14 +330,14 @@
 
     const question = qEl.value.trim();
     if (!question) {
-      alert("Paste any question or click 'Ask AI Doubt Doctor About This Trap' on a card first.");
+      alert(`Paste any ${PORTAL} question or click 'Ask AI Doubt Doctor About This Trap' on a card first.`);
       return;
     }
-    const topic = topicEl ? topicEl.value : `${PORTAL} Trap & Concept Check`;
+    const topic = (topicEl && topicEl.value.trim()) || `${PORTAL} • Boundary & Distractor Check`;
 
-    if (btnEl) { btnEl.disabled = true; btnEl.textContent = "Analyzing Trap & Shortcut..."; }
+    if (btnEl) { btnEl.disabled = true; btnEl.textContent = "⏳ Generating Socratic Breakdown..."; }
     outEl.style.display = "block";
-    outEl.innerHTML = `<div class="text-xs font-bold text-indigo-600">Generating Socratic breakdown &amp; 30s shortcut...</div>`;
+    outEl.innerHTML = `<div class="text-xs font-bold text-indigo-600">Analyzing trap mechanics, worked example &amp; 30s shortcut...</div>`;
 
     try {
       const res = await fetch("/api/doubt", {
@@ -358,7 +358,7 @@
         .replace(/\n/g, "<br>");
       outEl.innerHTML = `
         <div class="text-[10px] font-extrabold uppercase text-emerald-700 mb-1.5">✓ Socratic Breakdown &amp; 30s Antidote</div>
-        <div class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed max-h-80 overflow-y-auto pr-1">${formatted}</div>
+        <div class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed space-y-1.5">${formatted}</div>
       `;
     } catch (err) {
       outEl.innerHTML = `<div class="text-xs font-bold text-rose-600">Error: ${err.message}</div>`;
@@ -372,17 +372,10 @@
       .find(el => el.children.length === 0 && /Chapter-Wise -1 Trap Vault/i.test(el.textContent || ""));
     if (!trapH) return;
 
-    // Remove legacy bulky full-width card if present
-    const oldCard = document.getElementById("jn-ai-doubts-card");
-    if (oldCard && !oldCard.dataset.splitLayout) oldCard.remove();
-    const oldPill = document.getElementById("jn-ai-pill-btn");
-    if (oldPill) oldPill.remove();
-
-    const bannerCard = trapH.closest("div.rounded-2xl, section, div.bg-white") || trapH.parentElement;
+    const bannerCard = trapH.closest("div.rounded-2xl, div.rounded-3xl, section, div.bg-white") || trapH.parentElement;
     if (!bannerCard || !bannerCard.parentElement) return;
     const rootWrap = bannerCard.parentElement;
 
-    // Convert the content below bannerCard into a CAT-style 12-column split (8 left + 4 sticky right)
     let splitGrid = document.getElementById("jn-tab6-split-grid");
     if (!splitGrid) {
       const siblingsAfter = [];
@@ -402,14 +395,14 @@
       leftCol.className = "lg:col-span-8 space-y-4";
       siblingsAfter.forEach(node => leftCol.appendChild(node));
 
-      const topics = PORTAL === "NEET"
-        ? ["Botany • NCERT Line & Genetics Trap", "Zoology • Physiology & Assertion-Reason", "Physics • Sign Convention & Formula Trap", "Chemistry • Organic Reagent & Equilibrium"]
-        : ["Physics • Boundary & Constraint Check", "Chemistry • Reagent & Thermo Sign Check", "Mathematics • Domain, Calculus & Vector Trap"];
+      const defaultTopic = PORTAL === "NEET"
+        ? "Biology • NCERT Line & Assertion-Reason Check"
+        : "Physics & Math • Boundary & Distractor Check";
 
       const rightCol = document.createElement("div");
       rightCol.id = "jn-ai-doubts-card";
       rightCol.dataset.splitLayout = "1";
-      rightCol.className = "lg:col-span-4 lg:sticky lg:top-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3.5";
+      rightCol.className = "lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3.5";
       rightCol.innerHTML = `
         <div>
           <div class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600">SOCRATIC AI TUTOR</div>
@@ -419,15 +412,14 @@
 
         <div>
           <label class="block text-[11px] font-extrabold text-slate-700 dark:text-slate-300 mb-1">Topic / Trap Focus</label>
-          <select id="jn-ai-doubt-topic" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-2 text-xs font-bold">
-            ${topics.map(t => `<option value="${t}">${t}</option>`).join("")}
-          </select>
+          <input id="jn-ai-doubt-topic" type="text" value="${defaultTopic}"
+            class="w-full rounded-full border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3.5 py-2 text-xs font-extrabold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500" />
         </div>
 
         <div>
           <label class="block text-[11px] font-extrabold text-slate-700 dark:text-slate-300 mb-1">Question or Trap to Analyze</label>
           <textarea id="jn-ai-doubt-q" rows="4" placeholder="Paste any ${PORTAL} question or click 'Ask AI Doubt Doctor' on a trap card..."
-            class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 p-3 text-xs"></textarea>
+            class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 p-3 text-xs leading-relaxed focus:outline-none focus:border-indigo-500"></textarea>
         </div>
 
         <button id="jn-ai-doubt-btn" type="button" onclick="window.submitJeeNeetAiDoubt()"
@@ -443,27 +435,32 @@
       rootWrap.appendChild(splitGrid);
     }
 
-    // Attach 1-click "⚡ Ask AI Doubt Doctor About This Trap →" link onto each trap card on the left
+    // Bind "⚡ Ask AI Doubt Doctor About This Trap →" onto EVERY Trap #N card regardless of border radius class
     const leftArea = document.getElementById("jn-tab6-left-traps");
     if (leftArea) {
-      Array.from(leftArea.querySelectorAll("div.rounded-2xl, div.rounded-xl")).forEach(card => {
-        if (card.dataset.aiLinkBound) return;
-        const titleEl = Array.from(card.querySelectorAll("h3, h4, div.font-extrabold, div.font-bold"))
-          .find(el => /^Trap #\d+:/i.test((el.textContent || "").trim()));
-        if (!titleEl) return;
+      const trapTitleEls = Array.from(leftArea.querySelectorAll("h2, h3, h4, div, p, span"))
+        .filter(el => el.children.length === 0 && /^Trap #\d+\s*:/i.test((el.textContent || "").trim()));
+
+      trapTitleEls.forEach(titleEl => {
+        const card = titleEl.closest("div[class*='border'], div[class*='rounded'], div[class*='bg-white'], div[class*='p-']") || titleEl.parentElement;
+        if (!card || card.dataset.aiLinkBound) return;
         card.dataset.aiLinkBound = "1";
+
         const trapTitle = titleEl.textContent.trim();
-        const bodySnippet = (card.textContent || "").replace(/\s+/g, " ").slice(0, 220);
+        const lines = Array.from(card.querySelectorAll("div, p"))
+          .map(x => (x.textContent || "").trim())
+          .filter(t => t && t !== trapTitle && !/^Mark Trap Mastered$/i.test(t) && !/^Ask AI Doubt Doctor/i.test(t));
+        const uniqueLines = Array.from(new Set(lines)).slice(0, 3).join("\n");
 
         const linkBtn = document.createElement("button");
         linkBtn.type = "button";
-        linkBtn.className = "mt-2.5 inline-flex items-center gap-1 text-xs font-extrabold text-indigo-600 hover:text-indigo-500 cursor-pointer";
+        linkBtn.className = "mt-3 inline-flex items-center gap-1 text-xs font-extrabold text-indigo-600 hover:text-indigo-500 cursor-pointer";
         linkBtn.innerHTML = "&#9889; Ask AI Doubt Doctor About This Trap &rarr;";
-        linkBtn.onclick = () => window.askAiAboutTrapCard(PORTAL, trapTitle, bodySnippet);
+        linkBtn.onclick = () => window.askAiAboutTrapCard(trapTitle, uniqueLines);
         card.appendChild(linkBtn);
       });
     }
   };
 
-  setInterval(window.mountTab6AiDoubtBox, 500);
+  setInterval(window.mountTab6AiDoubtBox, 450);
 })();
