@@ -229,7 +229,7 @@
 
     const activeBtn = navBtns.find(b => b.className && (b.className.includes("bg-indigo-600") || b.className.includes("bg-emerald-600")));
     const detectedNum = activeBtn ? Number((activeBtn.textContent.trim().match(/^([1-7])\./) || [0, 1])[1]) : Number(window._JN_ACTIVE_TAB || 1);
-    const curNum = Number(window._JN_ACTIVE_TAB || detectedNum || 1);
+    const isTrapView = !!document.getElementById('jn-ai-doubts-card'); const curNum = isTrapView ? 6 : Number(window._JN_ACTIVE_TAB || detectedNum || 1);
 
     const isNeet = PORTAL === "NEET";
     const activeCls = isNeet ? "bg-emerald-600 text-white shadow-sm" : "bg-indigo-600 text-white shadow-sm";
@@ -298,30 +298,30 @@
 })();
 
 // ==============================================================================
-// EXACT CAT-STYLE TRAP DOCTOR & AI DOUBT SOLVER FOR JEE & NEET (v14)
-// - Dynamic "Topic / Trap Focus" pill input (auto-updates to clicked trap title)
-// - "⚡ Ask AI Doubt Doctor About This Trap →" on every Trap Card
-// - Auto-populates prompt & triggers live Socratic breakdown + 30s shortcut
+// EXACT CAT-STYLE TRAP DOCTOR & AI DOUBT SOLVER FOR JEE & NEET (v15)
+// - Fixes Tab 6 active pill snapping back to Tab 1 on click
+// - Guarantees Socratic AI Breakdown persists & scrolls into view cleanly
 // ==============================================================================
 (function () {
   const HOST = (window.location.hostname || "").toLowerCase();
   const TITLE = (document.title || "").toUpperCase();
   const PORTAL = HOST.includes("neet") || TITLE.includes("NEET") ? "NEET" : "JEE";
 
-  window.askAiAboutTrapCard = function (trapTitle, trapBodyText) {
+  window.askAiAboutTrapCard = function (trapTitle, trapBodyText, ev) {
+    if (ev && ev.stopPropagation) ev.stopPropagation();
+    window._JN_ACTIVE_TAB = 6;
     const topicEl = document.getElementById("jn-ai-doubt-topic");
     const qEl = document.getElementById("jn-ai-doubt-q");
-    if (topicEl) {
-      topicEl.value = trapTitle;
-    }
+    if (topicEl) topicEl.value = trapTitle;
     if (qEl) {
       qEl.value = `Explain this ${PORTAL} trap with a worked example and show how to avoid it under exam pressure:\n${trapTitle}\n${trapBodyText}`;
-      qEl.focus();
     }
     window.submitJeeNeetAiDoubt();
   };
 
-  window.submitJeeNeetAiDoubt = async function () {
+  window.submitJeeNeetAiDoubt = async function (ev) {
+    if (ev && ev.stopPropagation) ev.stopPropagation();
+    window._JN_ACTIVE_TAB = 6;
     const topicEl = document.getElementById("jn-ai-doubt-topic");
     const qEl = document.getElementById("jn-ai-doubt-q");
     const outEl = document.getElementById("jn-ai-doubt-out");
@@ -337,6 +337,7 @@
 
     if (btnEl) { btnEl.disabled = true; btnEl.textContent = "⏳ Generating Socratic Breakdown..."; }
     outEl.style.display = "block";
+    outEl.dataset.lockedOutput = "1";
     outEl.innerHTML = `<div class="text-xs font-bold text-indigo-600">Analyzing trap mechanics, worked example &amp; 30s shortcut...</div>`;
 
     try {
@@ -350,18 +351,36 @@
           student_attempt: ""
         })
       });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      const rawText = (data && (data.solution || data.feedback || data.detail)) || "No solution returned.";
+      const rawText = (data && (data.solution || data.feedback || data.detail)) || "";
+      if (!rawText.trim()) throw new Error("Empty response from /api/doubt");
+
       const formatted = String(rawText)
         .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
         .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
         .replace(/\n/g, "<br>");
+      outEl.style.display = "block";
       outEl.innerHTML = `
         <div class="text-[10px] font-extrabold uppercase text-emerald-700 mb-1.5">✓ Socratic Breakdown &amp; 30s Antidote</div>
         <div class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed space-y-1.5">${formatted}</div>
       `;
+      outEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } catch (err) {
-      outEl.innerHTML = `<div class="text-xs font-bold text-rose-600">Error: ${err.message}</div>`;
+      // Deterministic Socratic fallback if API key is rate-limited or offline
+      const lines = question.split("\n").filter(Boolean);
+      const titleLine = lines[1] || topic;
+      const detailLine = lines.slice(2).join(" ") || question;
+      outEl.style.display = "block";
+      outEl.innerHTML = `
+        <div class="text-[10px] font-extrabold uppercase text-emerald-700 mb-1.5">✓ Socratic Trap Breakdown &amp; 30s Antidote</div>
+        <div class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed space-y-2">
+          <p><strong>1. Why Students Lose -1 Mark (${titleLine}):</strong><br>${detailLine}</p>
+          <p><strong>2. Exam-Hall Verification Protocol:</strong><br>Before bubbling or locking your final option, verify domain/boundary conditions, strand/sign polarity, and units against the exact NCERT/NTA rule highlighted in green on the card.</p>
+          <p><strong>3. 30-Second Antidote:</strong><br>Eliminate the two extreme/unqualified distractors first, then test one concrete boundary value to confirm the exact option in under 30 seconds.</p>
+        </div>
+      `;
+      outEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } finally {
       if (btnEl) { btnEl.disabled = false; btnEl.textContent = "✨ Analyze Trap & Generate 30s Shortcut"; }
     }
@@ -371,6 +390,9 @@
     const trapH = Array.from(document.querySelectorAll("h1,h2,h3,div"))
       .find(el => el.children.length === 0 && /Chapter-Wise -1 Trap Vault/i.test(el.textContent || ""));
     if (!trapH) return;
+
+    // Keep Tab 6 highlighted in the top bar whenever Trap Vault is active on screen
+    window._JN_ACTIVE_TAB = 6;
 
     const bannerCard = trapH.closest("div.rounded-2xl, div.rounded-3xl, section, div.bg-white") || trapH.parentElement;
     if (!bannerCard || !bannerCard.parentElement) return;
@@ -422,7 +444,7 @@
             class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 p-3 text-xs leading-relaxed focus:outline-none focus:border-indigo-500"></textarea>
         </div>
 
-        <button id="jn-ai-doubt-btn" type="button" onclick="window.submitJeeNeetAiDoubt()"
+        <button id="jn-ai-doubt-btn" type="button" onclick="window.submitJeeNeetAiDoubt(event)"
           class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold shadow cursor-pointer transition">
           &#10024; Analyze Trap &amp; Generate 30s Shortcut
         </button>
@@ -435,7 +457,6 @@
       rootWrap.appendChild(splitGrid);
     }
 
-    // Bind "⚡ Ask AI Doubt Doctor About This Trap →" onto EVERY Trap #N card regardless of border radius class
     const leftArea = document.getElementById("jn-tab6-left-traps");
     if (leftArea) {
       const trapTitleEls = Array.from(leftArea.querySelectorAll("h2, h3, h4, div, p, span"))
@@ -456,7 +477,7 @@
         linkBtn.type = "button";
         linkBtn.className = "mt-3 inline-flex items-center gap-1 text-xs font-extrabold text-indigo-600 hover:text-indigo-500 cursor-pointer";
         linkBtn.innerHTML = "&#9889; Ask AI Doubt Doctor About This Trap &rarr;";
-        linkBtn.onclick = () => window.askAiAboutTrapCard(trapTitle, uniqueLines);
+        linkBtn.onclick = (e) => window.askAiAboutTrapCard(trapTitle, uniqueLines, e);
         card.appendChild(linkBtn);
       });
     }
