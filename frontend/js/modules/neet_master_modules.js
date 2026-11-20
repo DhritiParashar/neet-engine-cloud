@@ -1560,13 +1560,18 @@
       const eff = Math.min(300, Math.max(0, rawTotal + shiftAdj));
       const cutoffEff = Math.min(300, eff + catBonus);
 
-      let pct = "91.80 %ile", air = "AIR ~72,000 – 90,000", tier = "State Govt / Top Private Engineering Colleges";
-      if (eff >= 265) { pct = "99.95+ %ile"; air = "AIR 350 – 850"; tier = "Top 5 IITs & NIT Trichy CSE Tier"; }
+      let pct = "5.00 %ile", air = "AIR ~13,20,000+", tier = "Below Qualifying Cutoff (Foundation Rebuild Needed)";
+      if (eff <= 0) { pct = "0.00 %ile"; air = "AIR ~14,00,000+"; tier = "0 Marks — Attempt Mock in Tab 4 or Raise Target Sliders"; }
+      else if (eff >= 265) { pct = "99.95+ %ile"; air = "AIR 350 – 850"; tier = "Top 5 IITs & NIT Trichy CSE Tier"; }
       else if (eff >= 235) { pct = "99.72 %ile"; air = "AIR 2,200 – 3,800"; tier = "NIT Trichy/Surathkal CSE & Top IIT Core"; }
       else if (eff >= 210) { pct = "99.35 %ile"; air = "AIR 6,500 – 9,200"; tier = "Top NITs (ECE/EE) & IIT Qualifying Safe"; }
       else if (eff >= 180) { pct = "98.45 %ile"; air = "AIR 16,000 – 22,000"; tier = "Top 10 NITs Core & IIITs"; }
       else if (eff >= 145) { pct = "96.20 %ile"; air = "AIR 40,000 – 52,000"; tier = "NIT North-East / IIITs / JEE Adv Cutoff Cleared"; }
       else if (eff >= 110) { pct = "93.40 %ile"; air = "AIR 62,000 – 78,000"; tier = "JEE Advanced Borderline / State Govt Core"; }
+      else if (eff >= 80) { pct = "86.50 %ile"; air = "AIR ~1,65,000 – 1,95,000"; tier = "State Govt Engineering / Top Private Universities"; }
+      else if (eff >= 50) { pct = "72.40 %ile"; air = "AIR ~3,40,000 – 3,90,000"; tier = "State Counselling / Private Engineering Colleges"; }
+      else if (eff >= 25) { pct = "48.00 %ile"; air = "AIR ~6,80,000 – 7,40,000"; tier = "Below Cutoff — Focus on High-Yield NCERT Chapters"; }
+      else { pct = (eff * 1.8).toFixed(2) + " %ile"; air = "AIR ~10,50,000+"; tier = "Below Qualifying Cutoff — Concept & Accuracy Rebuild"; }
 
       const colleges = [
         { inst: "IIT Bombay / Delhi / Madras / Kanpur", branch: "CSE / MnC / EE (via JEE Adv Top 1,200)", status: cutoffEff >= 245 ? "Achievable at This Score" : "Need +" + (245 - cutoffEff) + " Eq." },
@@ -1627,12 +1632,17 @@
       const eff = Math.min(720, Math.max(0, rawTotal + diffAdj));
       const quotaEff = Math.min(720, eff + catBonus);
 
-      let air = "AIR ~45,000 – 68,000", tier = "State Quota / Semi-Govt MBBS & BDS";
-      if (eff >= 705) { air = "AIR 1 – 150"; tier = "AIIMS New Delhi / MAMC / VMMC Delhi"; }
+      let air = "AIR > 22,00,000", tier = "Below Qualifying Cutoff (NCERT Bio 340+ Rebuild Needed)";
+      if (eff <= 0) { air = "AIR > 23,50,000"; tier = "0 Marks — Attempt Mock in Tab 4 or Raise Target Sliders"; }
+      else if (eff >= 705) { air = "AIR 1 – 150"; tier = "AIIMS New Delhi / MAMC / VMMC Delhi"; }
       else if (eff >= 685) { air = "AIR 400 – 1,800"; tier = "Top AIIMS (Bhopal, Jodhpur, Rishikesh) & JIPMER"; }
       else if (eff >= 660) { air = "AIR 2,800 – 6,500"; tier = "Premier State Govt Medical Colleges (AIQ)"; }
       else if (eff >= 630) { air = "AIR 11,000 – 21,000"; tier = "All-India Quota (15%) & State Govt MBBS"; }
       else if (eff >= 595) { air = "AIR 26,000 – 42,000"; tier = "State Quota Govt MBBS (85% Domicile)"; }
+      else if (eff >= 520) { air = "AIR 75,000 – 1,35,000"; tier = "Private Medical Colleges / Deemed MBBS & Govt BDS"; }
+      else if (eff >= 400) { air = "AIR 2,40,000 – 4,10,000"; tier = "BAMS / BHMS / Private BDS & Allied Health"; }
+      else if (eff >= 200) { air = "AIR 7,50,000 – 12,00,000"; tier = "Qualifying Cutoff Zone — Intensive NCERT Drill Needed"; }
+      else { air = "AIR > 15,00,000"; tier = "Below NTA Qualifying Percentile — Foundation Rebuild"; }
 
       const colleges = [
         { inst: "AIIMS New Delhi / MAMC / VMMC", quota: "All India Quota (15%) • Target 700+", status: quotaEff >= 700 ? "Achievable at This Score" : "Need +" + (700 - quotaEff) + " Marks" },
