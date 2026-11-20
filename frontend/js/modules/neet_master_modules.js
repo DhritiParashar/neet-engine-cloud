@@ -485,12 +485,38 @@
   };
 
   // ============================================================================
-  // TAB 4: FULL-LENGTH NTA MOCK SIMULATOR + VERIFIED FULL-MOCK-ONLY LEDGER (v25)
+  // TAB 4: FULL-LENGTH NTA MOCK SIMULATOR + DIFFICULTY CALIBRATION + LEDGER (v46)
   // ============================================================================
   const LOG_KEY = IS_JEE ? "goalisb_jee_full_mock_ledger_v1" : "goalisb_neet_full_mock_ledger_v1";
   const SYNC_KEY = IS_JEE ? "goalisb_jee_verified_standing_v1" : "goalisb_neet_verified_standing_v1";
   const REQUIRED_QS = IS_JEE ? 75 : 180;
   const MAX_MARKS = IS_JEE ? 300 : 720;
+
+  window._MOCK_DIFF = window._MOCK_DIFF || "MODERATE";
+
+  function getDiffMeta(diffCode) {
+    const d = (diffCode || window._MOCK_DIFF || "MODERATE").toUpperCase();
+    if (d === "TOUGH") {
+      const adj = IS_JEE ? 14 : 15;
+      return { code: "TOUGH", adj, label: IS_JEE ? `Tough Shift (+${adj} Eq.)` : `Tough Paper (+${adj} Eq.)`, short: "TOUGH" };
+    }
+    if (d === "EASY") {
+      const adj = IS_JEE ? -12 : -10;
+      return { code: "EASY", adj, label: IS_JEE ? `High-Cutoff Shift (${adj} Eq.)` : `High-Cutoff Paper (${adj} Eq.)`, short: "EASY" };
+    }
+    return { code: "MODERATE", adj: 0, label: "Standard NTA Paper (0 Eq.)", short: "STANDARD" };
+  }
+
+  window.setFullMockDifficulty = function (diffCode) {
+    if (window._CBT_STARTED && !window._CBT_SUBMITTED) {
+      alert("Finish or Abort your active session before changing Paper Difficulty.");
+      return;
+    }
+    window._MOCK_DIFF = diffCode;
+    window._ACTIVE_MOCK_PAPER = null;
+    window._ACTIVE_MOCK_PAPER_ID = null;
+    window.renderScienceTab4();
+  };
 
   function newSerialId() {
     const num = Math.floor(1000 + Math.random() * 9000);
@@ -508,7 +534,6 @@
     return "Senapati Roy";
   }
 
-  // Strictly returns ONLY complete, officially submitted Full-Length Mocks (75 Qs JEE / 180 Qs NEET)
   function getVerifiedFullMockLogs() {
     try {
       const raw = JSON.parse(localStorage.getItem(LOG_KEY) || "[]");
@@ -547,43 +572,47 @@
     return a;
   }
 
-  function pickRandomDistinct(pool, count) {
+  function pickWeightedPool(pool, count, diffCode) {
     if (!pool.length) return [];
+    let prioritized = pool.slice();
+    if (diffCode === "TOUGH") {
+      const hard = pool.filter(q => q.difficulty_tier === "AIR_TOP_500" || q.difficulty_tier === "CONTENDER_98_650");
+      if (hard.length >= Math.min(count, 10)) prioritized = hard;
+    } else if (diffCode === "EASY") {
+      const base = pool.filter(q => q.difficulty_tier === "FOUNDATION" || q.difficulty_tier === "CONTENDER_98_650");
+      if (base.length >= Math.min(count, 10)) prioritized = base;
+    }
     const out = [];
     while (out.length < count) {
-      const batch = shuffleArray(pool);
-      for (let i = 0; i < batch.length && out.length < count; i++) {
-        out.push(batch[i]);
-      }
+      const batch = shuffleArray(prioritized);
+      for (let i = 0; i < batch.length && out.length < count; i++) out.push(batch[i]);
     }
     return out;
   }
 
   function buildFullMockPaper() {
-    // Cache the paper per Serial Mock ID so switching questions/tabs preserves the active paper,
-    // while every new Serial Mock ID generates a fresh randomized exam!
-    if (window._ACTIVE_MOCK_PAPER && window._ACTIVE_MOCK_PAPER_ID === window._MOCK_SERIAL_ID && window._ACTIVE_MOCK_PAPER.length === REQUIRED_QS) {
+    const dMeta = getDiffMeta();
+    const cacheKey = window._MOCK_SERIAL_ID + "_" + dMeta.code;
+    if (window._ACTIVE_MOCK_PAPER && window._ACTIVE_MOCK_PAPER_ID === cacheKey && window._ACTIVE_MOCK_PAPER.length === REQUIRED_QS) {
       return window._ACTIVE_MOCK_PAPER;
     }
     let paper = [];
     if (IS_JEE) {
-      const subjects = ["PHYSICS", "CHEMISTRY", "MATHEMATICS"];
-      subjects.forEach(subj => {
+      ["PHYSICS", "CHEMISTRY", "MATHEMATICS"].forEach(subj => {
         const mcqs = window._SCI_QUESTIONS.filter(q => q.subject === subj && q.question_type !== "NUMERICAL_INT");
         const nums = window._SCI_QUESTIONS.filter(q => q.subject === subj && q.question_type === "NUMERICAL_INT");
-        pickRandomDistinct(mcqs, 20).forEach(base => paper.push({ ...base, mock_sec: "Section A (MCQ)", mock_subj: subj }));
-        pickRandomDistinct(nums, 5).forEach(base => paper.push({ ...base, mock_sec: "Section B (Numerical)", mock_subj: subj }));
+        pickWeightedPool(mcqs, 20, dMeta.code).forEach(base => paper.push({ ...base, mock_sec: "Section A (MCQ)", mock_subj: subj }));
+        pickWeightedPool(nums, 5, dMeta.code).forEach(base => paper.push({ ...base, mock_sec: "Section B (Numerical)", mock_subj: subj }));
       });
     } else {
-      const sections = [["PHYSICS", 45], ["CHEMISTRY", 45], ["BOTANY", 45], ["ZOOLOGY", 45]];
-      sections.forEach(([subj, count]) => {
+      [["PHYSICS", 45], ["CHEMISTRY", 45], ["BOTANY", 45], ["ZOOLOGY", 45]].forEach(([subj, count]) => {
         const pool = window._SCI_QUESTIONS.filter(q => q.subject === subj && Array.isArray(q.options_json) && q.options_json.length >= 4);
-        pickRandomDistinct(pool, count).forEach(base => paper.push({ ...base, mock_sec: "Compulsory MCQ", mock_subj: subj }));
+        pickWeightedPool(pool, count, dMeta.code).forEach(base => paper.push({ ...base, mock_sec: "Compulsory MCQ", mock_subj: subj }));
       });
     }
     if (paper.length === REQUIRED_QS) {
       window._ACTIVE_MOCK_PAPER = paper;
-      window._ACTIVE_MOCK_PAPER_ID = window._MOCK_SERIAL_ID;
+      window._ACTIVE_MOCK_PAPER_ID = cacheKey;
     }
     return paper;
   }
@@ -603,6 +632,7 @@
   }
 
   function evaluateMockPaper(paper) {
+    const dMeta = getDiffMeta();
     let totalScore = 0, totalCorrect = 0, totalWrong = 0, totalAttempted = 0;
     const subjStats = IS_JEE
       ? { PHYSICS: { c: 0, w: 0, s: 0, max: 100 }, CHEMISTRY: { c: 0, w: 0, s: 0, max: 100 }, MATHEMATICS: { c: 0, w: 0, s: 0, max: 100 } }
@@ -640,17 +670,24 @@
     const elapsedSec = Math.max(1, 180 * 60 - window._CBT_SEC_LEFT);
     const pacePerQ = (elapsedSec / Math.max(1, paper.length)).toFixed(1) + "s/Q";
     const minsTaken = Math.floor(elapsedSec / 60) + "m " + (elapsedSec % 60) + "s";
-    const verdict = totalAttempted < Math.round(paper.length * 0.35) ? "Under-Attempted Full Paper (Low Pacing)" : (Number(accuracy) >= 82 ? "High Precision (AIR / 99+%ile Trajectory)" : "Moderate Accuracy (Audit -1 Traps in Tab 5)");
-    const projection = IS_JEE
-      ? (totalScore >= 250 ? "99.92+ %ile (NIT Trichy CSE / Adv Top 1,500)" : totalScore >= 210 ? "99.35 %ile (Top NITs Core)" : totalScore >= 170 ? "98.10 %ile (Top IIIT / NIT)" : totalScore >= 120 ? "94.50+ %ile (JEE Adv Cutoff Zone)" : "Below 92 %ile (Foundation Rebuild Needed)")
-      : (totalScore >= 695 ? "AIR < 350 (AIIMS New Delhi / MAMC)" : totalScore >= 660 ? "AIR ~3,200 (Top State Govt Medical College)" : totalScore >= 625 ? "AIR ~14,500 (Govt MBBS AIQ)" : totalScore >= 575 ? "AIR ~35,000 (State Quota MBBS)" : "Below Govt Cutoff (NCERT Bio 345+ Sprint Needed)");
 
-    return { totalScore, totalCorrect, totalWrong, totalAttempted, unattempted, accuracy, pacePerQ, verdict, subjStats, projection, minsTaken, itemsAudit };
+    // Corroborate calibrated score with selected Paper Difficulty / NTA Shift offset
+    const effScore = Math.min(MAX_MARKS, Math.max(0, totalScore + dMeta.adj));
+    const verdict = totalAttempted < Math.round(paper.length * 0.35)
+      ? `Under-Attempted (${dMeta.label})`
+      : (Number(accuracy) >= 82 ? `High Precision on ${dMeta.label}` : `Moderate Accuracy (${dMeta.label} — Audit Traps in Tab 6)`);
+
+    const projection = IS_JEE
+      ? (effScore >= 265 ? "99.95+ %ile (AIR 350–850 • Top IIT / NIT Trichy CSE)" : effScore >= 235 ? "99.72 %ile (AIR 2,200–3,800 • Top NIT CSE)" : effScore >= 210 ? "99.35 %ile (AIR 6,500–9,200 • Top NITs Core)" : effScore >= 180 ? "98.45 %ile (AIR 16,000–22,000 • Top IIIT / NIT)" : effScore >= 145 ? "96.20 %ile (JEE Adv Cutoff Cleared)" : "Below 94 %ile (Foundation Rebuild Needed)")
+      : (effScore >= 705 ? "AIR 1–150 (AIIMS New Delhi / MAMC)" : effScore >= 685 ? "AIR 400–1,800 (Top AIIMS & JIPMER)" : effScore >= 660 ? "AIR 2,800–6,500 (Premier Govt Medical College)" : effScore >= 630 ? "AIR 11,000–21,000 (Govt MBBS AIQ)" : effScore >= 595 ? "AIR 26,000–42,000 (State Quota MBBS)" : "Below Govt Cutoff (NCERT Bio 345+ Sprint Needed)");
+
+    return { totalScore, effScore, diffCode: dMeta.code, diffLabel: dMeta.label, diffAdj: dMeta.adj, totalCorrect, totalWrong, totalAttempted, unattempted, accuracy, pacePerQ, verdict, subjStats, projection, minsTaken, itemsAudit };
   }
 
   async function fetchDynamicMockFromPostgres() {
+    const dMeta = getDiffMeta();
     try {
-      const res = await fetch("/api/science/mock-paper?exam=" + EXAM + "&ts=" + Date.now(), { cache: "no-store" });
+      const res = await fetch("/api/science/mock-paper?exam=" + EXAM + "&scope=FULL&difficulty=" + dMeta.code + "&ts=" + Date.now(), { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         if (data.ok && Array.isArray(data.paper) && data.paper.length === REQUIRED_QS) {
@@ -658,7 +695,7 @@
             ...q,
             options_json: typeof q.options_json === "string" ? JSON.parse(q.options_json) : q.options_json
           }));
-          window._ACTIVE_MOCK_PAPER_ID = window._MOCK_SERIAL_ID;
+          window._ACTIVE_MOCK_PAPER_ID = window._MOCK_SERIAL_ID + "_" + dMeta.code;
           return true;
         }
       }
@@ -689,14 +726,17 @@
     const paper = buildFullMockPaper();
     const res = evaluateMockPaper(paper);
     if (res.totalAttempted < 5) {
-      const ok = confirm(`You answered only ${res.totalAttempted}/${REQUIRED_QS} questions. Submitting records ${res.totalScore}/${MAX_MARKS} as your official standing in the Ledger and Tab 6 Forecaster. Proceed?`);
+      const ok = confirm(`You answered only ${res.totalAttempted}/${REQUIRED_QS} questions. Submitting records Raw ${res.totalScore}/${MAX_MARKS} (Calibrated ${res.effScore}/${MAX_MARKS} under ${res.diffLabel}) in the Ledger and Tab 7 Forecaster. Proceed?`);
       if (!ok) return;
     }
     window._CBT_SUBMITTED = true;
     saveVerifiedFullMock({
       sessionId: window._MOCK_SERIAL_ID,
       timestamp: new Date().toLocaleString(),
-      blueprint: IS_JEE ? "Full JEE Main CBT (75 Qs • 300 Marks)" : "Full NEET UG OMR (180 Qs • 720 Marks)",
+      blueprint: IS_JEE ? `Full JEE Main CBT (75 Qs • ${res.diffLabel})` : `Full NEET UG OMR (180 Qs • ${res.diffLabel})`,
+      difficulty: res.diffCode,
+      diffLabel: res.diffLabel,
+      diffAdj: res.diffAdj,
       candidate: getCandidateName(),
       status: "SUBMITTED",
       totalQuestions: REQUIRED_QS,
@@ -706,6 +746,7 @@
       verdict: res.verdict,
       counts: `${res.totalCorrect}C / ${res.totalWrong}W / ${res.unattempted}U`,
       totalScore: res.totalScore,
+      effScore: res.effScore,
       maxScore: MAX_MARKS,
       projection: res.projection,
       subjects: res.subjStats,
@@ -731,11 +772,10 @@
       localStorage.removeItem(LOG_KEY);
       localStorage.removeItem(SYNC_KEY);
       window._T6_SYNCED_ID = null;
-      window._T6_MODE = "VERIFIED";
+      window._T6_MODE = "TARGET";
       window.renderScienceTab4();
       return;
     }
-    // Abort unsubmitted run cleanly WITHOUT logging to Full-Mock Ledger or Tab 6
     window._MOCK_SERIAL_ID = newSerialId();
     window._CBT_STARTED = false;
     window._CBT_ANS = {};
@@ -799,6 +839,7 @@
       `;
     }).join("");
 
+    const effDisplay = rec.effScore !== undefined ? rec.effScore : rec.totalScore;
     w.document.write(`<!DOCTYPE html><html><head><title>${esc(rec.sessionId)} - GOALisB Official Diagnostic Marksheet</title></head>
       <body style="font-family:system-ui,-apple-system,sans-serif;padding:28px;color:#0f172a;max-width:860px;margin:auto;">
         <div style="border-bottom:3px solid #4338ca;padding-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
@@ -809,20 +850,20 @@
           <div style="text-align:right;font-size:11px;">
             <div><strong>Assessment Serial ID:</strong> ${esc(rec.sessionId)}</div>
             <div><strong>Timestamp:</strong> ${esc(rec.timestamp)}</div>
-            <div><strong>Verification:</strong> VERIFIED FULL MOCK (${REQUIRED_QS} Qs)</div>
+            <div><strong>Paper Level:</strong> ${esc(rec.diffLabel || "Standard NTA Paper")}</div>
           </div>
         </div>
 
         <div style="margin:14px 0;padding:12px 14px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;font-size:12px;">
           <div><div style="color:#64748b;font-size:10px;font-weight:700;">CANDIDATE</div><strong>${esc(rec.candidate)}</strong></div>
-          <div><div style="color:#64748b;font-size:10px;font-weight:700;">SCORE AWARDED</div><strong style="font-size:15px;color:#047857;">${rec.totalScore} / ${rec.maxScore}</strong></div>
+          <div><div style="color:#64748b;font-size:10px;font-weight:700;">RAW / SHIFT-EQ SCORE</div><strong style="font-size:14px;color:#047857;">${rec.totalScore} / ${rec.maxScore}</strong><div style="font-size:10px;color:#4338ca;">Calibrated: ${effDisplay}/${rec.maxScore}</div></div>
           <div><div style="color:#64748b;font-size:10px;font-weight:700;">ACCURACY &amp; SPLIT</div><strong>${esc(rec.accuracy || "0.0")}% (${esc(rec.counts || "")})</strong></div>
           <div><div style="color:#64748b;font-size:10px;font-weight:700;">TIME &amp; PACE</div><strong>${esc(rec.timeTaken)} (${esc(rec.pacePerQ || "-")})</strong></div>
         </div>
 
         <div style="margin-bottom:14px;padding:10px 14px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:8px;font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-          <div><strong>Verified Present Standing:</strong> ${esc(rec.projection)}</div>
-          <div><strong>Behavioral Verdict:</strong> ${esc(rec.verdict || "Standard Pacing")}</div>
+          <div><strong>Calibrated Standing:</strong> ${esc(rec.projection)}</div>
+          <div><strong>Paper Tier:</strong> ${esc(rec.diffLabel || "Standard NTA Paper")}</div>
         </div>
 
         <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px;">
@@ -853,6 +894,7 @@
     if (!window._SCI_HYDRATED && window._CBT_STARTED) await hydrateFromNeon(); else if (!window._SCI_HYDRATED) hydrateFromNeon();
     ensureMockTimer();
 
+    const dMeta = getDiffMeta();
     window._MOCK_SERIAL_ID = window._MOCK_SERIAL_ID || newSerialId();
     window._CBT_ANS = window._CBT_ANS || {};
     window._CBT_REVIEW = window._CBT_REVIEW || {};
@@ -868,6 +910,12 @@
     const totalQs = paper.length;
     const logs = getVerifiedFullMockLogs();
 
+    const diffPills = [
+      ["TOUGH", IS_JEE ? "Tough Shift (+14 Eq.)" : "Tough Paper (+15 Eq.)", "AIR Top-500 Discriminator Weighting"],
+      ["MODERATE", "Standard NTA Paper (0 Eq.)", "Balanced Multi-Tier NTA Blueprint"],
+      ["EASY", IS_JEE ? "High-Cutoff Shift (-12 Eq.)" : "High-Cutoff Paper (-10 Eq.)", "High-Speed Accuracy / Inflated Cutoff"]
+    ];
+
     const resetDeclHtml = window._RESET_MODAL_MODE ? `
       <div class="bg-rose-50 border-2 border-rose-400 rounded-2xl p-5 space-y-3 shadow-sm">
         <div class="flex items-center justify-between">
@@ -878,7 +926,7 @@
           <input id="cbt-reset-decl-chk" type="checkbox" class="mt-0.5 w-4 h-4 accent-rose-600" />
           <span>${window._RESET_MODAL_MODE === "CLEAR_LEDGER"
             ? "I declare that I wish to permanently erase all verified Full-Length Mock records from this browser."
-            : "I declare that I am aborting Serial ID " + window._MOCK_SERIAL_ID + " without submission. Because only complete Full Mocks are calibrated, this aborted attempt will NOT be logged or synced to Tab 6."}</span>
+            : "I declare that I am aborting Serial ID " + window._MOCK_SERIAL_ID + " without submission. Because only complete Full Mocks are calibrated, this aborted attempt will NOT be logged or synced to Tab 7."}</span>
         </label>
         <div class="flex gap-2">
           <button type="button" onclick="window.confirmResetWithDeclaration();" class="px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-extrabold cursor-pointer">Confirm &amp; Reset</button>
@@ -891,10 +939,10 @@
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div class="text-xs font-extrabold uppercase tracking-wider text-${accent}-600">VERIFIED FULL-MOCK ASSESSMENT LEDGER (COMPLETE ${REQUIRED_QS}-Q SUBMISSIONS ONLY)</div>
-            <h3 class="text-xl font-extrabold text-slate-900 mt-0.5">Serial Mock ID &amp; Verified Present Standing (${logs.length} Full Mocks Logged)</h3>
+            <h3 class="text-xl font-extrabold text-slate-900 mt-0.5">Serial Mock ID, Paper Difficulty &amp; Calibrated Standing (${logs.length} Full Mocks Logged)</h3>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button" onclick="window.selectUnifiedTab(7);" class="px-4 py-2 rounded-xl bg-${accent}-50 border border-${accent}-200 text-${accent}-700 text-xs font-extrabold cursor-pointer">View Present Forecast in Tab 6 &rarr;</button>
+            <button type="button" onclick="window.selectUnifiedTab(7);" class="px-4 py-2 rounded-xl bg-${accent}-50 border border-${accent}-200 text-${accent}-700 text-xs font-extrabold cursor-pointer">View Forecaster in Tab 7 &rarr;</button>
             <button type="button" onclick="window.openResetDeclarationModal('CLEAR_LEDGER');" class="px-4 py-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-extrabold cursor-pointer">Clear Log</button>
           </div>
         </div>
@@ -902,12 +950,16 @@
           <table class="w-full text-left border-collapse text-xs">
             <thead>
               <tr class="border-b border-slate-200 text-[11px] font-extrabold uppercase text-slate-500">
-                <th class="py-2.5 pr-3">SERIAL MOCK ID</th><th class="py-2.5 pr-3">DATE &amp; TIME</th><th class="py-2.5 pr-3">FULL BLUEPRINT</th><th class="py-2.5 pr-3">VERIFIED SCORE</th><th class="py-2.5 pr-3">ACCURACY</th><th class="py-2.5">MARKSHEET &amp; SYNC</th>
+                <th class="py-2.5 pr-3">SERIAL MOCK ID</th><th class="py-2.5 pr-3">DATE &amp; TIME</th><th class="py-2.5 pr-3">PAPER LEVEL</th><th class="py-2.5 pr-3">RAW / CALIBRATED SCORE</th><th class="py-2.5 pr-3">ACCURACY</th><th class="py-2.5">MARKSHEET &amp; SYNC</th>
               </tr>
             </thead>
             <tbody>
-              ${!logs.length ? `<tr><td colspan="6" class="py-4 text-slate-500">No full-length mocks submitted yet. Short drills and aborted sessions are excluded so Tab 6 reflects only complete ${REQUIRED_QS}-question exam performance.</td></tr>`
-              : logs.map(lg => `<tr class="border-b border-slate-100"><td class="py-3 pr-3 font-mono font-extrabold text-slate-900">${lg.sessionId}</td><td class="py-3 pr-3 text-slate-600">${lg.timestamp}</td><td class="py-3 pr-3 font-semibold">${lg.blueprint}</td><td class="py-3 pr-3 font-black">${lg.totalScore} / ${lg.maxScore}</td><td class="py-3 pr-3 font-bold">${lg.accuracy}% (${lg.counts})</td><td class="py-3 flex gap-1.5"><button type="button" onclick="window.downloadMockPdfReport('${lg.sessionId}');" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold cursor-pointer">PDF Marksheet</button><button type="button" onclick="window.applySyncedMockToTab6('${lg.sessionId}'); window.selectUnifiedTab(7);" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold cursor-pointer">&#8635; Sync Tab 6</button></td></tr>`).join("")}
+              ${!logs.length ? `<tr><td colspan="6" class="py-4 text-slate-500">No full-length mocks submitted yet. Select a Paper Difficulty Level above and complete a ${REQUIRED_QS}-question exam to calibrate Tab 7.</td></tr>`
+              : logs.map(lg => {
+                const effVal = lg.effScore !== undefined ? lg.effScore : lg.totalScore;
+                const dBadge = lg.diffLabel || "Standard NTA Paper";
+                return `<tr class="border-b border-slate-100"><td class="py-3 pr-3 font-mono font-extrabold text-slate-900">${lg.sessionId}</td><td class="py-3 pr-3 text-slate-600">${lg.timestamp}</td><td class="py-3 pr-3"><span class="px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 font-extrabold text-[10px]">${dBadge}</span></td><td class="py-3 pr-3 font-black">${lg.totalScore} / ${lg.maxScore} <span class="text-[11px] font-bold text-emerald-700">(Eq: ${effVal})</span></td><td class="py-3 pr-3 font-bold">${lg.accuracy}% (${lg.counts})</td><td class="py-3 flex gap-1.5"><button type="button" onclick="window.downloadMockPdfReport('${lg.sessionId}');" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold cursor-pointer">PDF Marksheet</button><button type="button" onclick="window.applySyncedMockToTab6('${lg.sessionId}'); window.selectUnifiedTab(7);" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold cursor-pointer">&#8635; Sync Tab 7</button></td></tr>`;
+              }).join("")}
             </tbody>
           </table>
         </div>
@@ -925,19 +977,38 @@
                   <span class="text-xs font-mono font-bold text-slate-600">Next Serial ID: <strong>${window._MOCK_SERIAL_ID}</strong></span>
                 </div>
                 <h2 class="text-2xl font-black text-slate-900 pt-1">${IS_JEE ? "1. Full JEE Main Standard CBT Mock (75 Qs • 180 Mins)" : "1. Full NEET UG Compulsory OMR Mock (180 Qs • 180 Mins)"}</h2>
-                <p class="text-xs text-slate-600">Only complete ${REQUIRED_QS}-question official submissions are logged in the Ledger and calibrated in Tab 6.</p>
+                <p class="text-xs text-slate-600">Select the NTA Paper Difficulty / Shift Tier below. Both the question mix and your calibrated Percentile/AIR in Tab 7 corroborate your chosen level.</p>
               </div>
               <button type="button" onclick="window.launchProctoredMockSession();" class="px-6 py-3.5 rounded-2xl bg-${accent}-600 hover:bg-${accent}-500 text-white text-sm font-extrabold shadow-md cursor-pointer">&#9654; Start Proctored Full Mock (180 Mins)</button>
             </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-${accent}-700">SELECT PAPER DIFFICULTY / NTA SHIFT CALIBRATION TIER</span>
+                <span class="text-[11px] font-semibold text-slate-500">Syncs directly with Tab 7 Normalization Dropdown</span>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                ${diffPills.map(([dCode, dTitle, dSub]) => `
+                  <button type="button" onclick="window.setFullMockDifficulty('${dCode}');"
+                    class="text-left p-3.5 rounded-xl border cursor-pointer ${dMeta.code === dCode
+                      ? `bg-${accent}-600 text-white border-${accent}-600 shadow-sm`
+                      : "bg-white text-slate-800 border-slate-200 hover:border-slate-400"}">
+                    <div class="text-xs font-extrabold">${dTitle}</div>
+                    <div class="text-[11px] mt-0.5 ${dMeta.code === dCode ? "text-white/90" : "text-slate-500"}">${dSub}</div>
+                  </button>
+                `).join("")}
+              </div>
+            </div>
+
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
               <div class="p-4 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[10px] font-extrabold uppercase text-slate-400">QUESTION COUNT</div><div class="text-base font-black text-slate-900 mt-0.5">${totalQs} Compulsory Qs</div></div>
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[10px] font-extrabold uppercase text-slate-400">PROCTORED CLOCK</div><div class="text-base font-black text-amber-600 mt-0.5">180:00 Minutes (Paused)</div></div>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[10px] font-extrabold uppercase text-slate-400">SELECTED PAPER TIER</div><div class="text-sm font-black text-${accent}-700 mt-0.5">${dMeta.label}</div></div>
               <div class="p-4 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[10px] font-extrabold uppercase text-slate-400">LEDGER POLICY</div><div class="text-base font-black text-indigo-700 mt-0.5">Full Mocks Only</div></div>
               <div class="p-4 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[10px] font-extrabold uppercase text-slate-400">POSTGRESQL BANK</div><div class="text-base font-black text-emerald-600 mt-0.5">${window._SCI_QUESTIONS.length} Items (${(window._SCI_QUESTIONS.length / REQUIRED_QS).toFixed(1)}&times; Mock)</div></div>
             </div>
             <label class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-2.5 text-xs text-slate-700 cursor-pointer">
               <input id="cbt-launch-decl" type="checkbox" checked class="mt-0.5 w-4 h-4 accent-${accent}-600" />
-              <span><strong>Candidate Honor-Code Declaration:</strong> I confirm that I am attempting Serial ID <strong>${window._MOCK_SERIAL_ID}</strong> as a full ${REQUIRED_QS}-question NTA mock under proctored conditions (+4/-1) to calibrate my true present standing in Tab 6.</span>
+              <span><strong>Candidate Honor-Code Declaration:</strong> I confirm that I am attempting Serial ID <strong>${window._MOCK_SERIAL_ID}</strong> (<strong>${dMeta.label}</strong>) as a full ${REQUIRED_QS}-question NTA mock under proctored conditions (+4/-1).</span>
             </label>
           </div>
           ${ledgerHtml}
@@ -960,17 +1031,18 @@
         ${resetDeclHtml}
         <div class="bg-white border border-slate-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
           <div class="flex flex-wrap items-center gap-2">
-            <span class="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-300 font-mono text-xs font-extrabold">Serial ID: ${window._MOCK_SERIAL_ID}</span>
+            <span class="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-300 font-mono text-xs font-extrabold">${window._MOCK_SERIAL_ID}</span>
+            <span class="px-2.5 py-1.5 rounded-xl bg-amber-100 text-amber-950 text-[11px] font-extrabold">${dMeta.label}</span>
             ${subjTabs.map(([subName, startIdx, cnt]) => `<button type="button" onclick="window._CBT_IDX=${startIdx}; window.renderScienceTab4();" class="px-3.5 py-2 rounded-xl text-xs font-extrabold cursor-pointer ${activeSubj === subName ? `bg-${accent}-600 text-white` : "bg-slate-100 text-slate-700"}">${subName} (${cnt} Qs)</button>`).join("")}
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <div class="px-3.5 py-1.5 rounded-xl bg-slate-900 text-amber-300 font-mono text-sm font-extrabold"><span id="cbt-clock">${h}:${m}:${s}</span></div>
             ${!window._CBT_SUBMITTED ? `
-              <button type="button" onclick="window.openResetDeclarationModal('EXIT_SESSION');" class="px-3.5 py-2 rounded-xl bg-rose-50 border border-rose-300 text-rose-700 text-xs font-extrabold cursor-pointer">Abort &amp; Reset (Do Not Log)</button>
-              <button type="button" onclick="window.submitMockAndSync();" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold cursor-pointer">Submit Full Mock &amp; Sync Tab 6</button>
+              <button type="button" onclick="window.openResetDeclarationModal('EXIT_SESSION');" class="px-3.5 py-2 rounded-xl bg-rose-50 border border-rose-300 text-rose-700 text-xs font-extrabold cursor-pointer">Abort &amp; Reset</button>
+              <button type="button" onclick="window.submitMockAndSync();" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold cursor-pointer">Submit Full Mock &amp; Sync Tab 7</button>
             ` : `
               <button type="button" onclick="window.downloadMockPdfReport('${window._MOCK_SERIAL_ID}');" class="px-4 py-2 rounded-xl bg-amber-500 text-slate-950 text-xs font-extrabold cursor-pointer">Download PDF Marksheet</button>
-              <button type="button" onclick="window.applySyncedMockToTab6('${window._MOCK_SERIAL_ID}'); window.selectUnifiedTab(7);" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-extrabold cursor-pointer">View Present Standing in Tab 6 &rarr;</button>
+              <button type="button" onclick="window.applySyncedMockToTab6('${window._MOCK_SERIAL_ID}'); window.selectUnifiedTab(7);" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-extrabold cursor-pointer">View Calibrated Standing in Tab 7 &rarr;</button>
               <button type="button" onclick="window.startFreshMockReset();" class="px-3.5 py-2 rounded-xl border text-xs font-extrabold cursor-pointer">New Full Mock</button>
             `}
           </div>
@@ -980,8 +1052,8 @@
           <div class="bg-white border-2 border-emerald-500 rounded-2xl p-6 space-y-4 shadow-sm">
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <div class="text-xs font-extrabold uppercase text-emerald-700">VERIFIED FULL-MOCK SCORECARD &bull; SERIAL ${window._MOCK_SERIAL_ID}</div>
-                <h3 class="text-2xl font-black text-slate-900">Total Score: ${evalRes.totalScore} / ${MAX_MARKS} &bull; ${evalRes.projection}</h3>
+                <div class="text-xs font-extrabold uppercase text-emerald-700">VERIFIED FULL-MOCK SCORECARD &bull; ${evalRes.diffLabel.toUpperCase()}</div>
+                <h3 class="text-2xl font-black text-slate-900">Raw: ${evalRes.totalScore}/${MAX_MARKS} &bull; Calibrated: ${evalRes.effScore}/${MAX_MARKS} &rarr; ${evalRes.projection}</h3>
               </div>
               <div class="text-xs font-bold text-slate-600">Accuracy: <span class="text-indigo-700 font-extrabold">${evalRes.accuracy}%</span> &bull; Pace: <span class="font-extrabold">${evalRes.pacePerQ}</span></div>
             </div>
@@ -993,7 +1065,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-8 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
-              <div><span class="text-xs font-extrabold uppercase text-${accent}-600">Question ${qIdx + 1} of ${totalQs} &bull; ${q.mock_subj} &bull; ${q.mock_sec}</span><div class="text-[11px] text-slate-500">Code: ${q.question_code} &bull; Chapter: ${q.chapter_name}</div></div>
+              <div><span class="text-xs font-extrabold uppercase text-${accent}-600">Question ${qIdx + 1} of ${totalQs} &bull; ${q.mock_subj} &bull; ${q.mock_sec}</span><div class="text-[11px] text-slate-500">Code: ${q.question_code} &bull; Tier: ${q.difficulty_tier || "STANDARD"} &bull; ${q.chapter_name}</div></div>
               <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-extrabold">+4 Correct / -1 Incorrect</span>
             </div>
             <div class="text-sm font-bold text-slate-900 leading-relaxed whitespace-pre-line min-h-[90px]">${q.prompt}</div>
@@ -1423,6 +1495,7 @@
         window._T6_JEE.p = Math.max(0, Number(rec.subjects.PHYSICS.s) || 0);
         window._T6_JEE.c = Math.max(0, Number(rec.subjects.CHEMISTRY.s) || 0);
         window._T6_JEE.m = Math.max(0, Number(rec.subjects.MATHEMATICS.s) || 0);
+        if (rec.difficulty) window._T6_JEE.shift = rec.difficulty;
         window._T6_SYNCED_ID = rec.sessionId;
         window._T6_MODE = "VERIFIED";
         return true;
@@ -1432,6 +1505,7 @@
         window._T6_NEET.c = Math.max(0, Number(rec.subjects.CHEMISTRY.s) || 0);
         window._T6_NEET.b = Math.max(0, Number(rec.subjects.BOTANY.s) || 0);
         window._T6_NEET.z = Math.max(0, Number(rec.subjects.ZOOLOGY.s) || 0);
+        if (rec.difficulty) window._T6_NEET.diff = rec.difficulty;
         window._T6_SYNCED_ID = rec.sessionId;
         window._T6_MODE = "VERIFIED";
         return true;
@@ -1500,12 +1574,12 @@
             <div class="text-[11px] font-bold text-emerald-700 mt-0.5">Est. CRL: ${air}</div>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <div class="text-[10px] font-extrabold uppercase text-slate-500">${isTargetMode ? "Expected Admission Tier" : "Actual Admission Tier"} (${st.cat})</div>
+            <div class="text-[10px] font-extrabold uppercase text-slate-500">${isTargetMode ? "Expected Admission Tier" : "Actual Admission Tier"} (${st.cat}${catBonus > 0 ? " +" + catBonus + " Quota Eq." : ""})</div>
             <div class="text-xs font-extrabold text-slate-900 mt-1 leading-snug">${tier}</div>
           </div>
         </div>
         <div class="space-y-2 pt-2">
-          <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700">${isTargetMode ? "Tentative Institute & Branch Outcome at Selected Target" : "Actual Institute & Branch Readiness from Synced Mock"} (${st.cat})</div>
+          <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700">${isTargetMode ? "Tentative Institute & Branch Outcome at Selected Target" : "Actual Institute & Branch Readiness from Synced Mock"} (${st.cat}${catBonus > 0 ? " +" + catBonus + " Quota Eq." : ""})</div>
           ${colleges.map(c => `
             <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2 text-xs">
               <div><div class="font-extrabold text-slate-900">${c.inst}</div><div class="text-slate-600">${c.branch}</div></div>
@@ -1563,7 +1637,7 @@
           <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
             <div class="text-[10px] font-extrabold uppercase text-emerald-700">${isTargetMode ? "Tentative Expected AIR" : "Actual Projected AIR"}</div>
             <div class="text-xl font-black text-emerald-950 mt-0.5">${air}</div>
-            <div class="text-[11px] font-bold text-emerald-700 mt-0.5">MCC / State (${st.cat})</div>
+            <div class="text-[11px] font-bold text-emerald-700 mt-0.5">MCC / State (${st.cat}${catBonus > 0 ? " +" + catBonus + " Quota Eq." : ""})</div>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <div class="text-[10px] font-extrabold uppercase text-slate-500">${isTargetMode ? "Expected Medical Tier" : "Actual Medical Tier"}</div>
@@ -1571,7 +1645,7 @@
           </div>
         </div>
         <div class="space-y-2 pt-2">
-          <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700">${isTargetMode ? "Tentative AIIMS & GMC Outcome at Selected Target" : "Actual AIIMS & GMC Readiness from Synced Mock"} (${st.cat})</div>
+          <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700">${isTargetMode ? "Tentative AIIMS & GMC Outcome at Selected Target" : "Actual AIIMS & GMC Readiness from Synced Mock"} (${st.cat}${catBonus > 0 ? " +" + catBonus + " Quota Eq." : ""})</div>
           ${colleges.map(c => `
             <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2 text-xs">
               <div><div class="font-extrabold text-slate-900">${c.inst}</div><div class="text-slate-600">${c.quota}</div></div>
@@ -1713,9 +1787,9 @@
               <div>
                 <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "NTA Shift Normalization" : "Paper Difficulty Level"}</label>
                 <select onchange="if(${IS_JEE}) window._T6_JEE.shift=this.value; else window._T6_NEET.diff=this.value; window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
-                  <option value="TOUGH">Tough Paper (+${IS_JEE ? 14 : 15} Eq.)</option>
-                  <option value="MODERATE" selected>Standard NTA Paper</option>
-                  <option value="EASY">High-Cutoff Paper (-${IS_JEE ? 12 : 10} Eq.)</option>
+                  <option value="TOUGH" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "TOUGH" ? "selected" : ""}>Tough Paper (+${IS_JEE ? 14 : 15} Eq.)</option>
+                  <option value="MODERATE" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "MODERATE" ? "selected" : ""}>Standard NTA Paper (0 Eq.)</option>
+                  <option value="EASY" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "EASY" ? "selected" : ""}>High-Cutoff Paper (-${IS_JEE ? 12 : 10} Eq.)</option>
                 </select>
               </div>
               <div>
@@ -2324,9 +2398,9 @@
               <div>
                 <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "NTA Shift Normalization" : "Paper Difficulty Level"}</label>
                 <select onchange="if(${IS_JEE}) window._T6_JEE.shift=this.value; else window._T6_NEET.diff=this.value; window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
-                  <option value="TOUGH">Tough Paper (+${IS_JEE ? 14 : 15} Eq.)</option>
-                  <option value="MODERATE" selected>Standard NTA Paper</option>
-                  <option value="EASY">High-Cutoff Paper (-${IS_JEE ? 12 : 10} Eq.)</option>
+                  <option value="TOUGH" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "TOUGH" ? "selected" : ""}>Tough Paper (+${IS_JEE ? 14 : 15} Eq.)</option>
+                  <option value="MODERATE" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "MODERATE" ? "selected" : ""}>Standard NTA Paper (0 Eq.)</option>
+                  <option value="EASY" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "EASY" ? "selected" : ""}>High-Cutoff Paper (-${IS_JEE ? 12 : 10} Eq.)</option>
                 </select>
               </div>
               <div>

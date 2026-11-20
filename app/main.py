@@ -2108,31 +2108,41 @@ def _get_science_engine():
 
 
 @app.get("/api/science/mock-paper")
-def get_dynamic_mock_paper(exam: str = "JEE", scope: str = "FULL"):
+def get_dynamic_mock_paper(exam: str = "JEE", scope: str = "FULL", difficulty: str = "MODERATE"):
     from sqlalchemy import text as _sa_text
     exam_code = exam.strip().upper()
     sc = scope.strip().upper()
+    diff = difficulty.strip().upper()
+    tier_order = (
+        "CASE difficulty_tier WHEN 'AIR_TOP_500' THEN 1 WHEN 'CONTENDER_98_650' THEN 2 ELSE 3 END, RANDOM()"
+        if diff == "TOUGH"
+        else (
+            "CASE difficulty_tier WHEN 'FOUNDATION' THEN 1 WHEN 'CONTENDER_98_650' THEN 2 ELSE 3 END, RANDOM()"
+            if diff == "EASY"
+            else "RANDOM()"
+        )
+    )
     eng = _get_science_engine()
     paper = []
     with eng.connect() as conn:
         if exam_code == "JEE":
             subjs = ("PHYSICS", "CHEMISTRY", "MATHEMATICS") if sc == "FULL" else (sc,)
             for subj in subjs:
-                mcqs = conn.execute(_sa_text("""
+                mcqs = conn.execute(_sa_text(f"""
                     SELECT id, question_code, subject, ncert_class, chapter_name, topic_tag,
                            exam_tags, question_type, difficulty_tier, prompt,
                            options_json, correct_answer, explanation
                     FROM jee_neet_questions
                     WHERE 'JEE' = ANY(exam_tags) AND subject = :s AND question_type != 'NUMERICAL_INT'
-                    ORDER BY RANDOM() LIMIT 20
+                    ORDER BY {tier_order} LIMIT 20
                 """), {"s": subj}).mappings().all()
-                nums = conn.execute(_sa_text("""
+                nums = conn.execute(_sa_text(f"""
                     SELECT id, question_code, subject, ncert_class, chapter_name, topic_tag,
                            exam_tags, question_type, difficulty_tier, prompt,
                            options_json, correct_answer, explanation
                     FROM jee_neet_questions
                     WHERE 'JEE' = ANY(exam_tags) AND subject = :s AND question_type = 'NUMERICAL_INT'
-                    ORDER BY RANDOM() LIMIT 5
+                    ORDER BY {tier_order} LIMIT 5
                 """), {"s": subj}).mappings().all()
                 for r in mcqs:
                     d = dict(r); d["mock_sec"] = "Section A (MCQ)"; d["mock_subj"] = subj; paper.append(d)
@@ -2146,17 +2156,17 @@ def get_dynamic_mock_paper(exam: str = "JEE", scope: str = "FULL"):
             else:
                 subjs = (sc,)
             for subj in subjs:
-                rows = conn.execute(_sa_text("""
+                rows = conn.execute(_sa_text(f"""
                     SELECT id, question_code, subject, ncert_class, chapter_name, topic_tag,
                            exam_tags, question_type, difficulty_tier, prompt,
                            options_json, correct_answer, explanation
                     FROM jee_neet_questions
                     WHERE 'NEET' = ANY(exam_tags) AND subject = :s
-                    ORDER BY RANDOM() LIMIT 45
+                    ORDER BY {tier_order} LIMIT 45
                 """), {"s": subj}).mappings().all()
                 for r in rows:
                     d = dict(r); d["mock_sec"] = "Compulsory MCQ"; d["mock_subj"] = subj; paper.append(d)
-    return {"ok": True, "exam": exam_code, "scope": sc, "count": len(paper), "paper": paper}
+    return {"ok": True, "exam": exam_code, "scope": sc, "difficulty": diff, "count": len(paper), "paper": paper}
 
 @app.get("/api/science/questions")
 def get_science_questions(exam: str = "JEE", subject: str = "", limit: int = 200):
