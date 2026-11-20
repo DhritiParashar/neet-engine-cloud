@@ -1821,6 +1821,11 @@
     const nEl = document.getElementById("t6-num-" + key);
     if (rEl && Number(rEl.value) !== v) rEl.value = v;
     if (nEl && Number(nEl.value) !== v) nEl.value = v;
+    const setBtn = document.getElementById("t6-set-target-btn");
+    if (setBtn) {
+      const tot = IS_JEE ? (window._T6_JEE.p + window._T6_JEE.c + window._T6_JEE.m) : (window._T6_NEET.p + window._T6_NEET.c + window._T6_NEET.b + window._T6_NEET.z);
+      setBtn.innerHTML = "&#127919; Set Target (Lock " + tot + "/" + MAX_MARKS + ")";
+    }
     window.updateScienceTab6();
   };
 
@@ -1893,10 +1898,6 @@
                   : "Showing your actual verified Full-Mock marks alongside your Locked Target & Deficiency Matrix."}</div>
               </div>
               <div class="flex flex-col gap-1.5 shrink-0">
-                <button type="button" onclick="window.commitCurrentAsTarget();"
-                  class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold shadow-sm cursor-pointer">
-                  &#127919; Set Target
-                </button>
                 <button type="button" onclick="if(window.applySyncedMockToTab6()){ window.renderScienceTab7(); } else { alert('No submitted Tab 4 Full Mock found in ledger yet. Submit a complete Tab 4 Full Mock first.'); }"
                   class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-sm cursor-pointer">
                   &#8635; Sync Mock
@@ -1906,12 +1907,7 @@
                     class="px-3.5 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-[11px] font-extrabold cursor-pointer">
                     My Target
                   </button>
-                ` : `
-                  <button type="button" onclick="window.resetDesiredTargetToDefault();"
-                    class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-[11px] font-extrabold cursor-pointer">
-                    Reset Target
-                  </button>
-                `}
+                ` : ""}
               </div>
             </div>
 
@@ -1931,6 +1927,17 @@
                   class="w-full accent-${accent}-600 cursor-pointer" />
               </div>
             `).join("")}
+
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+              <button id="t6-set-target-btn" type="button" onclick="window.commitCurrentAsTarget();"
+                class="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold shadow-sm cursor-pointer">
+                &#127919; Set Target (Lock ${IS_JEE ? (window._T6_JEE.p + window._T6_JEE.c + window._T6_JEE.m) + "/300" : (window._T6_NEET.p + window._T6_NEET.c + window._T6_NEET.b + window._T6_NEET.z) + "/720"})
+              </button>
+              <button type="button" onclick="window.resetDesiredTargetToDefault();"
+                class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 text-xs font-extrabold cursor-pointer">
+                Reset Target
+              </button>
+            </div>
 
             <div class="grid grid-cols-2 gap-3 pt-1 text-xs">
               <div>
