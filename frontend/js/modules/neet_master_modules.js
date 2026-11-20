@@ -1530,12 +1530,11 @@
   };
 
   window.resetDesiredTargetToDefault = function () {
-    const def = getDefaultSelfTarget();
-    saveSelfTarget(def);
-    if (IS_JEE) window._T6_JEE = { ...def };
-    else window._T6_NEET = { ...def };
+    const saved = loadSavedSelfTarget();
+    if (IS_JEE) window._T6_JEE = { ...saved };
+    else window._T6_NEET = { ...saved };
     window._T6_MODE = "TARGET";
-    window._T6_TARGET_LOCKED_MSG = "Reset to Default Benchmark";
+    window._T6_TARGET_LOCKED_MSG = "Restored Last Locked Target";
     window.renderScienceTab7();
   };
 
