@@ -894,7 +894,7 @@
             <h3 class="text-xl font-extrabold text-slate-900 mt-0.5">Serial Mock ID &amp; Verified Present Standing (${logs.length} Full Mocks Logged)</h3>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button" onclick="window.applySyncedMockToTab6(); window.selectUnifiedTab(7);" class="px-4 py-2 rounded-xl bg-${accent}-50 border border-${accent}-200 text-${accent}-700 text-xs font-extrabold cursor-pointer">View Present Forecast in Tab 6 &rarr;</button>
+            <button type="button" onclick="window.selectUnifiedTab(7);" class="px-4 py-2 rounded-xl bg-${accent}-50 border border-${accent}-200 text-${accent}-700 text-xs font-extrabold cursor-pointer">View Present Forecast in Tab 6 &rarr;</button>
             <button type="button" onclick="window.openResetDeclarationModal('CLEAR_LEDGER');" class="px-4 py-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-extrabold cursor-pointer">Clear Log</button>
           </div>
         </div>
@@ -1381,11 +1381,35 @@
   };
 
   // ============================================================================
-  // TAB 6: VERIFIED FULL-MOCK PRESENT-LEVEL FORECASTER & WHAT-IF SANDBOX (v29)
+  // TAB 7: DESIRED SELF-TARGET SIMULATOR + SYNCED ACTUAL STRENGTH (v45)
   // ============================================================================
-  window._T6_MODE = window._T6_MODE || "VERIFIED";
-  window._T6_JEE = { p: 76, c: 74, m: 68, shift: "MODERATE", cat: "GEN" };
-  window._T6_NEET = { p: 155, c: 160, b: 175, z: 170, diff: "MODERATE", cat: "GEN" };
+  const TARGET_KEY = IS_JEE ? "goalisb_jee_self_target_v1" : "goalisb_neet_self_target_v1";
+
+  function loadSavedSelfTarget() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(TARGET_KEY) || "null");
+      if (raw && typeof raw === "object") return raw;
+    } catch (_) {}
+    return IS_JEE
+      ? { p: 82, c: 80, m: 78, shift: "MODERATE", cat: "GEN" }
+      : { p: 165, c: 170, b: 175, z: 175, diff: "MODERATE", cat: "GEN" };
+  }
+
+  function saveSelfTarget(obj) {
+    try { localStorage.setItem(TARGET_KEY, JSON.stringify(obj)); } catch (_) {}
+  }
+
+  window._T6_MODE = window._T6_MODE || "TARGET";
+  window._T6_JEE = loadSavedSelfTarget();
+  window._T6_NEET = loadSavedSelfTarget();
+
+  window.switchToDesiredTargetMode = function () {
+    const saved = loadSavedSelfTarget();
+    if (IS_JEE) window._T6_JEE = { ...window._T6_JEE, ...saved };
+    else window._T6_NEET = { ...window._T6_NEET, ...saved };
+    window._T6_MODE = "TARGET";
+    window.renderScienceTab7();
+  };
 
   window.applySyncedMockToTab6 = function (sessionId) {
     try {
@@ -1419,10 +1443,15 @@
   window.updateScienceTab6 = function () {
     const out = document.getElementById("t6-live-results");
     if (!out) return;
+    const isTargetMode = (window._T6_MODE !== "VERIFIED");
+    const vLogs = getVerifiedFullMockLogs();
+    const latestMock = vLogs[0] || null;
+    const savedTarget = loadSavedSelfTarget();
 
     if (IS_JEE) {
       const st = window._T6_JEE;
       const rawTotal = st.p + st.c + st.m;
+      const targetTotal = (savedTarget.p || 0) + (savedTarget.c || 0) + (savedTarget.m || 0);
       const shiftAdj = st.shift === "TOUGH" ? 14 : (st.shift === "EASY" ? -12 : 0);
       const catBonus = st.cat === "SCST" ? 45 : (st.cat === "OBC" ? 14 : (st.cat === "EWS" ? 10 : 0));
       const eff = Math.min(300, Math.max(0, rawTotal + shiftAdj));
@@ -1437,38 +1466,46 @@
       else if (eff >= 110) { pct = "93.40 %ile"; air = "AIR 62,000 – 78,000"; tier = "JEE Advanced Borderline / State Govt Core"; }
 
       const colleges = [
-        { inst: "IIT Bombay / Delhi / Madras / Kanpur", branch: "CSE / MnC / EE (via JEE Adv Top 1,200)", status: cutoffEff >= 245 ? "High Readiness" : "Need +" + (245 - cutoffEff) + " Eq." },
-        { inst: "NIT Trichy / Surathkal / Warangal", branch: "Computer Science & Engineering (CSE)", status: cutoffEff >= 235 ? "Safe Target" : "Need +" + (235 - cutoffEff) + " Eq." },
-        { inst: "NIT Trichy / Surathkal / Rourkela / Calicut", branch: "ECE / Electrical / Mechanical", status: cutoffEff >= 195 ? "Safe Target" : "Need +" + (195 - cutoffEff) + " Eq." },
-        { inst: "IIIT Hyderabad / IIIT Bangalore / DTU / NSUT", branch: "CSE / AI & Data Science", status: cutoffEff >= 215 ? "Competitive" : "Need +" + (215 - cutoffEff) + " Eq." }
+        { inst: "IIT Bombay / Delhi / Madras / Kanpur", branch: "CSE / MnC / EE (via JEE Adv Top 1,200)", status: cutoffEff >= 245 ? "Achievable at This Score" : "Need +" + (245 - cutoffEff) + " Eq." },
+        { inst: "NIT Trichy / Surathkal / Warangal", branch: "Computer Science & Engineering (CSE)", status: cutoffEff >= 235 ? "Achievable at This Score" : "Need +" + (235 - cutoffEff) + " Eq." },
+        { inst: "NIT Trichy / Surathkal / Rourkela / Calicut", branch: "ECE / Electrical / Mechanical", status: cutoffEff >= 195 ? "Achievable at This Score" : "Need +" + (195 - cutoffEff) + " Eq." },
+        { inst: "IIIT Hyderabad / IIIT Bangalore / DTU / NSUT", branch: "CSE / AI & Data Science", status: cutoffEff >= 215 ? "Competitive at This Score" : "Need +" + (215 - cutoffEff) + " Eq." }
       ];
 
       const weakest = [["Physics", st.p], ["Chemistry", st.c], ["Mathematics", st.m]].sort((a, b) => a[1] - b[1])[0];
       const diag = document.getElementById("t6-bottleneck");
       if (diag) {
-        diag.innerHTML = `<div class="font-extrabold">Bottleneck Diagnostic: ${weakest[0]} (${weakest[1]}/100)</div>
-          <div>Eliminating just <strong>4 negative-marking errors</strong> (+20 marks) lifts your shift-normalized score to <strong>${Math.min(300, eff + 20)}/300</strong>.</div>`;
+        if (!isTargetMode) {
+          const gap = targetTotal - rawTotal;
+          diag.innerHTML = `<div class="font-extrabold">Actual Strength vs. Desired Target (${targetTotal}/300): ${gap > 0 ? `Gap of +${gap} Marks Needed` : "Target Achieved!"}</div>
+            <div>Weakest Verified Subject: <strong>${weakest[0]} (${weakest[1]}/100)</strong>. Target splits: P ${savedTarget.p}, C ${savedTarget.c}, M ${savedTarget.m}.</div>`;
+        } else {
+          diag.innerHTML = `<div class="font-extrabold">Desired Target Balance &bull; Lowest Target Subject: ${weakest[0]} (${weakest[1]}/100)</div>
+            <div>${latestMock
+              ? `Your latest verified Full Mock (<strong>${latestMock.sessionId}</strong>) achieved <strong>${latestMock.totalScore}/300</strong> (${rawTotal - latestMock.totalScore >= 0 ? "+" + (rawTotal - latestMock.totalScore) + " marks below your desired target" : "ahead of target"}). Click <strong>Sync Mock</strong> above to inspect your actual strength.`
+              : `No Full Mock submitted in Tab 4 yet. Complete a 75-Q Full Mock in Tab 4, then click <strong>Sync Mock</strong> to compare actual strength against this desired target.`}</div>`;
+        }
       }
 
       out.innerHTML = `
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
-            <div class="text-[10px] font-extrabold uppercase text-indigo-700">Raw / Normalized Total</div>
+          <div class="p-4 rounded-2xl ${isTargetMode ? "bg-indigo-50 border-indigo-200" : "bg-emerald-50 border-emerald-200"} border">
+            <div class="text-[10px] font-extrabold uppercase ${isTargetMode ? "text-indigo-700" : "text-emerald-700"}">${isTargetMode ? "Desired Target Total" : "Actual Verified Score"}</div>
             <div class="text-2xl font-black text-slate-900 mt-0.5">${rawTotal} <span class="text-xs font-bold text-slate-500">/ 300</span></div>
-            <div class="text-[11px] font-bold text-indigo-700 mt-0.5">Shift-Eq: ${eff}/300</div>
+            <div class="text-[11px] font-bold ${isTargetMode ? "text-indigo-700" : "text-emerald-700"} mt-0.5">Shift-Eq: ${eff}/300</div>
           </div>
           <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
-            <div class="text-[10px] font-extrabold uppercase text-emerald-700">Projected NTA Percentile</div>
+            <div class="text-[10px] font-extrabold uppercase text-emerald-700">${isTargetMode ? "Tentative Expected Percentile" : "Actual Projected Percentile"}</div>
             <div class="text-2xl font-black text-emerald-900 mt-0.5">${pct}</div>
             <div class="text-[11px] font-bold text-emerald-700 mt-0.5">Est. CRL: ${air}</div>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <div class="text-[10px] font-extrabold uppercase text-slate-500">JoSAA Admission Tier (${st.cat})</div>
+            <div class="text-[10px] font-extrabold uppercase text-slate-500">${isTargetMode ? "Expected Admission Tier" : "Actual Admission Tier"} (${st.cat})</div>
             <div class="text-xs font-extrabold text-slate-900 mt-1 leading-snug">${tier}</div>
           </div>
         </div>
         <div class="space-y-2 pt-2">
-          <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700">Target Institute &amp; Branch Readiness Matrix (${st.cat})</div>
+          <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700">${isTargetMode ? "Tentative Institute & Branch Outcome at Selected Target" : "Actual Institute & Branch Readiness from Synced Mock"} (${st.cat})</div>
           ${colleges.map(c => `
             <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2 text-xs">
               <div><div class="font-extrabold text-slate-900">${c.inst}</div><div class="text-slate-600">${c.branch}</div></div>
@@ -1480,6 +1517,7 @@
     } else {
       const st = window._T6_NEET;
       const rawTotal = st.p + st.c + st.b + st.z;
+      const targetTotal = (savedTarget.p || 0) + (savedTarget.c || 0) + (savedTarget.b || 0) + (savedTarget.z || 0);
       const bioTotal = st.b + st.z;
       const diffAdj = st.diff === "TOUGH" ? 15 : (st.diff === "EASY" ? -10 : 0);
       const catBonus = st.cat === "SCST" ? 85 : (st.cat === "OBC" ? 12 : (st.cat === "EWS" ? 10 : 0));
@@ -1494,38 +1532,46 @@
       else if (eff >= 595) { air = "AIR 26,000 – 42,000"; tier = "State Quota Govt MBBS (85% Domicile)"; }
 
       const colleges = [
-        { inst: "AIIMS New Delhi / MAMC / VMMC", quota: "All India Quota (15%) • Target 700+", status: quotaEff >= 700 ? "Safe Contender" : "Need +" + (700 - quotaEff) + " Marks" },
-        { inst: "AIIMS Bhopal / Jodhpur / Bhubaneswar / JIPMER", quota: "All India Quota (15%) • Target 680+", status: quotaEff >= 680 ? "Safe Contender" : "Need +" + (680 - quotaEff) + " Marks" },
-        { inst: "Top State Govt Medical Colleges (GMC)", quota: "AIQ & 85% State Quota • Target 645+", status: quotaEff >= 645 ? "High Probability" : "Need +" + (645 - quotaEff) + " Marks" },
+        { inst: "AIIMS New Delhi / MAMC / VMMC", quota: "All India Quota (15%) • Target 700+", status: quotaEff >= 700 ? "Achievable at This Score" : "Need +" + (700 - quotaEff) + " Marks" },
+        { inst: "AIIMS Bhopal / Jodhpur / Bhubaneswar / JIPMER", quota: "All India Quota (15%) • Target 680+", status: quotaEff >= 680 ? "Achievable at This Score" : "Need +" + (680 - quotaEff) + " Marks" },
+        { inst: "Top State Govt Medical Colleges (GMC)", quota: "AIQ & 85% State Quota • Target 645+", status: quotaEff >= 645 ? "Achievable at This Score" : "Need +" + (645 - quotaEff) + " Marks" },
         { inst: "Govt MBBS Seat (" + st.cat + " Quota)", quota: "85% State Quota • Target 610+", status: quotaEff >= 610 ? "Within Cutoff" : "Need +" + (610 - quotaEff) + " Marks" }
       ];
 
       const weakest = [["Physics", st.p], ["Chemistry", st.c], ["Botany", st.b], ["Zoology", st.z]].sort((a, b) => a[1] - b[1])[0];
       const diag = document.getElementById("t6-bottleneck");
       if (diag) {
-        diag.innerHTML = `<div class="font-extrabold">Biology Anchor: ${bioTotal}/360 &bull; Weakest Subject: ${weakest[0]} (${weakest[1]}/180)</div>
-          <div>Avoiding just <strong>5 NCERT Assertion-Reason traps</strong> (+25 marks) boosts your effective score to <strong>${Math.min(720, eff + 25)}/720</strong>.</div>`;
+        if (!isTargetMode) {
+          const gap = targetTotal - rawTotal;
+          diag.innerHTML = `<div class="font-extrabold">Actual Strength vs. Desired Target (${targetTotal}/720): ${gap > 0 ? `Gap of +${gap} Marks Needed` : "Target Achieved!"}</div>
+            <div>Weakest Verified Subject: <strong>${weakest[0]} (${weakest[1]}/180)</strong>. Target splits: P ${savedTarget.p}, C ${savedTarget.c}, B ${savedTarget.b}, Z ${savedTarget.z}.</div>`;
+        } else {
+          diag.innerHTML = `<div class="font-extrabold">Desired Biology Anchor: ${bioTotal}/360 &bull; Lowest Target Subject: ${weakest[0]} (${weakest[1]}/180)</div>
+            <div>${latestMock
+              ? `Your latest verified Full Mock (<strong>${latestMock.sessionId}</strong>) achieved <strong>${latestMock.totalScore}/720</strong> (${rawTotal - latestMock.totalScore >= 0 ? "+" + (rawTotal - latestMock.totalScore) + " marks below your desired target" : "ahead of target"}). Click <strong>Sync Mock</strong> above to inspect your actual strength.`
+              : `No Full Mock submitted in Tab 4 yet. Complete a 180-Q Full Mock in Tab 4, then click <strong>Sync Mock</strong> to compare actual strength against this desired target.`}</div>`;
+        }
       }
 
       out.innerHTML = `
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
-            <div class="text-[10px] font-extrabold uppercase text-emerald-700">Total NEET Score</div>
+          <div class="p-4 rounded-2xl ${isTargetMode ? "bg-indigo-50 border-indigo-200" : "bg-emerald-50 border-emerald-200"} border">
+            <div class="text-[10px] font-extrabold uppercase ${isTargetMode ? "text-indigo-700" : "text-emerald-700"}">${isTargetMode ? "Desired Target Score" : "Actual Verified Score"}</div>
             <div class="text-2xl font-black text-slate-900 mt-0.5">${rawTotal} <span class="text-xs font-bold text-slate-500">/ 720</span></div>
-            <div class="text-[11px] font-bold text-emerald-700 mt-0.5">Biology: ${bioTotal}/360</div>
+            <div class="text-[11px] font-bold ${isTargetMode ? "text-indigo-700" : "text-emerald-700"} mt-0.5">Biology: ${bioTotal}/360</div>
           </div>
-          <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
-            <div class="text-[10px] font-extrabold uppercase text-indigo-700">Projected All India Rank</div>
-            <div class="text-xl font-black text-indigo-950 mt-0.5">${air}</div>
-            <div class="text-[11px] font-bold text-indigo-700 mt-0.5">MCC / State (${st.cat})</div>
+          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+            <div class="text-[10px] font-extrabold uppercase text-emerald-700">${isTargetMode ? "Tentative Expected AIR" : "Actual Projected AIR"}</div>
+            <div class="text-xl font-black text-emerald-950 mt-0.5">${air}</div>
+            <div class="text-[11px] font-bold text-emerald-700 mt-0.5">MCC / State (${st.cat})</div>
           </div>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <div class="text-[10px] font-extrabold uppercase text-slate-500">Medical College Tier</div>
+            <div class="text-[10px] font-extrabold uppercase text-slate-500">${isTargetMode ? "Expected Medical Tier" : "Actual Medical Tier"}</div>
             <div class="text-xs font-extrabold text-slate-900 mt-1 leading-snug">${tier}</div>
           </div>
         </div>
         <div class="space-y-2 pt-2">
-          <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700">AIIMS &amp; Government Medical College Readiness (${st.cat})</div>
+          <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700">${isTargetMode ? "Tentative AIIMS & GMC Outcome at Selected Target" : "Actual AIIMS & GMC Readiness from Synced Mock"} (${st.cat})</div>
           ${colleges.map(c => `
             <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2 text-xs">
               <div><div class="font-extrabold text-slate-900">${c.inst}</div><div class="text-slate-600">${c.quota}</div></div>
@@ -1538,15 +1584,184 @@
   };
 
   window.syncT6Val = function (key, rawVal) {
-    window._T6_MODE = "WHATIF";
     const maxV = IS_JEE ? 100 : 180;
     const v = Math.min(maxV, Math.max(0, Math.round(Number(rawVal) || 0)));
-    if (IS_JEE) window._T6_JEE[key] = v;
-    else window._T6_NEET[key] = v;
+    if (IS_JEE) {
+      window._T6_JEE[key] = v;
+      if (window._T6_MODE !== "VERIFIED") saveSelfTarget(window._T6_JEE);
+    } else {
+      window._T6_NEET[key] = v;
+      if (window._T6_MODE !== "VERIFIED") saveSelfTarget(window._T6_NEET);
+    }
+    if (window._T6_MODE === "VERIFIED") {
+      window._T6_MODE = "TARGET";
+      if (IS_JEE) saveSelfTarget(window._T6_JEE);
+      else saveSelfTarget(window._T6_NEET);
+      const pill = document.getElementById("t6-mode-badge");
+      if (pill) {
+        pill.textContent = "MODE: DESIRED SELF-TARGET (TENTATIVE OUTCOME)";
+        pill.className = "px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800 text-[10px] font-extrabold uppercase";
+      }
+    }
     const rEl = document.getElementById("t6-rng-" + key);
     const nEl = document.getElementById("t6-num-" + key);
     if (rEl && Number(rEl.value) !== v) rEl.value = v;
     if (nEl && Number(nEl.value) !== v) nEl.value = v;
+    window.updateScienceTab6();
+  };
+
+  window.renderScienceTab7 = function (el) {
+    const target = getTarget(el);
+    if (!target) return;
+
+    const accent = IS_JEE ? "indigo" : "emerald";
+    const maxSub = IS_JEE ? 100 : 180;
+    const isTargetMode = (window._T6_MODE !== "VERIFIED");
+
+    if (isTargetMode) {
+      const saved = loadSavedSelfTarget();
+      if (IS_JEE) window._T6_JEE = { ...window._T6_JEE, ...saved };
+      else window._T6_NEET = { ...window._T6_NEET, ...saved };
+    }
+
+    const rows = IS_JEE
+      ? [["Physics", "p", window._T6_JEE.p], ["Chemistry", "c", window._T6_JEE.c], ["Mathematics", "m", window._T6_JEE.m]]
+      : [["Physics", "p", window._T6_NEET.p], ["Chemistry", "c", window._T6_NEET.c], ["Botany", "b", window._T6_NEET.b], ["Zoology", "z", window._T6_NEET.z]];
+
+    const ladder = IS_JEE ? [
+      ["260+ / 300", "99.93+ %ile", "AIR < 1,000", "NIT Trichy CSE / Top IIT Adv Contender"],
+      ["230 – 259", "99.65 – 99.92 %ile", "AIR 1,000 – 4,500", "Top 3 NITs CSE / IIIT-H & IIIT-B"],
+      ["200 – 229", "99.10 – 99.64 %ile", "AIR 4,500 – 11,500", "Top NITs ECE/EE & All-India IIITs"],
+      ["165 – 199", "97.80 – 99.09 %ile", "AIR 11,500 – 28,000", "Mid-Tier NITs / DTU / NSUT Core"],
+      ["115 – 164", "93.50 – 97.79 %ile", "AIR 28,000 – 80,000", "JEE Advanced Cutoff Qualified (Gen)"]
+    ] : [
+      ["700 – 720", "AIR 1 – 350", "AIIMS New Delhi / MAMC / JIPMER"],
+      ["680 – 699", "AIR 350 – 2,500", "AIIMS Bhopal, Jodhpur, Rishikesh & Top GMCs"],
+      ["650 – 679", "AIR 2,500 – 10,500", "Premier State Govt Medical Colleges (AIQ)"],
+      ["615 – 649", "AIR 10,500 – 28,000", "Govt MBBS Seats (AIQ & State Quota)"],
+      ["575 – 614", "AIR 28,000 – 55,000", "State Domicile MBBS / Semi-Govt Quota"]
+    ];
+
+    const vLogs = getVerifiedFullMockLogs();
+    const avgScore = vLogs.length ? Math.round(vLogs.reduce((a, b) => a + Number(b.totalScore || 0), 0) / vLogs.length) : null;
+    const bestScore = vLogs.length ? Math.max(...vLogs.map(b => Number(b.totalScore || 0))) : null;
+
+    const syncBannerHtml = isTargetMode
+      ? `<div id="t6-sync-pill" class="p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 text-xs text-indigo-950 space-y-1">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span><strong>&#127919; Self-Target Goal Active:</strong> Sliders show your desired target marks; right panel previews your tentative expected outcome.</span>
+            ${vLogs.length ? `<button type="button" onclick="if(window.applySyncedMockToTab6()){ window.renderScienceTab7(); }" class="underline font-extrabold text-emerald-700 cursor-pointer">Load Actual Mock Strength &rarr;</button>` : ""}
+          </div>
+          <div class="text-[11px] opacity-90">${vLogs.length
+            ? `Verified Full Mocks Logged: <strong>${vLogs.length}</strong> &bull; Latest: <strong>${vLogs[0].sessionId} (${vLogs[0].totalScore}/${MAX_MARKS})</strong> &bull; Best: <strong>${bestScore}/${MAX_MARKS}</strong>`
+            : `No Full ${REQUIRED_QS}-Q Mock submitted in Tab 4 yet. Submit a Full Mock in Tab 4, then click <strong>Sync Mock</strong> to check actual strength.`}</div>
+        </div>`
+      : `<div id="t6-sync-pill" class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs text-emerald-950 space-y-1">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span><strong>&#10003; Actual Strength Achieved:</strong> Sliders reflect verified marks from Full Mock <strong>${window._T6_SYNCED_ID}</strong></span>
+            <button type="button" onclick="window.switchToDesiredTargetMode();" class="underline font-extrabold text-indigo-700 cursor-pointer">Back to My Desired Target</button>
+          </div>
+          <div class="text-[11px] opacity-90">Full Mocks Completed: <strong>${vLogs.length}</strong> &bull; Rolling Average: <strong>${avgScore}/${MAX_MARKS}</strong> &bull; Best Full Mock: <strong>${bestScore}/${MAX_MARKS}</strong></div>
+        </div>`;
+
+    target.innerHTML = `
+      <div class="max-w-7xl mx-auto pt-4 pb-10 space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+            <div class="flex items-start justify-between gap-2">
+              <div class="space-y-1">
+                <span id="t6-mode-badge" class="inline-block px-2.5 py-1 rounded-full ${isTargetMode ? "bg-indigo-100 text-indigo-800" : "bg-emerald-100 text-emerald-800"} text-[10px] font-extrabold uppercase">
+                  ${isTargetMode ? "MODE: DESIRED SELF-TARGET (TENTATIVE OUTCOME)" : "MODE: SYNCED ACTUAL STRENGTH ACHIEVED"}
+                </span>
+                <h2 class="text-xl font-extrabold text-slate-900 pt-0.5">${isTargetMode ? "Set Desired Subject Target Marks" : "Actual Subject Strength Achieved"}</h2>
+                <div class="text-[11px] font-semibold text-slate-600">${isTargetMode
+                  ? "Adjust sliders to set your personal target & preview expected rank, or click Sync Mock to load your actual Tab 4 score."
+                  : "Showing your actual verified Full-Mock marks. Drag any slider to edit your Desired Target again."}</div>
+              </div>
+              <div class="flex flex-col gap-1.5 shrink-0">
+                <button type="button" onclick="if(window.applySyncedMockToTab6()){ window.renderScienceTab7(); } else { alert('No submitted Tab 4 Full Mock found in ledger yet. Submit a complete Tab 4 Full Mock first.'); }"
+                  class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-sm cursor-pointer">
+                  &#8635; Sync Mock
+                </button>
+                ${!isTargetMode ? `
+                  <button type="button" onclick="window.switchToDesiredTargetMode();"
+                    class="px-3.5 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-[11px] font-extrabold cursor-pointer">
+                    My Target
+                  </button>
+                ` : ""}
+              </div>
+            </div>
+
+            ${rows.map(([lbl, key, val]) => `
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs font-extrabold">
+                  <span>${lbl} ${isTargetMode ? "Target" : "Achieved"} (0 – ${maxSub})</span>
+                  <div class="flex items-center gap-1">
+                    <input id="t6-num-${key}" type="number" min="0" max="${maxSub}" value="${val}"
+                      oninput="window.syncT6Val('${key}', this.value);"
+                      class="w-16 rounded-lg border border-slate-300 px-2 py-1 text-right font-mono font-extrabold text-${accent}-700" />
+                    <span class="text-slate-500">/ ${maxSub}</span>
+                  </div>
+                </div>
+                <input id="t6-rng-${key}" type="range" min="0" max="${maxSub}" step="1" value="${val}"
+                  oninput="window.syncT6Val('${key}', this.value);"
+                  class="w-full accent-${accent}-600 cursor-pointer" />
+              </div>
+            `).join("")}
+
+            <div class="grid grid-cols-2 gap-3 pt-1 text-xs">
+              <div>
+                <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "NTA Shift Normalization" : "Paper Difficulty Level"}</label>
+                <select onchange="if(${IS_JEE}) window._T6_JEE.shift=this.value; else window._T6_NEET.diff=this.value; window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
+                  <option value="TOUGH">Tough Paper (+${IS_JEE ? 14 : 15} Eq.)</option>
+                  <option value="MODERATE" selected>Standard NTA Paper</option>
+                  <option value="EASY">High-Cutoff Paper (-${IS_JEE ? 12 : 10} Eq.)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "Admission Category" : "Counselling Quota"}</label>
+                <select onchange="if(${IS_JEE}) window._T6_JEE.cat=this.value; else window._T6_NEET.cat=this.value; window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
+                  <option value="GEN" selected>General (OPEN)</option>
+                  <option value="EWS">GEN-EWS</option>
+                  <option value="OBC">OBC-NCL</option>
+                  <option value="SCST">SC / ST</option>
+                </select>
+              </div>
+            </div>
+
+            ${syncBannerHtml}
+            <div id="t6-bottleneck" class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950 space-y-1"></div>
+          </div>
+
+          <div class="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+            <div id="t6-live-results" class="space-y-4"></div>
+
+            <div class="overflow-x-auto pt-2 border-t border-slate-100">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-2">${IS_JEE ? "NTA JEE Main Marks vs. Percentile Calibration Ladder" : "NTA NEET UG Marks vs. AIR Calibration Ladder"}</div>
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-slate-200 text-slate-500">
+                    ${IS_JEE
+                      ? '<th class="py-2 pr-3">Score Band</th><th class="py-2 pr-3">Percentile</th><th class="py-2 pr-3">CRL AIR</th><th class="py-2">Target Outcome</th>'
+                      : '<th class="py-2 pr-3">Score Band (720)</th><th class="py-2 pr-3">Projected AIR</th><th class="py-2">Medical College Allocation</th>'}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${ladder.map(r => `
+                    <tr class="border-b border-slate-100">
+                      <td class="py-2 pr-3 font-extrabold text-slate-900">${r[0]}</td>
+                      <td class="py-2 pr-3 font-bold text-emerald-700">${r[1]}</td>
+                      <td class="py-2 ${IS_JEE ? 'pr-3 font-semibold' : 'text-slate-600'}">${r[2]}</td>
+                      ${IS_JEE ? `<td class="py-2 text-slate-600">${r[3]}</td>` : ""}
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
     window.updateScienceTab6();
   };
 
