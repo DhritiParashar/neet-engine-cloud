@@ -1550,15 +1550,360 @@
     window.updateScienceTab6();
   };
 
+  // ============================================================================
+  // TAB 6: SUBJECT & CHAPTER-WISE TRAP DOCTOR (12 TRAPS PER CHAPTER) + AUTOPSY
+  // ============================================================================
+  window._T6_TD_SUBJ = window._T6_TD_SUBJ || (IS_JEE ? "PHYSICS" : "BOTANY");
+  window._T6_TD_CHAP_IDX = Number(window._T6_TD_CHAP_IDX || 0);
+  window._T6_TD_VIEW = window._T6_TD_VIEW || "LIBRARY";
+  window._T6_TD_MASTERED = window._T6_TD_MASTERED || {};
+
+  function getChapterTrapCatalog() {
+    if (IS_JEE) {
+      return {
+        PHYSICS: [
+          {
+            chapter: "Rotational Motion & Gravitation",
+            traps: [
+              { title: "Rolling vs. Sliding Kinetic Energy", lure: "Using KE = 1/2 mv^2 for a rolling body.", fix: "For pure rolling, KE_total = 1/2 mv^2 (1 + I/mR^2): 3/4 mv^2 (solid cylinder), 7/10 mv^2 (solid sphere), mv^2 (ring)." },
+              { title: "Axis Shift Direction in Parallel Axis Theorem", lure: "Applying I = I_1 + Md^2 between two arbitrary non-COM axes.", fix: "I = I_cm + Md^2 ONLY holds when I_cm passes through the exact Center of Mass." },
+              { title: "Friction Direction on Accelerated Rolling Body", lure: "Assuming static friction always opposes linear motion.", fix: "If torque is applied at axle, friction acts forward; if force acts above COM (h > I/mR), friction acts forward." },
+              { title: "Angular Momentum Conservation Pivot Choice", lure: "Conserving L about a moving point with external torque.", fix: "Choose the pivot point where the line of action of the impulsive external force passes (r x F = 0)." },
+              { title: "Escape Velocity vs. Orbital Velocity Factor", lure: "Confusing v_e = sqrt(gR) with v_o = sqrt(2gR).", fix: "v_orbital = sqrt(GM/R) = sqrt(gR), whereas v_escape = sqrt(2GM/R) = sqrt(2) * v_orbital." },
+              { title: "Altitude vs. Depth Gravity Formula", lure: "Using g(1 - 2h/R) when h is comparable to R.", fix: "Use binomial g(1 - 2h/R) ONLY for h << R; for large h, use exact g * [R/(R+h)]^2. Inside Earth, g(d) = g(1 - d/R)." },
+              { title: "Gravitational Potential Inside a Hollow Shell", lure: "Setting potential V = 0 because field E = 0 inside.", fix: "Inside a spherical shell, E = 0 everywhere, so potential is constant and non-zero: V = -GM/R." },
+              { title: "Time Period of Satellite Independent of Mass", lure: "Scaling T^2 with satellite mass m.", fix: "Kepler's 3rd Law T^2 = (4pi^2 / GM) r^3 depends ONLY on central planet mass M, never on satellite mass m." },
+              { title: "Instantaneous Axis of Rotation (IAOR) Speed", lure: "Using v = omega * R for the topmost point of a rolling wheel.", fix: "Topmost point is at distance 2R from bottom IAOR, so v_top = 2 * v_cm = 2 * omega * R." },
+              { title: "Kepler's 2nd Law Areal Velocity Sign", lure: "Equating linear speed v at perihelion and aphelion.", fix: "r_p * v_p = r_a * v_a (angular momentum conserved), so speed is maximum at perihelion (closest approach)." },
+              { title: "Total Energy Sign of Bound Orbit", lure: "Reporting binding energy as negative or total energy as positive.", fix: "For bound circular orbit: KE = +GMm/2r, PE = -GMm/r, Total E = -GMm/2r, Binding Energy = +GMm/2r." },
+              { title: "Moment of Inertia of Hollow vs. Solid Sphere", lure: "Swapping 2/5 MR^2 and 2/3 MR^2.", fix: "Solid sphere has mass closer to center -> smaller I = 2/5 MR^2; Hollow spherical shell -> larger I = 2/3 MR^2." }
+            ]
+          },
+          {
+            chapter: "Electrostatics & Current Electricity",
+            traps: [
+              { title: "Electric Field vs. Potential Inside Conductor", lure: "Assuming V = 0 inside a charged conductor because E = 0.", fix: "Inside a conductor in electrostatic equilibrium, E = 0, so V is constant throughout and equals V_surface." },
+              { title: "Gauss's Law Flux vs. Field Contribution", lure: "Thinking E on Gaussian surface depends only on q_enclosed.", fix: "Flux phi = q_enc / eps_0 depends only on enclosed charge, but E at any point depends on ALL charges (inside + outside)." },
+              { title: "Dielectric Insertion: Battery Connected vs. Disconnected", lure: "Using Q = const when battery remains connected.", fix: "Battery connected -> V = const, Q increases K times, U increases K times. Battery disconnected -> Q = const, V & U decrease by 1/K." },
+              { title: "Dipole Torque vs. Potential Energy Extremes", lure: "Assuming unstable equilibrium occurs at theta = 90 deg.", fix: "At theta = 90 deg, torque is max (pE) and U = 0; unstable equilibrium is at theta = 180 deg (U = +pE, torque = 0)." },
+              { title: "Stretching a Wire to n Times Length", lure: "Multiplying resistance by n instead of n^2.", fix: "Volume V = A*L is constant: if L -> nL, area A -> A/n, so R_new = n^2 * R_old." },
+              { title: "Terminal Voltage During Charging vs. Discharging", lure: "Always writing V = E - Ir.", fix: "During discharging V = E - Ir; during charging (current enters +ve terminal) V = E + Ir." },
+              { title: "Ammeter & Voltmeter Ideal Resistance Swap", lure: "Connecting low-resistance ammeter in parallel.", fix: "Ideal ammeter has R = 0 (series); ideal voltmeter has R = infinity (parallel)." },
+              { title: "Power Dissipation: Series vs. Parallel Bulb Rating", lure: "Assuming higher wattage bulb glows brighter in series.", fix: "In parallel (same V), P = V^2/R -> higher wattage glows brighter. In series (same I), P = I^2 R -> lower wattage (higher R) glows brighter." },
+              { title: "Wheatstone Bridge Non-Null Deflection", lure: "Simplifying bridge when R1/R2 != R3/R4.", fix: "Never drop the galvanometer branch unless R1*R4 == R2*R3; use nodal analysis or delta-star otherwise." },
+              { title: "Self-Energy of a Uniformly Charged Solid Sphere", lure: "Using kQ^2 / 2R (which is for a conducting shell).", fix: "Conducting/hollow shell self-energy = 1/2 kQ^2/R; uniformly charged non-conducting solid sphere = 3/5 kQ^2/R." },
+              { title: "RC Circuit Steady-State Capacitor Behavior", lure: "Treating capacitor as short circuit at t = infinity.", fix: "At t = 0 (uncharged), capacitor acts as short circuit; at t = infinity (steady state), capacitor acts as open circuit (I = 0)." },
+              { title: "Temperature Coefficient of Semiconductors vs. Metals", lure: "Applying positive alpha to Silicon/Germanium.", fix: "Metals have positive alpha (R rises with T); semiconductors/electrolytes have negative alpha (R drops with T)." }
+            ]
+          },
+          {
+            chapter: "Ray & Wave Optics",
+            traps: [
+              { title: "Cartesian Sign Convention for Mirror & Lens", lure: "Forgetting negative sign for object distance u.", fix: "Incident light goes left-to-right: u is negative for all real objects; f is +ve for convex lens/mirror, -ve for concave lens/mirror." },
+              { title: "Lens Immersed in Liquid of Higher Refractive Index", lure: "Assuming convex lens always stays converging.", fix: "If mu_liquid > mu_lens, 1/f = (mu_lens/mu_liq - 1)(1/R1 - 1/R2) flips sign: convex lens becomes diverging!" },
+              { title: "Cutting a Lens Horizontally vs. Vertically", lure: "Halving focal length when cut along principal axis.", fix: "Horizontal cut (along principal axis) keeps f unchanged (brightness halves); vertical cut (symmetrical) doubles focal length (f -> 2f)." },
+              { title: "Total Internal Reflection (TIR) Medium Direction", lure: "Checking sin(theta_c) = mu_denser / mu_rarer (> 1).", fix: "TIR ONLY happens from denser to rarer medium, and sin(theta_c) = mu_rarer / mu_denser < 1." },
+              { title: "YDSE Fringe Width in Liquid Medium", lure: "Leaving wavelength unchanged when apparatus is submerged.", fix: "In liquid of refractive index mu, lambda' = lambda / mu, so fringe width beta' = beta / mu shrinks." },
+              { title: "Intensity Ratio I_max / I_min Formula", lure: "Using (I1 + I2) / (I1 - I2) instead of amplitudes.", fix: "I_max / I_min = (sqrt(I1) + sqrt(I2))^2 / (sqrt(I1) - sqrt(I2))^2." },
+              { title: "Power of Lens in Diopters Unit Trap", lure: "Computing P = 1 / f_cm without converting to meters.", fix: "P (in Diopters) = 100 / f(cm) = 1 / f(m)." },
+              { title: "Silvered Lens Effective Focal Length", lure: "Adding powers with wrong sign for mirror reflection.", fix: "1/f_eq = 1/f_mirror - 2/f_lens (using Cartesian signs, effective system acts as a mirror)." },
+              { title: "Minimum Deviation in Prism Condition", lure: "Assuming i1 = i2 holds for any angle of incidence.", fix: "Minimum deviation delta_m occurs ONLY when i1 = i2 and r1 = r2 = A/2." },
+              { title: "Diffraction Central Maxima Width vs. YDSE", lure: "Using lambda*D/d for central diffraction maximum.", fix: "Central diffraction bright fringe has angular width 2*lambda/a (linear width 2*lambda*D/a)—twice that of secondary fringes." },
+              { title: "Malus's Law Unpolarized Light First Polarizer", lure: "Applying I_0 cos^2(theta) to unpolarized incident light.", fix: "Unpolarized light passing through the first polarizer ALWAYS becomes I_0 / 2 regardless of polarizer angle." },
+              { title: "Plane Mirror Object Velocity Component", lure: "Doubling parallel velocity component of image.", fix: "Only the perpendicular velocity component reverses (v_im,perp = -v_obj,perp); parallel velocity stays identical." }
+            ]
+          },
+          {
+            chapter: "Thermodynamics & Modern Physics",
+            traps: [
+              { title: "Kelvin Conversion in Stefan-Boltzmann & Carnot", lure: "Plugging Celsius temperatures directly into T^4 or 1 - T2/T1.", fix: "ALWAYS convert Celsius to Kelvin (T_K = T_C + 273) in PV=nRT, Carnot efficiency, and radiation laws." },
+              { title: "Physics vs. Chemistry First Law Sign Convention", lure: "Using Delta_U = Q + W in Physics problems.", fix: "In Physics, dQ = dU + dW where W > 0 for expansion; in Chemistry, Delta_U = q + w where w < 0 for expansion." },
+              { title: "Molar Specific Heat in Polytropic Process", lure: "Using C_v for non-isochoric processes.", fix: "For PV^x = const, molar heat capacity is C = C_v + R / (1 - x)." },
+              { title: "RMS Speed vs. Average vs. Most Probable Speed", lure: "Ordering v_mp > v_avg > v_rms.", fix: "v_rms (sqrt(3RT/M)) > v_avg (sqrt(8RT/piM)) > v_mp (sqrt(2RT/M)) -> ratio 1.73 : 1.60 : 1.41." },
+              { title: "Photoelectric Stopping Potential vs. Intensity", lure: "Increasing stopping potential V_0 when light intensity doubles.", fix: "Intensity increases photocurrent (electron count); stopping potential V_0 depends ONLY on frequency and work function." },
+              { title: "De Broglie Wavelength of Accelerated Charge", lure: "Using same wavelength for proton and electron at same V.", fix: "lambda = h / sqrt(2 m q V): at same accelerating voltage V, heavier proton has much shorter wavelength." },
+              { title: "Bohr Radius & Energy Scaling with Z and n", lure: "Multiplying energy by Z instead of Z^2.", fix: "Radius r_n proportional to n^2 / Z; Energy E_n = -13.6 * (Z^2 / n^2) eV." },
+              { title: "Spectral Lines Number from Level n to Ground", lure: "Writing n(n+1)/2 instead of n(n-1)/2.", fix: "Maximum distinct emission lines from level n to n=1 is n(n - 1) / 2." },
+              { title: "Radioactive Mean Life vs. Half-Life", lure: "Equating tau = T_1/2.", fix: "Mean life tau = 1 / lambda = T_1/2 / 0.693 = 1.44 * T_1/2 (mean life is longer than half-life)." },
+              { title: "Nuclear Radius Proportionality", lure: "Scaling nuclear radius R with A instead of A^(1/3).", fix: "R = R_0 * A^(1/3), so nuclear density is constant and independent of mass number A." },
+              { title: "Zener Diode Breakdown Region Biasing", lure: "Operating Zener voltage regulator in forward bias.", fix: "A Zener diode regulates voltage ONLY when connected in REVERSE bias in the breakdown region." },
+              { title: "Adiabatic Bulk Modulus vs. Isothermal", lure: "Using B = P for rapid sound waves in air.", fix: "Isothermal B_iso = P; Adiabatic (sound propagation) B_adi = gamma * P." }
+            ]
+          }
+        ],
+        CHEMISTRY: [
+          {
+            chapter: "Chemical & Ionic Equilibrium",
+            traps: [
+              { title: "Pure Solids & Liquids in Kp / Kc Expressions", lure: "Including CaCO3(s) or H2O(l) in equilibrium constant.", fix: "Active mass of pure solids and pure liquids is unity (1); omit them from Kp, Kc, and Delta_n_g." },
+              { title: "Delta_n_g Sign & Kelvin T in Kp = Kc(RT)^Delta_n_g", lure: "Using Celsius T or counting solid moles in Delta_n_g.", fix: "Delta_n_g = (gaseous product moles) - (gaseous reactant moles), and T MUST be in Kelvin." },
+              { title: "pH of 10^-8 M Strong Acid (HCl)", lure: "Answering pH = 8 (basic!) for dilute HCl.", fix: "Include water auto-ionization [H+] = 10^-8 + 10^-7 = 1.1 x 10^-7 M -> pH = 6.96 (always < 7)." },
+              { title: "Inert Gas Addition at Constant Volume vs. Pressure", lure: "Shifting equilibrium when inert gas is added at constant V.", fix: "At constant V, partial pressures don't change -> NO shift. At constant P, volume rises -> shifts toward more gas moles." },
+              { title: "Solubility Product Ksp of AB2 / A2B3 Salts", lure: "Using Ksp = s^2 for CaF2 or Ag2CrO4.", fix: "For AB2/A2B: Ksp = 4s^3; for AB3: Ksp = 27s^4; for A2B3: Ksp = 108s^5." },
+              { title: "Buffer Capacity Maximum Condition", lure: "Assuming buffer works best when [Salt]/[Acid] = 10.", fix: "Maximum buffer capacity occurs at [Salt] = [Acid] (pH = pKa), effective within pKa +/- 1." },
+              { title: "Salt Hydrolysis pH of Weak Acid + Weak Base", lure: "Making pH depend on concentration C.", fix: "For WA + WB salt (e.g. CH3COONH4), pH = 7 + 1/2(pKa - pKb), completely independent of concentration C." },
+              { title: "Ostwald Dilution Law Validity", lure: "Applying alpha = sqrt(Ka/C) when alpha > 0.1.", fix: "If sqrt(Ka/C) > 0.1, solve the exact quadratic Ka = C*alpha^2 / (1 - alpha)." },
+              { title: "Temperature Effect on Ionic Product Kw", lure: "Assuming neutral water always has pH = 7 at 60 C.", fix: "Water dissociation is endothermic: at 60 C, Kw ~ 10^-13, so neutral water has pH = pOH = 6.5." },
+              { title: "Reversing or Multiplying Equilibrium Equation", lure: "Multiplying K by n instead of raising K^n.", fix: "Multiplying equation by n -> K_new = K^n; reversing equation -> K_new = 1/K." },
+              { title: "Common Ion Effect on Ksp Value", lure: "Changing Ksp when NaCl is added to AgCl.", fix: "Common ion lowers molar solubility s, but Ksp is a thermodynamic constant that changes ONLY with temperature." },
+              { title: "Conjugate Acid-Base Ka * Kb Relation", lure: "Using Ka + Kb = 14 instead of pKa + pKb = 14.", fix: "For a conjugate acid-base pair at 25 C: Ka * Kb = Kw = 10^-14 => pKa + pKb = 14." }
+            ]
+          },
+          {
+            chapter: "Electrochemistry & Chemical Kinetics",
+            traps: [
+              { title: "Standard Electrode Potential E0 is Intensive", lure: "Doubling E0 when cell reaction is multiplied by 2.", fix: "E0 is an intensive property (never multiplied by stoichiometric coefficients), whereas Delta_G0 = -nFE0 is extensive." },
+              { title: "Nernst Equation Log Base & 0.0591 Factor", lure: "Using 0.0591 with natural log ln(Q) instead of log10(Q).", fix: "At 298 K: E = E0 - (0.0591 / n) * log10(Q)." },
+              { title: "Cathode vs. Anode Sign in Galvanic vs. Electrolytic", lure: "Defining cathode by + or - sign instead of redox.", fix: "Oxidation ALWAYS occurs at Anode; Reduction ALWAYS occurs at Cathode (in both galvanic and electrolytic cells)." },
+              { title: "Electrolysis of Aqueous NaCl Products", lure: "Producing Na metal and O2 gas at electrodes.", fix: "In aqueous NaCl, H2O reduces to H2(g) at cathode, and Cl- oxidizes to Cl2(g) at anode (overpotential effect)." },
+              { title: "Molar Conductivity vs. Specific Conductivity on Dilution", lure: "Assuming both kappa and Lambda_m increase on dilution.", fix: "Specific conductance kappa decreases on dilution (fewer ions/mL), while molar conductivity Lambda_m increases." },
+              { title: "Zero-Order vs. First-Order Half-Life Dependence", lure: "Assuming t_1/2 is independent of [A]_0 for all orders.", fix: "Zero order: t_1/2 = [A]_0 / 2k; First order: t_1/2 = 0.693 / k (independent of [A]_0); Second order: t_1/2 = 1 / (k[A]_0)." },
+              { title: "First-Order Gas Phase Total Pressure Formula", lure: "Plugging total pressure P_t directly as reactant pressure.", fix: "For A(g) -> B(g) + C(g), P_A = 2P_0 - P_t, so k = (2.303/t) log10[P_0 / (2P_0 - P_t)]." },
+              { title: "Arrhenius Plot Slope Sign", lure: "Taking slope of ln(k) vs. 1/T as +Ea/R.", fix: "ln(k) = ln(A) - (Ea/R)(1/T), so the slope is negative: -Ea / R (or -Ea / 2.303R for log10)." },
+              { title: "Catalyst Effect on Delta_H and Equilibrium Constant", lure: "Assuming catalyst increases equilibrium yield or Delta_H.", fix: "Catalyst lowers Ea for forward and reverse equally -> faster equilibrium, zero change in Delta_H, Delta_G, or K_eq." },
+              { title: "Molecularity vs. Order of Reaction", lure: "Allowing molecularity to be zero or fractional.", fix: "Order is experimental (can be 0, fractional, negative); molecularity applies only to elementary steps (positive integer 1, 2, 3)." },
+              { title: "Faraday's First Law Charge Calculation", lure: "Using current in mA or time in minutes.", fix: "Q (Coulombs) = I (Amperes) * t (seconds); 1 Faraday = 96,500 C deposits 1 gram-equivalent." },
+              { title: "Kohlrausch Law for Weak Electrolyte Lambda_m0", lure: "Extrapolating Lambda_m vs sqrt(C) linearly for CH3COOH.", fix: "Strong electrolytes extrapolate linearly; weak electrolytes require Kohlrausch's Law: Lambda0(CH3COOH) = Lambda0(CH3COONa) + Lambda0(HCl) - Lambda0(NaCl)." }
+            ]
+          },
+          {
+            chapter: "Organic Mechanisms & Named Reactions",
+            traps: [
+              { title: "Anisole Cleavage with HI (1 Equiv)", lure: "Forming iodobenzene + methanol.", fix: "Aryl-O bond has partial double-bond character: cleavage gives Phenol + CH3I (never iodobenzene)." },
+              { title: "Carbocation Rearrangement in SN1 & E1", lure: "Attaching nucleophile without checking 1,2-hydride/methyl shift.", fix: "Whenever a 1 deg or 2 deg carbocation forms next to a 3 deg/4 deg carbon, 1,2-shift occurs before nucleophile attack." },
+              { title: "SN2 Inversion vs. Retention of Configuration", lure: "Assuming chiral center always switches R to S.", fix: "SN2 gives 100% backside inversion of stereochemistry, though CIP priority rules may keep R/S label same or flip it." },
+              { title: "Hoffmann Bromamide Degradation Carbon Count", lure: "Keeping same number of carbons in product amine.", fix: "R-CONH2 + Br2 + 4KOH -> R-NH2 (product primary amine has ONE carbon less than parent amide)." },
+              { title: "Aldol vs. Cannizzaro Alpha-Hydrogen Requirement", lure: "Running Cannizzaro on acetaldehyde (CH3CHO).", fix: "Alpha-H present -> Aldol condensation; NO alpha-H (HCHO, PhCHO, R3C-CHO) -> Cannizzaro disproportionation." },
+              { title: "Reimer-Tiemann Electrophile Identity", lure: "Thinking chloroform acts as a nucleophile.", fix: "CHCl3 + OH- generates neutral singlet dichlorocarbene (:CCl2) electrophile -> ortho-salicylaldehyde major." },
+              { title: "Gabriel Phthalimide Synthesis Limitation", lure: "Using Gabriel synthesis to prepare aniline.", fix: "Aryl halides do not undergo SN2 with potassium phthalimide -> prepares ONLY pure aliphatic primary amines." },
+              { title: "Anti-Markovnikov Peroxide Effect Scope", lure: "Applying peroxide effect to HCl and HI.", fix: "Kharasch peroxide radical addition works ONLY with HBr (for HCl and HI, one propagation step is endothermic)." },
+              { title: "Grignard Reagent with Acidic Proton Sources", lure: "Getting nucleophilic addition in presence of -OH, -NH, or -SH.", fix: "RMgX reacts faster as a base with any active H (H2O, ROH, RCOOH, terminal alkyne) to form alkane R-H." },
+              { title: "Sandmeyer vs. Gattermann Reagent Difference", lure: "Confusing Cu2Cl2/HCl with Cu powder/HCl.", fix: "Sandmeyer uses Cu2X2/HX (higher yield); Gattermann uses Cu powder/HX." },
+              { title: "Lucas Test Reactivity Order", lure: "Thinking primary alcohol gives immediate turbidity.", fix: "3 deg alcohol -> immediate turbidity; 2 deg -> 5 mins; 1 deg -> no turbidity at room temperature." },
+              { title: "Ozonolysis Reductive vs. Oxidative Workup", lure: "Stopping at aldehyde when H2O2 is present.", fix: "Zn/H2O or Me2S gives aldehydes/ketones; H2O2 oxidizes aldehydes further to carboxylic acids." }
+            ]
+          },
+          {
+            chapter: "Chemical Bonding & Coordination Compounds",
+            traps: [
+              { title: "O2, O2+, O2-, O2^2- Bond Order & Magnetism", lure: "Assuming O2 is diamagnetic because it has even electrons (16).", fix: "MOT places 2 unpaired electrons in pi*2p -> O2 is paramagnetic (BO = 2.0); O2^2- is diamagnetic (BO = 1.0)." },
+              { title: "Bent's Rule & Lone Pair Position in Trigonal Bipyramidal", lure: "Placing lone pairs in axial positions of SF4 or ClF3.", fix: "In sp3d (TBP), lone pairs ALWAYS occupy equatorial positions to minimize 90-degree repulsions." },
+              { title: "Back Bonding in BF3 vs. BCl3 vs. BBr3 Lewis Acidity", lure: "Ranking BF3 as strongest Lewis acid due to F electronegativity.", fix: "2p-2p back bonding in BF3 reduces electron deficiency -> Lewis acid strength: BI3 > BBr3 > BCl3 > BF3." },
+              { title: "Strong Field vs. Weak Field Ligand Pairing in d4-d7", lure: "Pairing electrons in [FeF6]^3- or [CoF6]^3-.", fix: "F- is weak field (Delta_o < P) -> high spin; CN-, CO, en are strong field (Delta_o > P) -> low spin." },
+              { title: "Square Planar [Ni(CN)4]^2- vs. Tetrahedral [NiCl4]^2-", lure: "Assigning sp3 to [Ni(CN)4]^2-.", fix: "[Ni(CN)4]^2- is dsp2 square planar (diamagnetic); [NiCl4]^2- is sp3 tetrahedral (paramagnetic, 2 unpaired e-)." },
+              { title: "Geometrical Isomerism in Tetrahedral Complexes", lure: "Counting cis/trans isomers for [Ma2b2] tetrahedral.", fix: "Tetrahedral complexes NEVER show geometrical isomerism because all 4 positions are adjacent (109.5 deg)." },
+              { title: "Jahn-Teller Distortion in Octahedral Complexes", lure: "Expecting strong distortion in t2g^3 or t2g^6.", fix: "Strong Jahn-Teller elongation occurs when eg orbitals are asymmetrically filled (d9 Cu^2+, high-spin d4 Cr^2+)." },
+              { title: "Dipole Moment of NH3 vs. NF3", lure: "Giving NF3 higher dipole moment because F is more electronegative.", fix: "In NH3, lone pair and N-H dipoles reinforce (1.47 D); in NF3, they oppose (0.23 D)." },
+              { title: "Chelate Effect Entropic Stability", lure: "Attributing chelate stability solely to enthalpy.", fix: "Polydentate ligands (en, EDTA) release more solvent/ligand molecules -> large positive Delta_S drives stability." },
+              { title: "EAN (Effective Atomic Number) Rule", lure: "Forgetting to subtract oxidation state before adding 2 * CN.", fix: "EAN = Z - (Oxidation State) + 2 * (Coordination Number)." },
+              { title: "Ambidentate Ligands Linkage Isomerism", lure: "Missing NO2- (nitro/nitrito) or SCN- (thiocyanato/isothiocyanato).", fix: "Linkage isomerism occurs whenever a monodentate ligand has two different donor atoms." },
+              { title: "Ortho-Nitrophenol vs. Para-Nitrophenol Boiling Point", lure: "Giving ortho-nitrophenol higher boiling point.", fix: "Ortho-nitrophenol has intramolecular H-bonding (steam volatile, lower bp); para-nitrophenol has intermolecular H-bonding (higher bp)." }
+            ]
+          }
+        ],
+        MATHEMATICS: [
+          {
+            chapter: "Definite Integration & Differential Equations",
+            traps: [
+              { title: "King's Property f(a + b - x) Identification", lure: "Expanding sin^n(x)/(sin^n(x)+cos^n(x)) via substitution.", fix: "Whenever I = integral_a^b f(x)dx has symmetry f(a+b-x), add I + I = integral_a^b [f(x)+f(a+b-x)]dx -> instant (b-a)/2." },
+              { title: "Even vs. Odd Function on Symmetric Limits [-a, a]", lure: "Integrating odd functions manually or forgetting to split.", fix: "Check f(-x): if f(-x) = -f(x), integral on [-a, a] is immediately 0; if f(-x) = f(x), it is 2 * integral_0^a f(x)dx." },
+              { title: "Leibniz Rule Variable Limits Derivative", lure: "Forgetting chain rule g'(x) when differentiating integral limits.", fix: "d/dx [integral_{h(x)}^{g(x)} f(t)dt] = f(g(x))*g'(x) - f(h(x))*h'(x)." },
+              { title: "Modulus & Greatest Integer Function [x] Splitting", lure: "Integrating |x - c| or [x] across discontinuities without splitting.", fix: "Break the interval at every integer (for [x]) and every root (for |x - c|)." },
+              { title: "Integrating Factor Sign in Linear DE dy/dx + Py = Q", lure: "Dropping negative sign in P(x) when computing e^(integral P dx).", fix: "Include the sign of P(x) in IF = e^(integral P(x)dx), and write y * (IF) = integral Q * (IF) dx + C." },
+              { title: "Order vs. Degree of Differential Equation", lure: "Defining degree when derivatives are inside sin(dy/dx) or e^(y').", fix: "Order is always defined; degree is defined ONLY when the DE is a polynomial equation in derivatives." },
+              { title: "Area Under Curve Below X-Axis Sign", lure: "Letting negative definite integral cancel positive area.", fix: "Geometric area is always positive: Area = integral_a^b |y| dx." },
+              { title: "Substitution Limit Change Trap", lure: "Evaluating new antiderivative at old x-limits.", fix: "Either convert limits to u-values immediately or back-substitute u = g(x) before applying original limits." },
+              { title: "Periodic Function Definite Integral Property", lure: "Ignoring period T in integral_0^{nT} f(x) dx.", fix: "If f(x + T) = f(x), then integral_0^{nT} f(x)dx = n * integral_0^T f(x)dx." },
+              { title: "Bernoulli DE Reduction to Linear Form", lure: "Dividing by y^n without substituting v = y^(1-n).", fix: "Divide dy/dx + Py = Q y^n by y^n and set v = y^(1-n) -> dv/dx + (1-n)Pv = (1-n)Q." },
+              { title: "Walli's Formula Odd vs. Even Power pi/2 Factor", lure: "Multiplying by pi/2 when n is odd in integral_0^{pi/2} sin^n(x)dx.", fix: "Multiply by pi/2 ONLY when n is EVEN; when n is odd, the final factor is 1." },
+              { title: "Arbitrary Constants Count in General Solution", lure: "Leaving extra constants in an n-th order DE.", fix: "General solution of an n-th order ODE contains exact n independent arbitrary constants." }
+            ]
+          },
+          {
+            chapter: "Matrices, Determinants & Vectors",
+            traps: [
+              { title: "Scalar Factor in Determinant |kA|", lure: "Writing |kA| = k|A| for an n x n matrix.", fix: "Every row contributes a factor k: |kA| = k^n |A| for an n x n matrix." },
+              { title: "Adjoint Determinant |adj(A)| Power", lure: "Using |adj(A)| = |A|^n instead of |A|^(n-1).", fix: "For an n x n invertible matrix: |adj(A)| = |A|^(n-1), and |adj(adj(A))| = |A|^((n-1)^2)." },
+              { title: "Matrix Multiplication Non-Commutativity in (A+B)^2", lure: "Expanding (A + B)^2 = A^2 + 2AB + B^2.", fix: "(A + B)^2 = A^2 + AB + BA + B^2; equals A^2 + 2AB + B^2 ONLY if AB = BA." },
+              { title: "Reversal Law for Transpose & Inverse", lure: "Writing (AB)^-1 = A^-1 B^-1.", fix: "(AB)^-1 = B^-1 A^-1 and (AB)^T = B^T A^T (order always reverses)." },
+              { title: "Skew-Symmetric Odd-Order Determinant", lure: "Expanding a 3x3 or 5x5 skew-symmetric determinant manually.", fix: "Determinant of ANY odd-order skew-symmetric matrix is ALWAYS 0." },
+              { title: "Cramer's Rule Delta = 0 Consistency Check", lure: "Concluding no solution whenever Delta = 0.", fix: "If Delta = 0 and all Delta_i = 0, system can have infinitely many solutions (check rank/planes)." },
+              { title: "Scalar Triple Product [a b c] Coplanarity", lure: "Checking a . b = 0 for coplanarity.", fix: "Three vectors a, b, c are coplanar iff their scalar triple product [a b c] = 0." },
+              { title: "Vector Triple Product a x (b x c) Expansion", lure: "Confusing bracket order in BAC - CAB rule.", fix: "a x (b x c) = (a . c)b - (a . b)c (middle vector minus outer vector)." },
+              { title: "Projection of Vector a on Vector b", lure: "Dividing by |a| instead of |b|.", fix: "Scalar projection of a onto b is (a . b) / |b| (divide by magnitude of target vector b)." },
+              { title: "Shortest Distance Between Skew vs. Parallel Lines", lure: "Using |(a2 - a1) . (b1 x b2)| / |b1 x b2| when b1 || b2.", fix: "When b1 x b2 = 0 (parallel lines), shortest distance is |(a2 - a1) x b| / |b|." },
+              { title: "Trace of Matrix Product tr(AB) = tr(BA)", lure: "Assuming tr(ABC) = tr(ACB).", fix: "Trace is invariant under cyclic permutations: tr(ABC) = tr(BCA) = tr(CAB), NOT arbitrary swaps." },
+              { title: "Area of Triangle vs. Parallelogram Using Cross Product", lure: "Forgetting 1/2 factor for triangle area.", fix: "Parallelogram area = |a x b|; Triangle area = 1/2 |a x b|." }
+            ]
+          },
+          {
+            chapter: "Limits, Continuity & Differentiability",
+            traps: [
+              { title: "1^infinity Indeterminate Form Formula", lure: "Evaluating lim f(x)^g(x) as 1 when f(x) -> 1 and g(x) -> infinity.", fix: "For 1^infinity form, limit = exp(lim [f(x) - 1] * g(x))." },
+              { title: "L'Hopital's Rule Non-0/0 Application", lure: "Differentiating numerator/denominator when limit is NOT 0/0 or inf/inf.", fix: "Verify 0/0 or inf/inf BEFORE every single application of L'Hopital's Rule." },
+              { title: "Limit of sin(x)/x as x -> infinity", lure: "Writing lim_{x -> infinity} sin(x)/x = 1.", fix: "sin(x)/x -> 1 ONLY as x -> 0; as x -> infinity, |sin(x)| <= 1 so sin(x)/x -> 0." },
+              { title: "Differentiability of |f(x)| at Simple Roots", lure: "Assuming |x - a| is differentiable because it is continuous.", fix: "|x - a| is continuous everywhere, but non-differentiable at sharp corner x = a (LHD = -1 != RHD = +1)." },
+              { title: "Continuity Does Not Imply Differentiability", lure: "Skipping LHD = RHD check once LHL = RHL = f(a) holds.", fix: "Differentiability implies continuity, but continuous functions (like |x| or x^(1/3)) can fail differentiability." },
+              { title: "Rolle's & Lagrange MVT Open vs. Closed Interval", lure: "Requiring differentiability at endpoints [a, b].", fix: "MVT requires continuity on closed [a, b] and differentiability on open (a, b)." },
+              { title: "Inverse Function Derivative (f^-1)'(y)", lure: "Evaluating 1 / f'(y) instead of 1 / f'(x).", fix: "If f(a) = b, then (f^-1)'(b) = 1 / f'(a) (evaluate denominator at x = a, NOT b)." },
+              { title: "Logarithmic Differentiation for f(x)^g(x)", lure: "Using power rule g(x) * f(x)^(g(x)-1) * f'(x).", fix: "When both base and exponent depend on x, take ln(y) = g(x) ln(f(x)) before differentiating." },
+              { title: "Standard Exponential Limit (1 + a/x)^(bx)", lure: "Missing product a*b in exponent.", fix: "lim_{x -> infinity} (1 + a/x)^(bx) = e^(ab)." },
+              { title: "Point of Inflection Second Derivative Sign Change", lure: "Declaring inflection wherever f''(x) = 0.", fix: "f''(x) = 0 (or undefined) is necessary, AND f''(x) MUST change sign across that point." },
+              { title: "Local Extrema at Critical Points Where f'(x) DNE", lure: "Checking only f'(x) = 0 and ignoring sharp corners.", fix: "Critical points include BOTH f'(x) = 0 AND points in domain where f'(x) does not exist." },
+              { title: "Parametric Second Derivative d^2y/dx^2", lure: "Writing (d^2y/dt^2) / (d^2x/dt^2).", fix: "d^2y/dx^2 = [d/dt (dy/dx)] / (dx/dt) (must divide by dx/dt a second time)." }
+            ]
+          },
+          {
+            chapter: "Conic Sections, Sequences & Probability",
+            traps: [
+              { title: "AM >= GM Inequality Positive Numbers Condition", lure: "Applying AM >= GM to negative or zero variables.", fix: "AM >= GM holds strictly for POSITIVE real numbers only." },
+              { title: "Infinite GP Sum |r| < 1 Condition", lure: "Using a / (1 - r) when |r| >= 1.", fix: "Infinite geometric series converges ONLY when -1 < r < 1." },
+              { title: "Focal Distance of Point on Parabola y^2 = 4ax", lure: "Using x1 instead of x1 + a.", fix: "Focal distance SP = PM = x1 + a for y^2 = 4ax." },
+              { title: "Ellipse a > b vs. b > a Eccentricity Swap", lure: "Always using b^2 = a^2(1 - e^2) when b > a.", fix: "Always divide smaller semi-axis squared by larger semi-axis squared: e = sqrt(1 - minor^2 / major^2)." },
+              { title: "Hyperbola Eccentricity Sign", lure: "Using 1 - b^2/a^2 instead of 1 + b^2/a^2.", fix: "For hyperbola, e > 1 and e = sqrt(1 + b^2 / a^2)." },
+              { title: "Director Circle Radius for Ellipse & Hyperbola", lure: "Using a^2 + b^2 for hyperbola director circle.", fix: "Ellipse director circle: x^2 + y^2 = a^2 + b^2; Hyperbola director circle: x^2 + y^2 = a^2 - b^2 (real only if a > b)." },
+              { title: "Independent vs. Mutually Exclusive Events", lure: "Confusing P(A cap B) = 0 with P(A cap B) = P(A)P(B).", fix: "Two non-empty mutually exclusive events can NEVER be independent." },
+              { title: "Bayes' Theorem Denominator Partition", lure: "Forgetting one mutually exclusive path in total probability.", fix: "Sum P(E_i) * P(A | E_i) over ALL exhaustive partitions in the denominator." },
+              { title: "Binomial Distribution Variance vs. Mean", lure: "Writing Variance = np instead of npq.", fix: "For Binomial(n, p): Mean = np, Variance = npq (always Mean > Variance since q < 1)." },
+              { title: "Number of Terms in (x + y + z)^n Multinomial", lure: "Using n + 1 instead of (n + 1)(n + 2)/2.", fix: "Number of distinct terms in (x1 + x2 + ... + xk)^n is C(n + k - 1, k - 1)." },
+              { title: "Circular Permutation Necklace vs. Table", lure: "Using (n - 1)! when clockwise/anticlockwise are identical.", fix: "Seated people: (n - 1)!; Beads in a necklace/garland: (n - 1)! / 2." },
+              { title: "AGP (Arithmetico-Geometric Series) Multiplication", lure: "Subtracting S - rS without shifting terms by one slot.", fix: "Multiply S by common ratio r, shift right by 1 term, and subtract (1 - r)S." }
+            ]
+          }
+        ]
+      };
+    } else {
+      return {
+        BOTANY: [
+          {
+            chapter: "Molecular Basis of Inheritance",
+            traps: [
+              { title: "Chargaff's Rule Single-Stranded vs. Double-Stranded DNA", lure: "Applying %A = %T and %G = %C to ssDNA or RNA.", fix: "Chargaff's rule (%A = %T, %G = %C, A+G = 50%) holds ONLY for double-stranded DNA." },
+              { title: "Template (3'->5') vs. Coding (5'->3') Strand Polarity", lure: "Transcribing mRNA sequence from coding strand with T->U without checking polarity.", fix: "RNA polymerase reads template strand 3'->5' and synthesizes mRNA 5'->3' (same sequence as coding strand with U replacing T)." },
+              { title: "Leading vs. Lagging Strand Replication Direction", lure: "Assuming DNA polymerase synthesizes 3'->5' on lagging strand.", fix: "ALL DNA polymerases synthesize strictly in 5'->3' direction; lagging strand is simply made discontinuously as Okazaki fragments." },
+              { title: "AUG Dual Role & Stop Codon Count", lure: "Counting AUG as a stop codon or forgetting its dual role.", fix: "AUG codes for Methionine AND acts as initiator codon; UAA, UAG, UGA are the 3 stop codons (code for no amino acid)." },
+              { title: "Lac Operon Inducer Identity (Allolactose/Lactose)", lure: "Thinking glucose induces the lac operon.", fix: "Lactose/allolactose binds the repressor to induce transcription; high glucose actually lowers cAMP and reduces lac expression." },
+              { title: "Eukaryotic RNA Polymerases I, II, III", lure: "Assigning mRNA synthesis to RNA Pol I.", fix: "RNA Pol I -> rRNAs (28S, 18S, 5.8S); RNA Pol II -> hnRNA/mRNA; RNA Pol III -> tRNA, 5S rRNA, snRNAs." },
+              { title: "Histone Basic Amino Acids (Lysine & Arginine)", lure: "Calling histones acidic or rich in glutamate/aspartate.", fix: "Histones are positively charged basic proteins rich in Lysine and Arginine residues." },
+              { title: "Hershey-Chase Radioactive Labels (32P vs. 35S)", lure: "Swapping 32P to protein and 35S to DNA.", fix: "DNA contains Phosphorus (32P) and no sulfur; Protein coat contains Sulfur (35S) and no phosphorus." },
+              { title: "VNTR Satellite DNA in DNA Fingerprinting", lure: "Using coding exons instead of non-coding VNTRs.", fix: "Alec Jeffreys' DNA fingerprinting uses non-coding repetitive VNTR (minisatellite) sequences." },
+              { title: "Splicing Removes Introns, Joins Exons", lure: "Saying exons are removed during hnRNA processing.", fix: "Introns (intervening non-coding) are spliced out; Exons (expressed) are joined together with 5'-methylguanosine cap and 3'-poly-A tail." },
+              { title: "Okazaki Fragment Primer Composition", lure: "Assuming DNA primer initiates replication.", fix: "Primase lays down a short RNA primer first, which is later replaced with DNA by DNA Polymerase I." },
+              { title: "Human Genome Project Largest Gene & Chromosome", lure: "Confusing Chromosome 1 with Y chromosome gene count.", fix: "Chromosome 1 has most genes (2,968); Y chromosome has fewest (231); Dystrophin is the largest human gene (2.4 million bases)." }
+            ]
+          },
+          {
+            chapter: "Cell Cycle, Cell Division & Biomolecules",
+            traps: [
+              { title: "S-Phase DNA Doubles (2C->4C), Chromosome Number Stays 2n", lure: "Doubling chromosome number during S-phase.", fix: "In S-phase, DNA content doubles (2C -> 4C), while chromosome number remains constant (2n -> 2n)." },
+              { title: "Centromere Splitting: Anaphase vs. Anaphase I vs. Anaphase II", lure: "Splitting centromeres in Anaphase I of Meiosis.", fix: "Homologous chromosomes separate in Anaphase I (centromeres do NOT split); centromeres split in Mitotic Anaphase and Meiotic Anaphase II." },
+              { title: "Crossing Over Stage: Pachytene of Prophase I", lure: "Placing crossing over in Zygotene or Diplotene.", fix: "Synapsis = Zygotene; Crossing over (recombinase) = Pachytene; Chiasmata X-shape visible = Diplotene; Terminalisation = Diakinesis." },
+              { title: "G0 Quiescent Stage Metabolic Activity", lure: "Thinking cells in G0 are metabolically dead/inactive.", fix: "G0 cells (heart/nerve cells) exit proliferation but remain metabolically active." },
+              { title: "Zwitterion Net Charge at Isoelectric Point", lure: "Assigning +1 or -1 net charge to zwitterion.", fix: "At isoelectric pH, zwitterion has both -NH3+ and -COO-, giving net charge = 0." },
+              { title: "Competitive vs. Non-Competitive Enzyme Inhibition", lure: "Increasing Km and lowering Vmax for competitive inhibitor.", fix: "Competitive inhibitor (malonate on succinate dehydrogenase) increases Km while Vmax stays unchanged." },
+              { title: "Most Abundant Protein in Biosphere vs. Animal World", lure: "Confusing Collagen and RuBisCO.", fix: "RuBisCO is the most abundant protein in the whole biosphere; Collagen is the most abundant protein in the animal world." },
+              { title: "Reducing vs. Non-Reducing Sugars (Sucrose Trap)", lure: "Calling sucrose a reducing sugar.", fix: "Sucrose has glycosidic bond between C1 of glucose and C2 of fructose (no free aldehyde/ketone) -> NON-reducing sugar." },
+              { title: "Chitin Homopolymer of N-Acetylglucosamine", lure: "Calling chitin a heteropolymer or protein.", fix: "Chitin (fungal cell wall & arthropod exoskeleton) is a complex homopolymer of N-acetylglucosamine (NAG)." },
+              { title: "80S vs. 70S Ribosome Subunits", lure: "Adding 60S + 40S = 100S.", fix: "Eukaryotic 80S = 60S + 40S; Prokaryotic/Mitochondrial/Chloroplast 70S = 50S + 30S (Svedberg sedimentation is non-additive)." },
+              { title: "Endomembrane System Organelle Inclusion", lure: "Including mitochondria, chloroplasts, or peroxisomes.", fix: "Endomembrane system includes ONLY ER, Golgi complex, lysosomes, and vacuoles (coordinated function)." },
+              { title: "Middle Lamella Calcium Pectate Composition", lure: "Assigning cellulose or suberin to middle lamella.", fix: "Middle lamella glues adjacent plant cells together and is made primarily of Calcium pectate." }
+            ]
+          },
+          {
+            chapter: "Plant Physiology & Ecology",
+            traps: [
+              { title: "C4 Plants Lack Photorespiration (Kranz Anatomy)", lure: "Placing RuBisCO in mesophyll cells of C4 leaves.", fix: "In C4 plants (maize, sorghum), PEPcase is in mesophyll cells; RuBisCO is exclusively in bundle sheath cells (high CO2 prevents photorespiration)." },
+              { title: "ATP & NADPH Required per CO2 Fixed in C3 vs. C4", lure: "Using 3 ATP + 2 NADPH for C4 plants.", fix: "C3 cycle uses 3 ATP + 2 NADPH per CO2 (18 ATP + 12 NADPH per glucose); C4 uses 5 ATP + 2 NADPH per CO2 (30 ATP + 12 NADPH per glucose)." },
+              { title: "Cyclic vs. Non-Cyclic Photophosphorylation Products", lure: "Generating NADPH or O2 in cyclic photophosphorylation.", fix: "Cyclic photophosphorylation (PS I only, stroma lamellae) produces ONLY ATP—no NADPH and no O2 evolution." },
+              { title: "Chemiosmotic Proton Accumulation: Thylakoid Lumen vs. Mitochondrial Matrix", lure: "Accumulating H+ in chloroplast stroma.", fix: "In chloroplasts, H+ accumulates inside the thylakoid lumen; in mitochondria, H+ accumulates in the intermembrane space." },
+              { title: "Net ATP Yield in Aerobic Respiration (38 vs. 36)", lure: "Forgetting 2 ATP spent in glycolysis.", fix: "Glycolysis nets 2 ATP + 2 NADH; complete aerobic oxidation yields 38 ATP (prokaryotes/heart) or 36 ATP (malate-aspartate/glycerol shuttle)." },
+              { title: "RQ (Respiratory Quotient) of Fats, Proteins & Organic Acids", lure: "Assigning RQ = 1 to tripalmitin fat.", fix: "Carbohydrates RQ = 1.0; Fats (tripalmitin) RQ = 0.7 (< 1); Proteins RQ = 0.9; Organic acids RQ > 1." },
+              { title: "Auxin vs. Cytokinin Apical Dominance & Tissue Culture", lure: "Using high auxin to promote shoot formation.", fix: "High auxin : cytokinin ratio -> Root initiation; High cytokinin : auxin ratio -> Shoot bud initiation & overcomes apical dominance." },
+              { title: "Gibberellin Bolting vs. Abscisic Acid Stress Hormone", lure: "Calling ethylene a growth promoter only.", fix: "Gibberellins cause bolting (internode elongation) and malting; ABA closes stomata under water stress and induces seed dormancy." },
+              { title: "10% Energy Law & Inverted Pyramid of Biomass in Sea", lure: "Assuming all ecological pyramids are always upright.", fix: "Pyramid of energy is ALWAYS upright; Pyramid of biomass in sea/ocean is INVERTED (zooplankton biomass > phytoplankton standing crop)." },
+              { title: "GPP vs. NPP Equation", lure: "Writing GPP = NPP - R.", fix: "NPP = GPP - R (Net Primary Productivity = Gross Primary Productivity minus Respiration losses)." },
+              { title: "Species-Area Relationship Slope Z Value", lure: "Using Z = 1.15 for normal regional areas.", fix: "For small/regional areas Z = 0.1–0.2; for entire continents Z = 0.6–1.2 (frugivorous birds/mammals Z = 1.15)." },
+              { title: "In-Situ vs. Ex-Situ Biodiversity Conservation", lure: "Classifying botanical gardens or seed banks as in-situ.", fix: "National parks, biosphere reserves, sacred groves = In-situ; Zoological parks, botanical gardens, cryopreservation, seed banks = Ex-situ." }
+            ]
+          }
+        ],
+        ZOOLOGY: [
+          {
+            chapter: "Human Physiology & Circulation",
+            traps: [
+              { title: "SA Node Pacemaker Rate & Cardiac Cycle 0.8s", lure: "Assigning 0.8s to atrial systole.", fix: "Cardiac cycle = 0.8s (at 75 bpm): Atrial systole = 0.1s, Ventricular systole = 0.3s, Joint diastole = 0.4s." },
+              { title: "Lubb vs. Dubb Heart Sound Valve Closure", lure: "Linking Lubb to semilunar valves.", fix: "First sound 'Lubb' = closure of tricuspid & bicuspid (AV) valves; Second sound 'Dubb' = closure of semilunar valves." },
+              { title: "Fetal Erythroblastosis Foetalis Rh Incompatibility", lure: "Occurring when mother is Rh+ and fetus is Rh-.", fix: "Occurs ONLY when mother is Rh-negative and fetus is Rh-positive (affects 2nd Rh+ pregnancy unless anti-D antibodies given)." },
+              { title: "Oxygen Dissociation Curve Right Shift Factors", lure: "Shifting O2 curve right at high pH or low temperature.", fix: "Right shift (O2 unloading in tissues) is caused by HIGH pCO2, HIGH [H+] (low pH), HIGH 2,3-BPG, and HIGH temperature." },
+              { title: "CO2 Transport Percentage Breakdown", lure: "Saying most CO2 travels as carbamino-haemoglobin.", fix: "~70% of CO2 is transported as Bicarbonate (HCO3-), 20–25% as carbamino-Hb, and ~7% dissolved in plasma." },
+              { title: "Juxtaglomerular Apparatus (JGA) & RAAS Activation", lure: "Thinking ANF activates RAAS.", fix: "Low GFR/BP triggers JG cells to release Renin -> Angiotensin II -> Aldosterone (raises BP); ANF from atria opposes RAAS (vasodilation)." },
+              { title: "Counter-Current Multiplier: Henle's Loop vs. Vasa Recta", lure: "Making descending limb permeable to NaCl.", fix: "Descending limb of Henle is permeable ONLY to water; Ascending limb is impermeable to water and actively transports NaCl." },
+              { title: "Resting Membrane Potential & Depolarization Ions", lure: "Attributing depolarization to K+ efflux.", fix: "Resting potential (-70 mV) maintained by Na+/K+ pump (3 Na+ out, 2 K+ in); Depolarization = rapid Na+ influx; Repolarization = K+ efflux." },
+              { title: "Sarcomere Band Width During Muscle Contraction", lure: "Shortening the A-band during contraction.", fix: "During contraction, I-band and H-zone shorten, Z-lines come closer, while the A-band (myosin length) remains CONSTANT." },
+              { title: "Anterior vs. Posterior Pituitary Hormone Synthesis", lure: "Thinking posterior pituitary synthesizes oxytocin and ADH.", fix: "Oxytocin and ADH (vasopressin) are synthesized in the Hypothalamus and merely stored/released by the posterior pituitary." },
+              { title: "Steroid vs. Peptide Hormone Receptor Location", lure: "Placing steroid receptors on the plasma membrane.", fix: "Peptide hormones (insulin, FSH) bind membrane receptors (second messengers cAMP/IP3); Steroid & thyroid hormones bind intracellular/nuclear receptors." },
+              { title: "Organ of Corti Location & Otolith Equilibrium", lure: "Placing Organ of Corti in semicircular canals.", fix: "Organ of Corti (hearing) sits on the basilar membrane of the cochlea; Crista & Macula (vestibular apparatus) maintain balance." }
+            ]
+          },
+          {
+            chapter: "Human Reproduction & Reproductive Health",
+            traps: [
+              { title: "Spermatogenesis vs. Oogenesis Polar Body & Gamete Count", lure: "Producing 4 functional ova from 1 primary oocyte.", fix: "1 primary spermatocyte -> 4 functional haploid sperms; 1 primary oocyte -> 1 functional ovum + polar bodies." },
+              { title: "Meiosis II Completion in Human Oocyte", lure: "Completing Meiosis II before ovulation.", fix: "Primary oocyte arrests at Diplotene of Prophase I until puberty; Secondary oocyte arrests at Metaphase II and completes Meiosis II ONLY upon sperm entry." },
+              { title: "LH Surge Triggering Ovulation on Day 14", lure: "Attributing ovulation directly to progesterone surge.", fix: "Mid-cycle LH surge (Day 14) ruptures the Graafian follicle; Corpus luteum then secretes Progesterone to maintain endometrium." },
+              { title: "Placental vs. Ovarian Hormones in Pregnancy", lure: "Saying hCG, hPL, and relaxin are secreted in non-pregnant women.", fix: "hCG, hPL, and relaxin are produced ONLY during pregnancy (hCG & hPL by placenta; relaxin mainly by ovary)." },
+              { title: "Implantation Stage: Blastocyst at Day 7", lure: "Implanting as a 16-cell morula.", fix: "Implantation occurs at the Blastocyst stage (trophoblast attaches to endometrium, inner cell mass forms embryo)." },
+              { title: "Copper-Releasing vs. Hormone-Releasing IUDs", lure: "Saying CuT suppresses ovulation.", fix: "CuT, Cu7, Multiload 375 release Cu ions that suppress sperm motility & fertilizing capacity; LNG-20 & Progestasert make uterus unsuitable & cervix hostile." },
+              { title: "MTP Amendment Act Gestational Limits", lure: "Thinking MTP is illegal after 8 weeks.", fix: "MTP is safe in 1st trimester (up to 12 weeks) on 1 doctor's opinion, and permitted up to 24 weeks under specific medical grounds with 2 doctors' opinion." },
+              { title: "Amniocentesis Chromosomal Disorder Detection", lure: "Using amniocentesis to detect bacterial STIs.", fix: "Amniocentesis analyzes fetal cells in amniotic fluid for chromosomal abnormalities (Down, Klinefelter, Turner) and metabolic disorders." },
+              { title: "ZIFT vs. GIFT Embryo Transfer Site", lure: "Transferring >8-blastomere embryo into fallopian tube.", fix: "Zygote or up to 8 blastomeres -> Fallopian tube (ZIFT); >8 blastomeres -> Uterus (IUT); Ovum from donor into fallopian tube -> GIFT." },
+              { title: "Colostrum IgA Passive Immunity", lure: "Naming IgG as the antibody in colostrum.", fix: "Colostrum (first yellowish milk) is rich in IgA antibodies providing natural passive immunity to the newborn." },
+              { title: "Acrosomal Reaction Enzymes (Hyaluronidase)", lure: "Placing mitochondria in sperm head.", fix: "Sperm head has haploid nucleus + acrosome (digestive enzymes); middle piece has spiral mitochondria for tail motility." },
+              { title: "Curable vs. Non-Curable STIs in NCERT", lure: "Listing Hepatitis-B, Genital herpes, or HIV as curable.", fix: "Hepatitis-B, Genital herpes, and HIV infections are NOT completely curable (early detection helps manage them)." }
+            ]
+          },
+          {
+            chapter: "Biotechnology & Evolution",
+            traps: [
+              { title: "EcoRI Palindromic Recognition Sequence (5'-GAATTC-3')", lure: "Cutting between A and A instead of G and A.", fix: "EcoRI recognizes 5'-GAATTC-3' and cuts between G and A on both strands, creating sticky ends." },
+              { title: "Gel Electrophoresis DNA Migration Direction", lure: "Moving DNA fragments toward the negative cathode.", fix: "DNA is negatively charged (phosphate backbone) and moves toward the POSITIVE anode; smaller fragments move faster/farther." },
+              { title: "Insertional Inactivation of lacZ (Blue-White Screening)", lure: "Picking blue colonies as recombinants.", fix: "Recombinant plasmids disrupt beta-galactosidase (lacZ) -> WHITE colonies; non-recombinants retain intact enzyme -> BLUE colonies." },
+              { title: "PCR Taq Polymerase Thermostability Source", lure: "Using E. coli DNA polymerase in PCR.", fix: "PCR uses thermostable Taq polymerase isolated from Thermus aquaticus (survives 94 C denaturation step)." },
+              { title: "Downstream Processing Definition", lure: "Including gene cloning inside downstream processing.", fix: "Downstream processing refers strictly to separation and purification of the biosynthetic product AFTER fermentation." },
+              { title: "Bt Cotton Cry Genes (cryIAc & cryIIAb vs. cryIAb)", lure: "Using cryIAb for cotton bollworm.", fix: "cryIAc and cryIIAb control cotton bollworms; cryIAb controls corn borer." },
+              { title: "RNA Interference (RNAi) Double-Stranded RNA Silencing", lure: "Using RNAi to amplify nematode mRNA.", fix: "RNAi silences specific mRNA via complementary dsRNA (using Agrobacterium vectors against Meloidogyne incognita in tobacco)." },
+              { title: "ADA Deficiency First Gene Therapy (1990)", lure: "Giving permanent cure via mature lymphocyte infusion.", fix: "Mature lymphocytes have finite lifespan (require periodic infusion); permanent cure requires introducing ADA gene at early embryonic stage." },
+              { title: "Homologous vs. Analogous Organs Evolution Type", lure: "Calling sweet potato & potato homologous.", fix: "Homologous (forelimbs of whales/bats/humans, thorns of Bougainvillea & tendrils of Cucurbita) = Divergent evolution; Analogous (eye of octopus & mammal, sweet potato & potato) = Convergent evolution." },
+              { title: "Hardy-Weinberg Equilibrium p^2 + 2pq + q^2 = 1", lure: "Using q as frequency of homozygous recessive individuals.", fix: "q is recessive ALLELE frequency; q^2 is homozygous recessive GENOTYPE frequency; 2pq is heterozygous carrier frequency." },
+              { title: "Miller-Urey Experiment Gas Mixture (CH4, NH3, H2, H2O at 800 C)", lure: "Including free O2 in primitive reducing atmosphere.", fix: "Miller's flask contained CH4, NH3, H2 (2:1:2) and water vapor at 800 C with NO free O2 (reducing atmosphere)." },
+              { title: "Human Ancestor Cranial Capacity Order", lure: "Placing Homo habilis at 1400 cc.", fix: "Homo habilis (650–800 cc) -> Homo erectus (900 cc) -> Neanderthal man (1400 cc) -> Homo sapiens." }
+            ]
+          }
+        ]
+      };
+    }
+  }
+
+  window.toggleTrapMastered = function (trapKey) {
+    window._T6_TD_MASTERED[trapKey] = !window._T6_TD_MASTERED[trapKey];
+    window.renderScienceTab6();
+  };
+
   window.renderScienceTab6 = function (el) {
     const accent = IS_JEE ? "indigo" : "emerald";
     const target = getTarget(el);
     if (!target) return;
 
+    const catalog = getChapterTrapCatalog();
+    const subjects = Object.keys(catalog);
+    if (!catalog[window._T6_TD_SUBJ]) window._T6_TD_SUBJ = subjects[0];
+    const chapters = catalog[window._T6_TD_SUBJ] || [];
+    const chapIdx = Math.min(chapters.length - 1, Math.max(0, Number(window._T6_TD_CHAP_IDX || 0)));
+    const activeChap = chapters[chapIdx];
+
     const fullLogs = typeof getVerifiedFullMockLogs === "function" ? getVerifiedFullMockLogs() : [];
     const pracLogs = typeof getPracticeLogs === "function" ? getPracticeLogs() : [];
     const wrongItems = [];
-
     fullLogs.forEach(lg => {
       (lg.itemsAudit || []).forEach(it => {
         if (it.hasAns && !it.isCorrect) wrongItems.push({ source: "Full Mock", session: lg.sessionId, ...it });
@@ -1570,39 +1915,111 @@
       });
     });
 
+    const totalCatalogTraps = subjects.reduce((acc, s) => acc + catalog[s].reduce((a, c) => a + c.traps.length, 0), 0);
+    const masteredCount = Object.values(window._T6_TD_MASTERED).filter(Boolean).length;
+
     target.innerHTML = `
       <div class="max-w-7xl mx-auto pt-4 pb-10 space-y-5">
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <div class="text-xs font-extrabold uppercase tracking-wider text-${accent}-600">6. NEGATIVE-MARKING TRAP DOCTOR &amp; ERROR AUTOPSY</div>
-              <h2 class="text-2xl font-black text-slate-900 mt-0.5">${IS_JEE ? "JEE Main / Adv -1 Trap & Silly-Error Clinic" : "NEET UG NCERT Assertion-Reason & -1 Trap Clinic"}</h2>
+              <div class="text-xs font-extrabold uppercase tracking-wider text-${accent}-600">6. SUBJECT &amp; CHAPTER-WISE NTA TRAP DOCTOR (${totalCatalogTraps} VERIFIED TRAPS &bull; 12 PER CHAPTER)</div>
+              <h2 class="text-2xl font-black text-slate-900 mt-0.5">${IS_JEE ? "JEE Main / Adv Chapter-Wise -1 Trap Vault & Mock Autopsy" : "NEET UG NCERT Chapter-Wise -1 Trap Vault & Mock Autopsy"}</h2>
             </div>
-            <span class="px-3.5 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-extrabold">${wrongItems.length} Logged -1 Errors</span>
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" onclick="window._T6_TD_VIEW='LIBRARY'; window.renderScienceTab6();"
+                class="px-4 py-2 rounded-xl text-xs font-extrabold border cursor-pointer ${window._T6_TD_VIEW === "LIBRARY" ? `bg-${accent}-600 text-white border-${accent}-600` : "bg-slate-50 text-slate-700 border-slate-200"}">
+                Chapter Trap Vault (${totalCatalogTraps} Traps • ${masteredCount} Mastered)
+              </button>
+              <button type="button" onclick="window._T6_TD_VIEW='AUTOPSY'; window.renderScienceTab6();"
+                class="px-4 py-2 rounded-xl text-xs font-extrabold border cursor-pointer ${window._T6_TD_VIEW === "AUTOPSY" ? "bg-rose-600 text-white border-rose-600" : "bg-rose-50 text-rose-800 border-rose-200"}">
+                My Logged Mock -1 Errors (${wrongItems.length})
+              </button>
+            </div>
           </div>
-          <p class="text-xs text-slate-600">Automatically isolates every incorrect (-1) response across your submitted Full Mocks (Tab 4) and Subject Practice Mocks (Tab 5) so you can audit traps and eliminate negative marking.</p>
+
+          ${window._T6_TD_VIEW === "LIBRARY" ? `
+            <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+              <span class="text-[11px] font-extrabold uppercase text-slate-500 mr-1">Subject:</span>
+              ${subjects.map(s => `
+                <button type="button" onclick="window._T6_TD_SUBJ='${s}'; window._T6_TD_CHAP_IDX=0; window.renderScienceTab6();"
+                  class="px-4 py-2 rounded-xl text-xs font-extrabold border cursor-pointer ${window._T6_TD_SUBJ === s ? `bg-${accent}-600 text-white border-${accent}-600 shadow-sm` : "bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-400"}">
+                  ${s} (${catalog[s].length * 12} Traps)
+                </button>
+              `).join("")}
+            </div>
+          ` : ""}
         </div>
 
-        ${!wrongItems.length ? `
-          <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center space-y-2 shadow-sm">
-            <div class="text-base font-extrabold text-slate-800">Zero -1 Errors Recorded Yet</div>
-            <p class="text-xs text-slate-500">Submit a Full Mock in Tab 4 or a Subject Practice Mock in Tab 5 with any incorrect response to populate your personalized negative-marking autopsy here.</p>
+        ${window._T6_TD_VIEW === "LIBRARY" ? `
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <div class="lg:col-span-4 space-y-2.5">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-${accent}-600">${window._T6_TD_SUBJ} CHAPTERS (12 TRAPS EACH)</div>
+              ${chapters.map((ch, idx) => {
+                const chDone = ch.traps.filter((_, ti) => window._T6_TD_MASTERED[`${window._T6_TD_SUBJ}_${idx}_${ti}`]).length;
+                return `
+                  <button type="button" onclick="window._T6_TD_CHAP_IDX=${idx}; window.renderScienceTab6();"
+                    class="w-full text-left p-4 rounded-2xl border cursor-pointer ${idx === chapIdx ? `bg-${accent}-50 border-${accent}-500 shadow-sm` : "bg-white border-slate-200 hover:border-slate-300"}">
+                    <div class="flex items-center justify-between text-[10px] font-extrabold uppercase text-${accent}-600">
+                      <span>CHAPTER ${idx + 1} &bull; 12 NTA TRAPS</span>
+                      <span class="text-emerald-700">${chDone}/12 Mastered</span>
+                    </div>
+                    <div class="font-extrabold text-sm text-slate-900 mt-1">${ch.chapter}</div>
+                  </button>
+                `;
+              }).join("")}
+            </div>
+
+            <div class="lg:col-span-8 space-y-3">
+              <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-2 shadow-sm">
+                <div>
+                  <div class="text-[11px] font-extrabold uppercase text-${accent}-600">${window._T6_TD_SUBJ} &bull; CHAPTER ${chapIdx + 1} OF ${chapters.length}</div>
+                  <h3 class="text-lg font-black text-slate-900">${activeChap.chapter} (12 High-Frequency -1 Traps)</h3>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-extrabold">12 Verified Traps</span>
+              </div>
+
+              ${activeChap.traps.map((tp, ti) => {
+                const tKey = `${window._T6_TD_SUBJ}_${chapIdx}_${ti}`;
+                const isDone = !!window._T6_TD_MASTERED[tKey];
+                return `
+                  <div class="bg-white border ${isDone ? "border-emerald-400 bg-emerald-50/20" : "border-slate-200"} rounded-2xl p-5 space-y-2 text-xs shadow-sm">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <span class="font-extrabold text-sm text-slate-900">Trap #${ti + 1}: ${tp.title}</span>
+                      <button type="button" onclick="window.toggleTrapMastered('${tKey}');"
+                        class="px-3 py-1 rounded-full text-[11px] font-extrabold border cursor-pointer ${isDone ? "bg-emerald-600 text-white border-emerald-600" : "bg-slate-50 text-slate-700 border-slate-300"}">
+                        ${isDone ? "✓ Trap Mastered" : "Mark Trap Mastered"}
+                      </button>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900"><strong>Why 80% Lose -1 Mark:</strong> ${tp.lure}</div>
+                    <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950"><strong>Exact NTA / NCERT Rule:</strong> ${tp.fix}</div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
           </div>
         ` : `
-          <div class="space-y-3">
-            ${wrongItems.slice(0, 40).map((it, idx) => `
-              <div class="bg-white border border-rose-200 rounded-2xl p-5 space-y-2 text-xs shadow-sm">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                  <span class="font-extrabold text-rose-700">#${idx + 1} &bull; [${it.source}] ${it.session} &bull; ${it.subj} (${it.chapter})</span>
-                  <span class="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 font-extrabold">-1 Mark Lost</span>
+          ${!wrongItems.length ? `
+            <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center space-y-2 shadow-sm">
+              <div class="text-base font-extrabold text-slate-800">Zero -1 Mock Errors Recorded Yet</div>
+              <p class="text-xs text-slate-500">Submit a Full Mock in Tab 4 or a Subject Practice Mock in Tab 5 with any incorrect response to populate your personalized negative-marking autopsy here.</p>
+            </div>
+          ` : `
+            <div class="space-y-3">
+              ${wrongItems.slice(0, 40).map((it, idx) => `
+                <div class="bg-white border border-rose-200 rounded-2xl p-5 space-y-2 text-xs shadow-sm">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <span class="font-extrabold text-rose-700">#${idx + 1} &bull; [${it.source}] ${it.session} &bull; ${it.subj} (${it.chapter})</span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 font-extrabold">-1 Mark Lost</span>
+                  </div>
+                  <div class="text-sm font-bold text-slate-900 whitespace-pre-line">${it.prompt}</div>
+                  <div class="text-rose-700"><strong>Your Response:</strong> ${it.userText}</div>
+                  <div class="text-emerald-700"><strong>Official Answer:</strong> ${it.officialText}</div>
+                  <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700"><strong>Concept Fix &amp; Rule:</strong> ${it.explanation}</div>
                 </div>
-                <div class="text-sm font-bold text-slate-900 whitespace-pre-line">${it.prompt}</div>
-                <div class="text-rose-700"><strong>Your Response:</strong> ${it.userText}</div>
-                <div class="text-emerald-700"><strong>Official Answer:</strong> ${it.officialText}</div>
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700"><strong>Concept Fix &amp; Rule:</strong> ${it.explanation}</div>
-              </div>
-            `).join("")}
-          </div>
+              `).join("")}
+            </div>
+          `}
         `}
       </div>
     `;
