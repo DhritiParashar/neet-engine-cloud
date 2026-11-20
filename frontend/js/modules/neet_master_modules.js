@@ -672,10 +672,9 @@
       alert("Please check the NTA Candidate Honor-Code Declaration box before launching the session.");
       return;
     }
-    const meta = getScopeMeta();
     window._CBT_STARTED = true;
     window._CBT_SUBMITTED = false;
-    window._CBT_SEC_LEFT = meta.mins * 60;
+    window._CBT_SEC_LEFT = 180 * 60;
     window._CBT_IDX = 0;
     window._CBT_VISITED = { 0: true };
     window.renderScienceTab4();
