@@ -34,8 +34,8 @@
       else if (txt.startsWith("2. Data Interpretation")) btn.textContent = TABS[1];
       else if (txt.startsWith("3. Verbal Studio")) btn.textContent = TABS[2];
       else if (txt.startsWith("4. Section-Adaptive Mock")) btn.textContent = TABS[3];
-      else if (txt.startsWith("5. Trap Doctor")) btn.textContent = TABS[4];
-      else if (txt.startsWith("6. GRE Score Forecaster")) btn.textContent = TABS[5];
+      else if (txt.startsWith("5. Trap Doctor")) btn.textContent = TABS[5];
+      else if (txt.startsWith("6. GRE Score Forecaster")) btn.textContent = TABS[6];
     });
 
     // Hide any lingering legacy PYQ vault container outside main-workspace
@@ -1555,7 +1555,7 @@
     const target = getTarget(el);
     if (!target) return;
 
-    const fullLogs = getAllLedgerLogs();
+    const fullLogs = typeof getVerifiedFullMockLogs === "function" ? getVerifiedFullMockLogs() : [];
     const pracLogs = typeof getPracticeLogs === "function" ? getPracticeLogs() : [];
     const wrongItems = [];
 
@@ -1657,17 +1657,6 @@
 
     target.innerHTML = `
       <div class="max-w-7xl mx-auto pt-4 pb-10 space-y-5">
-        ${window._PM_SUBMITTED ? (() => {
-          const latest = getPracticeLogs().find(x => x.sessionId === window._PM_SERIAL) || getPracticeLogs()[0];
-          return latest ? `
-            <div class="bg-white border-2 border-emerald-500 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
-              <div>
-                <div class="text-xs font-extrabold uppercase text-emerald-700">PRACTICE MOCK SCORECARD &bull; ${latest.sessionId}</div>
-                <div class="text-xl font-black text-slate-900 mt-0.5">Score: ${latest.totalScore} / ${latest.maxScore} &bull; Accuracy: ${latest.accuracy}% (${latest.counts})</div>
-              </div>
-              <button type="button" onclick="window.downloadPracticePdfReport('${latest.sessionId}');" class="px-4 py-2.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-extrabold shadow-sm cursor-pointer">Download PDF Marksheet</button>
-            </div>` : "";
-        })() : ""}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div class="flex items-start justify-between gap-2">
