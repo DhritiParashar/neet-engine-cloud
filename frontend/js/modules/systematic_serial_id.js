@@ -296,3 +296,134 @@
     }, 150);
   });
 })();
+
+// ==============================================================================
+// EMBEDDED SOCRATIC AI DOUBT SOLVER FOR TAB 6 (JEE & NEET v11)
+// ==============================================================================
+(function () {
+  const HOST = (window.location.hostname || "").toLowerCase();
+  const TITLE = (document.title || "").toUpperCase();
+  const PORTAL = HOST.includes("neet") || TITLE.includes("NEET") ? "NEET" : "JEE";
+
+  window.submitJeeNeetAiDoubt = async function () {
+    const topicEl = document.getElementById("jn-ai-doubt-topic");
+    const qEl = document.getElementById("jn-ai-doubt-q");
+    const attEl = document.getElementById("jn-ai-doubt-att");
+    const outEl = document.getElementById("jn-ai-doubt-out");
+    const btnEl = document.getElementById("jn-ai-doubt-btn");
+    if (!qEl || !outEl) return;
+
+    const question = qEl.value.trim();
+    if (!question) {
+      alert("Please enter or paste your question / concept doubt first.");
+      return;
+    }
+    const topic = topicEl ? topicEl.value : `${PORTAL} Core Concept`;
+    const attempt = attEl ? attEl.value.trim() : "";
+
+    if (btnEl) { btnEl.disabled = true; btnEl.textContent = "Analyzing Concept & NTA Trap..."; }
+    outEl.style.display = "block";
+    outEl.innerHTML = `<div class="text-xs font-bold text-indigo-600">Generating step-by-step Socratic derivation, NTA -1 trap check &amp; 30-second shortcut...</div>`;
+
+    try {
+      const res = await fetch("/api/doubt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          track: PORTAL === "NEET" ? "NEET_UG_720" : "JEE_MAIN_ADV_300",
+          topic: topic,
+          question: question,
+          student_attempt: attempt
+        })
+      });
+      const data = await res.json();
+      const rawText = (data && (data.solution || data.feedback || data.detail)) || "No solution returned.";
+      const formatted = String(rawText)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\n/g, "<br>");
+      outEl.innerHTML = `
+        <div class="text-[11px] font-extrabold uppercase text-emerald-700 mb-2">✓ Socratic AI Resolution &amp; NTA Negative-Marking Guard</div>
+        <div class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed">${formatted}</div>
+      `;
+    } catch (err) {
+      outEl.innerHTML = `<div class="text-xs font-bold text-rose-600">Error contacting AI Doubt Engine: ${err.message}</div>`;
+    } finally {
+      if (btnEl) { btnEl.disabled = false; btnEl.textContent = "🧠 Ask AI Socratic Tutor"; }
+    }
+  };
+
+  window.mountTab6AiDoubtBox = function () {
+    const trapH = Array.from(document.querySelectorAll("h1,h2,h3,div"))
+      .find(el => el.children.length === 0 && /Chapter-Wise -1 Trap Vault/i.test(el.textContent || ""));
+    if (!trapH || document.getElementById("jn-ai-doubts-card")) return;
+
+    const bannerCard = trapH.closest("div.rounded-2xl, section, div.bg-white") || trapH.parentElement;
+    if (!bannerCard) return;
+
+    const errBtn = Array.from(bannerCard.querySelectorAll("button"))
+      .find(b => /My Logged Mock -1 Errors/i.test(b.textContent || ""));
+    if (errBtn && errBtn.parentElement && !document.getElementById("jn-ai-pill-btn")) {
+      const pill = document.createElement("button");
+      pill.id = "jn-ai-pill-btn";
+      pill.type = "button";
+      pill.className = "px-4 py-2 rounded-full text-xs font-extrabold bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm cursor-pointer transition";
+      pill.textContent = "🧠 Ask AI Socratic Doubt";
+      pill.onclick = () => {
+        const c = document.getElementById("jn-ai-doubts-card");
+        if (c) { c.scrollIntoView({ behavior: "smooth", block: "center" }); document.getElementById("jn-ai-doubt-q")?.focus(); }
+      };
+      errBtn.parentElement.appendChild(pill);
+    }
+
+    const topics = PORTAL === "NEET"
+      ? ["Botany — Molecular Basis & Genetics", "Zoology — Human Physiology & Reproduction", "Physics — Electrostatics, Optics & Modern Physics", "Chemistry — Organic Mechanisms & Equilibrium"]
+      : ["Physics — Rotational Motion, Electrodynamics & Modern Physics", "Chemistry — Organic Named Reactions, Thermodynamics & Coordination", "Mathematics — Calculus, Vectors/3D, Conics & Probability"];
+
+    const card = document.createElement("div");
+    card.id = "jn-ai-doubts-card";
+    card.className = "bg-white dark:bg-slate-900 border-2 border-indigo-500/30 rounded-2xl p-6 shadow-sm space-y-4 my-5";
+    card.innerHTML = `
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <span class="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-extrabold uppercase">SOCRATIC AI DOUBT SOLVER &bull; STEP-BY-STEP + 30-SEC SHORTCUT</span>
+          <h3 class="text-lg font-extrabold text-slate-900 dark:text-white mt-1">Ask Any ${PORTAL} Concept, Numerical, or Mock Question Doubt</h3>
+          <p class="text-xs text-slate-500">Paste any tricky problem or mock question below for the NCERT/JEE core rule, -1 trap warning, and fastest solving shortcut.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+          <label class="block text-[11px] font-extrabold text-slate-600 mb-1">Subject &amp; Chapter Track</label>
+          <select id="jn-ai-doubt-topic" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-2 text-xs font-bold">
+            ${topics.map(t => `<option value="${t}">${t}</option>`).join("")}
+          </select>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-[11px] font-extrabold text-slate-600 mb-1">Your Attempt / Where You Got Stuck (Optional)</label>
+          <input id="jn-ai-doubt-att" type="text" placeholder="e.g., Confused between isothermal vs adiabatic work sign convention..."
+            class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-2 text-xs" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-[11px] font-extrabold text-slate-600 mb-1">Question Stem / Concept Doubt</label>
+        <textarea id="jn-ai-doubt-q" rows="3" placeholder="Paste the full question or describe the concept you want broken down step-by-step..."
+          class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 p-3 text-xs"></textarea>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <span class="text-[11px] text-slate-400">Powered by GOALisB Socratic Tutor (/api/doubt)</span>
+        <button id="jn-ai-doubt-btn" type="button" onclick="window.submitJeeNeetAiDoubt()"
+          class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold shadow cursor-pointer">
+          🧠 Ask AI Socratic Tutor
+        </button>
+      </div>
+
+      <div id="jn-ai-doubt-out" style="display:none;" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800"></div>
+    `;
+    bannerCard.insertAdjacentElement("afterend", card);
+  };
+
+  setInterval(window.mountTab6AiDoubtBox, 600);
+})();
