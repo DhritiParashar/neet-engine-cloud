@@ -1939,6 +1939,17 @@
               </button>
             </div>
 
+                        <div id="t6-target-action-bar" style="display:flex;gap:8px;align-items:center;padding-top:8px;">
+              <button id="t6-set-target-btn" type="button" onclick="window.commitCurrentAsTarget();"
+                style="flex:1;background:#4f46e5;color:#ffffff;border:none;border-radius:12px;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer;">
+                &#127919; Set Target (Lock ${IS_JEE ? (window._T6_JEE.p + window._T6_JEE.c + window._T6_JEE.m) + "/300" : (window._T6_NEET.p + window._T6_NEET.c + window._T6_NEET.b + window._T6_NEET.z) + "/720"})
+              </button>
+              <button type="button" onclick="window.resetDesiredTargetToDefault();"
+                style="background:#f1f5f9;color:#1e293b;border:1px solid #cbd5e1;border-radius:12px;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer;">
+                Reset Target
+              </button>
+            </div>
+
             <div class="grid grid-cols-2 gap-3 pt-1 text-xs">
               <div>
                 <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "NTA Shift Normalization" : "Paper Difficulty Level"}</label>
