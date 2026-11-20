@@ -99,6 +99,7 @@
     const target = getTarget(el);
     if (!target) return;
     await hydrateFromNeon();
+    if (window._ACTIVE_SCI_TAB && window._ACTIVE_SCI_TAB !== 1) return;
 
     const mods = window._SCI_MODULES.filter(x => !String(x.module_code || "").startsWith("NEET-T2-"));
     if (!mods.length) {
@@ -250,6 +251,7 @@
     const target = getTarget(el);
     if (!target) return;
     await hydrateFromNeon();
+    if (window._ACTIVE_SCI_TAB && window._ACTIVE_SCI_TAB !== 2) return;
 
     const mods = window._SCI_MODULES.filter(x => String(x.module_code || "").startsWith("NEET-T2-"));
     if (!mods.length) {
@@ -390,6 +392,7 @@
     const target = getTarget(el);
     if (!target) return;
     await hydrateFromNeon();
+    if (window._ACTIVE_SCI_TAB && window._ACTIVE_SCI_TAB !== 3) return;
 
     const allAR = window._SCI_QUESTIONS.filter(q =>
       q.question_type === "ASSERTION_REASON" || q.question_type === "STATEMENT_I_II"
@@ -2322,6 +2325,112 @@
               { title: "Hardy-Weinberg Equilibrium p^2 + 2pq + q^2 = 1", lure: "Using q as frequency of homozygous recessive individuals.", fix: "q is recessive ALLELE frequency; q^2 is homozygous recessive GENOTYPE frequency; 2pq is heterozygous carrier frequency." },
               { title: "Miller-Urey Experiment Gas Mixture (CH4, NH3, H2, H2O at 800 C)", lure: "Including free O2 in primitive reducing atmosphere.", fix: "Miller's flask contained CH4, NH3, H2 (2:1:2) and water vapor at 800 C with NO free O2 (reducing atmosphere)." },
               { title: "Human Ancestor Cranial Capacity Order", lure: "Placing Homo habilis at 1400 cc.", fix: "Homo habilis (650–800 cc) -> Homo erectus (900 cc) -> Neanderthal man (1400 cc) -> Homo sapiens." }
+            ]
+          }
+        ],
+        PHYSICS: [
+          {
+            chapter: "Modern Physics & Dual Nature",
+            traps: [
+              { title: "Photoelectric Stopping Potential vs. Intensity", lure: "Increasing stopping potential V0 when light intensity doubles.", fix: "Intensity increases photocurrent (electron count); stopping potential V0 depends ONLY on incident frequency and work function." },
+              { title: "De Broglie Wavelength of Proton vs. Electron at Same V", lure: "Using equal wavelength for proton and electron accelerated through same V.", fix: "lambda = h / sqrt(2 m q V): at equal accelerating voltage V, heavier proton has much shorter wavelength." },
+              { title: "Bohr Orbit Radius & Energy Z-Dependence", lure: "Multiplying energy by Z instead of Z^2.", fix: "Radius r_n proportional to n^2 / Z; Energy E_n = -13.6 * (Z^2 / n^2) eV." },
+              { title: "Emission Spectral Lines from Level n to Ground", lure: "Using n(n + 1) / 2 instead of n(n - 1) / 2.", fix: "Maximum distinct spectral lines from level n to n = 1 is n(n - 1) / 2." },
+              { title: "Radioactive Mean Life vs. Half-Life", lure: "Equating mean life tau with T_1/2.", fix: "Mean life tau = 1 / lambda = T_1/2 / 0.693 = 1.44 * T_1/2 (longer than half-life)." },
+              { title: "Nuclear Radius & Nuclear Density Scaling", lure: "Scaling nuclear radius R with A instead of A^(1/3).", fix: "R = R_0 * A^(1/3), so nuclear density is constant and independent of mass number A." },
+              { title: "Alpha, Beta-Minus & Gamma Decay Mass/Atomic Shifts", lure: "Changing mass number A during beta decay.", fix: "Alpha: A-4, Z-2; Beta-minus: A unchanged, Z+1; Beta-plus: A unchanged, Z-1; Gamma: A and Z unchanged." },
+              { title: "Zener Diode Voltage Regulation Biasing", lure: "Operating Zener regulator in forward bias.", fix: "Zener diode regulates voltage ONLY when connected in REVERSE bias in the breakdown region." },
+              { title: "p-n Junction Depletion Width vs. Doping & Bias", lure: "Widening depletion layer under forward bias.", fix: "Forward bias narrows depletion barrier; Reverse bias widens depletion layer; heavy doping narrows depletion layer." },
+              { title: "NAND & NOR Universal Gate Truth Table Inversion", lure: "Forgetting final NOT inversion on NAND/NOR outputs.", fix: "NAND output is 0 ONLY when both inputs are 1; NOR output is 1 ONLY when both inputs are 0." },
+              { title: "Binding Energy per Nucleon Stability Peak", lure: "Thinking Uranium-238 has highest binding energy per nucleon.", fix: "Iron-56 (Fe-56) sits at the peak (~8.8 MeV/nucleon); both fission of heavy nuclei and fusion of light nuclei release energy." },
+              { title: "Threshold Wavelength Upper Limit Trap", lure: "Emitting photoelectrons when lambda > lambda_0.", fix: "Photoelectric emission occurs ONLY when incident wavelength lambda <= threshold wavelength lambda_0 (higher frequency)." }
+            ]
+          },
+          {
+            chapter: "Ray Optics & Electrostatics",
+            traps: [
+              { title: "Cartesian Sign Convention for Mirror & Lens", lure: "Forgetting negative sign for real object distance u.", fix: "Incident light travels left-to-right: u is negative for all real objects; f is +ve for convex lens/mirror, -ve for concave lens/mirror." },
+              { title: "Lens Submerged in Higher Refractive Index Liquid", lure: "Assuming convex lens always stays converging.", fix: "When mu_liquid > mu_lens, focal length flips sign: a convex glass lens behaves as a diverging lens in CS2." },
+              { title: "Total Internal Reflection (TIR) Medium Direction", lure: "Using sin(theta_c) = mu_denser / mu_rarer (> 1).", fix: "TIR occurs ONLY when light travels from denser to rarer medium, with sin(theta_c) = mu_rarer / mu_denser < 1." },
+              { title: "Power of Lens Diopter Unit Conversion", lure: "Computing P = 1 / f_cm without converting cm to meters.", fix: "P (in Diopters) = 100 / f(cm) = 1 / f(m)." },
+              { title: "YDSE Fringe Width in Liquid Medium", lure: "Keeping fringe width beta unchanged in water.", fix: "In liquid of refractive index mu, lambda' = lambda / mu, so fringe width beta' = beta / mu decreases." },
+              { title: "Electric Field vs. Potential Inside Charged Conductor", lure: "Setting potential V = 0 inside because E = 0.", fix: "Inside a conductor in electrostatic equilibrium, E = 0, so V is constant throughout and equals V_surface." },
+              { title: "Dielectric Insertion: Battery Connected vs. Disconnected", lure: "Keeping Q constant when battery remains connected.", fix: "Battery connected -> V constant, Q & U increase K times; Battery disconnected -> Q constant, V & U decrease by 1/K." },
+              { title: "Electric Dipole Unstable Equilibrium Angle", lure: "Choosing theta = 90 deg as unstable equilibrium.", fix: "At theta = 90 deg, torque is maximum (pE) and U = 0; unstable equilibrium is at theta = 180 deg (U = +pE, torque = 0)." },
+              { title: "Stretching a Wire to n Times Original Length", lure: "Multiplying resistance by n instead of n^2.", fix: "Since volume A*L is constant, stretching length to nL reduces area to A/n, giving R_new = n^2 * R_old." },
+              { title: "Bulb Brightness in Series vs. Parallel", lure: "Assuming 100W bulb glows brighter than 40W in series.", fix: "In parallel (same V), higher wattage glows brighter; in series (same I), lower wattage (higher resistance) glows brighter." },
+              { title: "Ammeter & Voltmeter Ideal Resistance Swap", lure: "Connecting ideal ammeter in parallel.", fix: "Ideal ammeter has zero resistance (connected in series); ideal voltmeter has infinite resistance (connected in parallel)." },
+              { title: "Terminal Voltage During Charging vs. Discharging", lure: "Always applying V = E - Ir.", fix: "During discharging V = E - Ir; during charging (current enters +ve terminal) V = E + Ir." }
+            ]
+          },
+          {
+            chapter: "Mechanics, Rotational & Gravitation",
+            traps: [
+              { title: "Escape Velocity vs. Orbital Velocity Factor", lure: "Confusing v_o = sqrt(2gR) with v_e = sqrt(gR).", fix: "v_orbital = sqrt(gR), whereas v_escape = sqrt(2gR) = sqrt(2) * v_orbital." },
+              { title: "Altitude vs. Depth Variation of g", lure: "Using g(1 - 2h/R) when altitude h is large.", fix: "Use g(1 - 2h/R) ONLY for h << R; for general altitude use g * [R/(R+h)]^2. Inside Earth, g(d) = g(1 - d/R)." },
+              { title: "Gravitational Potential Inside Hollow Shell", lure: "Setting V = 0 inside because field g = 0.", fix: "Inside a spherical shell, gravitational field is 0, so potential is constant and non-zero: V = -GM/R." },
+              { title: "Rolling Kinetic Energy Total Formula", lure: "Using KE = 1/2 mv^2 for a rolling sphere or cylinder.", fix: "KE_total = 1/2 mv^2 (1 + I/mR^2): 7/10 mv^2 (solid sphere), 3/4 mv^2 (solid cylinder), mv^2 (ring)." },
+              { title: "Moment of Inertia: Solid vs. Hollow Sphere", lure: "Swapping 2/5 MR^2 and 2/3 MR^2.", fix: "Solid sphere = 2/5 MR^2; Hollow spherical shell = 2/3 MR^2." },
+              { title: "Work Done by Centripetal Force in Circular Motion", lure: "Computing F_c * 2*pi*R for one revolution.", fix: "Centripetal force is always perpendicular to instantaneous velocity -> instantaneous power and work done are ALWAYS ZERO." },
+              { title: "Conservative vs. Non-Conservative Force Work", lure: "Making work done by friction zero in a closed loop.", fix: "Work over a closed path is zero ONLY for conservative forces (gravity, spring, electrostatic); friction work is path-dependent." },
+              { title: "Kelvin Conversion in Thermodynamics & Carnot", lure: "Plugging Celsius values into T_2 / T_1 or PV = nRT.", fix: "Always convert Celsius to Kelvin (T_K = T_C + 273) before computing ratios or T^4 radiation." },
+              { title: "Physics First Law Sign Convention vs. Chemistry", lure: "Using dU = dQ + dW in Physics.", fix: "In Physics, dQ = dU + dW where W > 0 during gas expansion." },
+              { title: "Adiabatic vs. Isothermal Bulk Modulus", lure: "Using B = P for sound waves in air.", fix: "Isothermal B = P; Adiabatic (sound propagation) B = gamma * P." },
+              { title: "Terminal Velocity Radius Proportionality", lure: "Scaling terminal velocity v_t with r instead of r^2.", fix: "By Stokes' Law, terminal velocity v_t = [2 r^2 (rho - sigma) g] / (9 eta) is proportional to r^2." },
+              { title: "Capillary Rise Height vs. Tube Radius", lure: "Increasing capillary height when radius increases.", fix: "h = (2 T cos theta) / (r rho g): capillary rise is inversely proportional to tube radius r." }
+            ]
+          }
+        ],
+        CHEMISTRY: [
+          {
+            chapter: "Solutions, Electrochemistry & Kinetics",
+            traps: [
+              { title: "Van't Hoff Factor (i) for Dissociation vs. Association", lure: "Using i = 1 for NaCl, CaCl2, or acetic acid in benzene.", fix: "Complete dissociation: NaCl i = 2, CaCl2 i = 3, Al2(SO4)3 i = 5; Dimerization in benzene: i = 0.5." },
+              { title: "Positive vs. Negative Raoult's Law Deviation", lure: "Confusing ethanol + acetone with chloroform + acetone.", fix: "Ethanol + acetone breaks H-bonds -> positive deviation (minimum boiling azeotrope); CHCl3 + acetone forms new H-bonds -> negative deviation." },
+              { title: "Henry's Law Constant KH vs. Gas Solubility", lure: "Thinking higher KH means higher solubility.", fix: "P = KH * x: at fixed pressure, HIGHER KH means LOWER gas solubility (KH rises with temperature)." },
+              { title: "Standard Electrode Potential E0 is Intensive", lure: "Doubling E0 when cell equation is multiplied by 2.", fix: "E0 is intensive (never multiplied by n), whereas Delta_G0 = -nFE0 is extensive." },
+              { title: "Nernst Equation 0.0591 with log10 vs. ln", lure: "Using 0.0591 with natural log ln(Q).", fix: "At 298 K: E = E0 - (0.0591 / n) * log10(Q)." },
+              { title: "Molar Conductivity vs. Specific Conductivity on Dilution", lure: "Increasing kappa on dilution.", fix: "Specific conductivity kappa decreases on dilution; Molar conductivity Lambda_m increases on dilution." },
+              { title: "Zero-Order vs. First-Order Half-Life Formula", lure: "Making zero-order t_1/2 independent of [A]_0.", fix: "Zero order: t_1/2 = [A]_0 / 2k; First order: t_1/2 = 0.693 / k (independent of initial concentration)." },
+              { title: "Catalyst Effect on Delta_H and K_eq", lure: "Increasing equilibrium constant with catalyst.", fix: "Catalyst lowers Ea equally for forward & reverse reactions -> zero change in Delta_H, Delta_G, or K_eq." },
+              { title: "pH of 10^-8 M HCl Solution", lure: "Answering pH = 8 for an acid.", fix: "Include water [H+] = 10^-7 M -> total [H+] = 1.1 x 10^-7 M -> pH = 6.96 (< 7)." },
+              { title: "Solubility Product Ksp of CaF2 / Ag2CrO4", lure: "Using Ksp = s^2 for AB2 salts.", fix: "For AB2/A2B salts: Ksp = 4s^3; for AB3: Ksp = 27s^4." },
+              { title: "Arrhenius Plot ln(k) vs. 1/T Slope Sign", lure: "Taking slope as +Ea/R.", fix: "Slope of ln(k) vs. 1/T is negative: -Ea / R." },
+              { title: "Electrolysis of Aqueous NaCl Products", lure: "Depositing Na metal at cathode.", fix: "H2O reduces to H2(g) at cathode and Cl- oxidizes to Cl2(g) at anode." }
+            ]
+          },
+          {
+            chapter: "Chemical Bonding & Coordination Compounds",
+            traps: [
+              { title: "O2 Paramagnetism & Bond Order Sequence", lure: "Calling O2 diamagnetic because it has 16 electrons.", fix: "MOT places 2 unpaired e- in pi*2p -> O2 is paramagnetic (BO = 2.0); O2+ BO = 2.5; O2- BO = 1.5; O2^2- BO = 1.0 (diamagnetic)." },
+              { title: "Lone Pair Position in sp3d Trigonal Bipyramidal", lure: "Placing lone pairs in axial positions of SF4 or ClF3.", fix: "In sp3d geometry, lone pairs ALWAYS occupy equatorial positions to minimize 90-degree repulsions." },
+              { title: "Lewis Acid Strength: BI3 > BBr3 > BCl3 > BF3", lure: "Ranking BF3 as strongest Lewis acid.", fix: "2p-2p back bonding in BF3 reduces boron electron deficiency -> BF3 is the weakest Lewis acid among boron trihalides." },
+              { title: "Dipole Moment of NH3 vs. NF3", lure: "Giving NF3 higher dipole moment than NH3.", fix: "In NH3, orbital dipole and N-H bond dipoles add up (1.47 D); in NF3, they oppose (0.23 D)." },
+              { title: "Strong Field vs. Weak Field Pairing in [FeF6]^3- vs. [Fe(CN)6]^3-", lure: "Pairing d5 electrons in [FeF6]^3-.", fix: "F- is weak field (5 unpaired e-, high spin); CN- is strong field (1 unpaired e-, low spin)." },
+              { title: "Square Planar [Ni(CN)4]^2- vs. Tetrahedral [NiCl4]^2-", lure: "Assigning sp3 to [Ni(CN)4]^2-.", fix: "[Ni(CN)4]^2- is dsp2 square planar (diamagnetic); [NiCl4]^2- is sp3 tetrahedral (paramagnetic, 2 unpaired e-)." },
+              { title: "No Geometrical Isomerism in Tetrahedral Complexes", lure: "Counting cis/trans isomers for [Ma2b2] tetrahedral.", fix: "Tetrahedral complexes NEVER show geometrical isomerism because all 4 positions are equidistant." },
+              { title: "Ortho-Nitrophenol vs. Para-Nitrophenol Steam Volatility", lure: "Giving ortho-nitrophenol higher boiling point.", fix: "Ortho-nitrophenol has intramolecular H-bonding (steam volatile, lower bp); para-nitrophenol has intermolecular H-bonding (higher bp)." },
+              { title: "Inert Pair Effect in Group 13, 14, 15", lure: "Making Pb^4+ more stable than Pb^2+.", fix: "Down the group, lower oxidation state (+1 in Tl, +2 in Pb, +3 in Bi) becomes more stable due to poor shielding of d/f electrons." },
+              { title: "Lanthanoid Contraction Consequences", lure: "Giving Hf much larger atomic radius than Zr.", fix: "4f poor shielding causes Zr (4d) and Hf (5d) to have nearly identical atomic radii (160 pm vs. 159 pm)." },
+              { title: "KMnO4 Equivalent Weight in Acidic, Neutral & Basic Media", lure: "Using M/5 in all media.", fix: "Acidic (Mn^2+): M/5; Neutral/faintly alkaline (MnO2): M/3; Strongly alkaline (MnO4^2-): M/1." },
+              { title: "Ambidentate Ligands Linkage Isomerism", lure: "Overlooking NO2- and SCN- linkage isomers.", fix: "Monodentate ligands with two donor atoms (NO2-, SCN-, CN-) cause linkage isomerism." }
+            ]
+          },
+          {
+            chapter: "Organic Name Reactions & Biomolecules",
+            traps: [
+              { title: "Anisole + HI Cleavage Products", lure: "Forming iodobenzene + methanol.", fix: "Aryl-O partial double bond resists cleavage -> yields Phenol + CH3I." },
+              { title: "Hoffmann Bromamide Degradation Carbon Loss", lure: "Keeping same carbon chain length in product amine.", fix: "R-CONH2 + Br2 + 4KOH -> R-NH2 (primary amine has ONE carbon less than amide)." },
+              { title: "Aldol vs. Cannizzaro Alpha-Hydrogen Test", lure: "Running Cannizzaro on acetaldehyde.", fix: "Alpha-H present -> Aldol; No alpha-H (HCHO, PhCHO) -> Cannizzaro." },
+              { title: "Reimer-Tiemann Dichlorocarbene Electrophile", lure: "Thinking :CCl2 is a nucleophile.", fix: "Singlet dichlorocarbene (:CCl2) is a neutral electrophile attacking ortho position of phenoxide." },
+              { title: "Gabriel Phthalimide Synthesis Scope", lure: "Preparing aniline via Gabriel synthesis.", fix: "Prepares ONLY pure aliphatic primary amines (aryl halides do not undergo SN2)." },
+              { title: "Anti-Markovnikov Peroxide Effect Only for HBr", lure: "Applying peroxide effect to HCl or HI.", fix: "Kharasch radical addition works ONLY with HBr." },
+              { title: "Carbocation 1,2-Shift in SN1 / Dehydration", lure: "Attaching nucleophile without checking rearrangement.", fix: "Always check for 1,2-hydride or 1,2-methyl shift to form a more stable 3 deg carbocation." },
+              { title: "Lucas Reagent Turbidity Speed Order", lure: "Giving 1 deg alcohol instant turbidity.", fix: "3 deg alcohol -> immediate; 2 deg -> 5 mins; 1 deg -> no turbidity at room temperature." },
+              { title: "Glucose + Br2 Water vs. HNO3 Oxidation", lure: "Forming saccharic acid with mild Br2 water.", fix: "Mild Br2 water oxidizes only -CHO to Gluconic acid; strong HNO3 oxidizes both ends to Saccharic acid." },
+              { title: "Sucrose Invert Sugar & Non-Reducing Nature", lure: "Calling sucrose a reducing sugar.", fix: "Sucrose (alpha-D-glucose C1 — C2 beta-D-fructose) has no free hemiacetal group -> non-reducing sugar." },
+              { title: "DNA vs. RNA Pyrimidine Bases", lure: "Putting Uracil in DNA or Thymine in RNA.", fix: "DNA has A, G, C, Thymine; RNA has A, G, C, Uracil." },
+              { title: "Essential vs. Non-Essential Amino Acids & Zwitterion", lure: "Assigning net +1 charge to zwitterion at pI.", fix: "At isoelectric point, zwitterion carries both +NH3 and -COO- with net zero charge." }
             ]
           }
         ]
