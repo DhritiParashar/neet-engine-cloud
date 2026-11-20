@@ -1482,7 +1482,7 @@
   };
 
   // ============================================================================
-  // TAB 7: DESIRED SELF-TARGET SIMULATOR + SYNCED ACTUAL STRENGTH (v45)
+  // TAB 7: SET TARGET LOCK + ACHIEVEMENT VS. DEFICIENCY REMAINING MATRIX (v50)
   // ============================================================================
   const TARGET_KEY = IS_JEE ? "goalisb_jee_self_target_v1" : "goalisb_neet_self_target_v1";
 
@@ -1505,14 +1505,27 @@
   }
 
   window._T6_MODE = "TARGET";
+  window._T6_TARGET_LOCKED_MSG = "";
   window._T6_JEE = loadSavedSelfTarget();
   window._T6_NEET = loadSavedSelfTarget();
+
+  window.commitCurrentAsTarget = function () {
+    if (IS_JEE) {
+      saveSelfTarget({ ...window._T6_JEE });
+    } else {
+      saveSelfTarget({ ...window._T6_NEET });
+    }
+    window._T6_MODE = "TARGET";
+    window._T6_TARGET_LOCKED_MSG = "Target Saved (" + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + ")";
+    window.renderScienceTab7();
+  };
 
   window.switchToDesiredTargetMode = function () {
     const saved = loadSavedSelfTarget();
     if (IS_JEE) window._T6_JEE = { ...saved };
     else window._T6_NEET = { ...saved };
     window._T6_MODE = "TARGET";
+    window._T6_TARGET_LOCKED_MSG = "";
     window.renderScienceTab7();
   };
 
@@ -1522,6 +1535,7 @@
     if (IS_JEE) window._T6_JEE = { ...def };
     else window._T6_NEET = { ...def };
     window._T6_MODE = "TARGET";
+    window._T6_TARGET_LOCKED_MSG = "Reset to Default Benchmark";
     window.renderScienceTab7();
   };
 
@@ -1540,6 +1554,7 @@
         if (rec.difficulty) window._T6_JEE.shift = rec.difficulty;
         window._T6_SYNCED_ID = rec.sessionId;
         window._T6_MODE = "VERIFIED";
+        window._T6_TARGET_LOCKED_MSG = "";
         return true;
       }
       if (!IS_JEE && rec.subjects.PHYSICS && rec.subjects.CHEMISTRY && rec.subjects.BOTANY && rec.subjects.ZOOLOGY) {
@@ -1550,11 +1565,95 @@
         if (rec.difficulty) window._T6_NEET.diff = rec.difficulty;
         window._T6_SYNCED_ID = rec.sessionId;
         window._T6_MODE = "VERIFIED";
+        window._T6_TARGET_LOCKED_MSG = "";
         return true;
       }
     } catch (_) {}
     return false;
   };
+
+  function buildAchievementVsDeficiencyHtml(savedTarget, latestMock) {
+    const accent = IS_JEE ? "indigo" : "emerald";
+    const maxSub = IS_JEE ? 100 : 180;
+    const subjects = IS_JEE
+      ? [
+          { name: "Physics", tgt: Number(savedTarget.p || 0), act: latestMock && latestMock.subjects && latestMock.subjects.PHYSICS ? Number(latestMock.subjects.PHYSICS.s || 0) : null },
+          { name: "Chemistry", tgt: Number(savedTarget.c || 0), act: latestMock && latestMock.subjects && latestMock.subjects.CHEMISTRY ? Number(latestMock.subjects.CHEMISTRY.s || 0) : null },
+          { name: "Mathematics", tgt: Number(savedTarget.m || 0), act: latestMock && latestMock.subjects && latestMock.subjects.MATHEMATICS ? Number(latestMock.subjects.MATHEMATICS.s || 0) : null }
+        ]
+      : [
+          { name: "Physics", tgt: Number(savedTarget.p || 0), act: latestMock && latestMock.subjects && latestMock.subjects.PHYSICS ? Number(latestMock.subjects.PHYSICS.s || 0) : null },
+          { name: "Chemistry", tgt: Number(savedTarget.c || 0), act: latestMock && latestMock.subjects && latestMock.subjects.CHEMISTRY ? Number(latestMock.subjects.CHEMISTRY.s || 0) : null },
+          { name: "Botany", tgt: Number(savedTarget.b || 0), act: latestMock && latestMock.subjects && latestMock.subjects.BOTANY ? Number(latestMock.subjects.BOTANY.s || 0) : null },
+          { name: "Zoology", tgt: Number(savedTarget.z || 0), act: latestMock && latestMock.subjects && latestMock.subjects.ZOOLOGY ? Number(latestMock.subjects.ZOOLOGY.s || 0) : null }
+        ];
+
+    const totalTgt = subjects.reduce((s, r) => s + r.tgt, 0);
+    const totalAct = latestMock ? subjects.reduce((s, r) => s + (r.act || 0), 0) : null;
+    const totalDef = totalAct !== null ? (totalTgt - totalAct) : null;
+
+    return `
+      <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div class="text-xs font-extrabold uppercase tracking-wider text-${accent}-700">ACHIEVEMENT VS. DEFICIENCY REMAINING MATRIX</div>
+            <div class="text-[11px] text-slate-600">${latestMock
+              ? `Comparing Locked Target (${totalTgt}/${MAX_MARKS}) against Verified Mock <strong>${latestMock.sessionId}</strong> (${totalAct}/${MAX_MARKS})`
+              : `Locked Target: <strong>${totalTgt}/${MAX_MARKS}</strong> &bull; Complete a Full Mock in Tab 4 to populate Actual Achievement`}</div>
+          </div>
+          ${totalDef !== null ? `
+            <span class="px-3 py-1 rounded-full text-xs font-extrabold ${totalDef <= 0 ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-900"}">
+              ${totalDef <= 0 ? `Target Surpassed (+${Math.abs(totalDef)} Marks)` : `Total Deficiency: ${totalDef} Marks`}
+            </span>
+          ` : `<span class="px-3 py-1 rounded-full bg-slate-200 text-slate-700 text-[11px] font-bold">0 Full Mocks Logged</span>`}
+        </div>
+
+        <div class="overflow-x-auto bg-white rounded-xl border border-slate-200">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="border-b border-slate-200 bg-slate-50 text-[10px] font-extrabold uppercase text-slate-500">
+                <th class="py-2 px-3">Subject</th>
+                <th class="py-2 px-3">Locked Target</th>
+                <th class="py-2 px-3">Achieved (Mock)</th>
+                <th class="py-2 px-3">Deficiency / Surplus</th>
+                <th class="py-2 px-3 w-32">Completion</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${subjects.map(r => {
+                const def = r.act !== null ? (r.tgt - r.act) : null;
+                const pctBar = r.act !== null && r.tgt > 0 ? Math.min(100, Math.max(0, Math.round((r.act / r.tgt) * 100))) : 0;
+                return `
+                  <tr class="border-b border-slate-100">
+                    <td class="py-2.5 px-3 font-extrabold text-slate-900">${r.name}</td>
+                    <td class="py-2.5 px-3 font-bold text-${accent}-700">${r.tgt} / ${maxSub}</td>
+                    <td class="py-2.5 px-3 font-extrabold text-slate-900">${r.act !== null ? `${r.act} / ${maxSub}` : "&mdash;"}</td>
+                    <td class="py-2.5 px-3 font-extrabold ${def === null ? "text-slate-400" : (def <= 0 ? "text-emerald-700" : "text-rose-700")}">
+                      ${def === null ? "Pending Mock" : (def <= 0 ? `+${Math.abs(def)} Surplus` : `-${def} Remaining`)}
+                    </td>
+                    <td class="py-2.5 px-3">
+                      <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+                        <div class="h-full ${def !== null && def <= 0 ? "bg-emerald-600" : `bg-${accent}-600`}" style="width:${pctBar}%"></div>
+                      </div>
+                    </td>
+                  </tr>
+                `;
+              }).join("")}
+              <tr class="bg-slate-50 font-black text-slate-900">
+                <td class="py-2.5 px-3">OVERALL TOTAL</td>
+                <td class="py-2.5 px-3 text-${accent}-700">${totalTgt} / ${MAX_MARKS}</td>
+                <td class="py-2.5 px-3">${totalAct !== null ? `${totalAct} / ${MAX_MARKS}` : "&mdash;"}</td>
+                <td class="py-2.5 px-3 ${totalDef === null ? "text-slate-400" : (totalDef <= 0 ? "text-emerald-700" : "text-amber-800")}">
+                  ${totalDef === null ? "Pending Mock" : (totalDef <= 0 ? `+${Math.abs(totalDef)} Surplus` : `-${totalDef} Remaining`)}
+                </td>
+                <td class="py-2.5 px-3 text-[11px] font-extrabold text-slate-600">${totalAct !== null && totalTgt > 0 ? Math.min(100, Math.max(0, Math.round((totalAct / totalTgt) * 100))) + "%" : "0%"}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
 
   window.updateScienceTab6 = function () {
     const out = document.getElementById("t6-live-results");
@@ -1563,6 +1662,7 @@
     const vLogs = getVerifiedFullMockLogs();
     const latestMock = vLogs[0] || null;
     const savedTarget = loadSavedSelfTarget();
+    const matrixHtml = buildAchievementVsDeficiencyHtml(savedTarget, latestMock);
 
     if (IS_JEE) {
       const st = window._T6_JEE;
@@ -1596,22 +1696,18 @@
       const weakest = [["Physics", st.p], ["Chemistry", st.c], ["Mathematics", st.m]].sort((a, b) => a[1] - b[1])[0];
       const diag = document.getElementById("t6-bottleneck");
       if (diag) {
-        if (!isTargetMode) {
-          const gap = targetTotal - rawTotal;
-          diag.innerHTML = `<div class="font-extrabold">Actual Strength vs. Desired Target (${targetTotal}/300): ${gap > 0 ? `Gap of +${gap} Marks Needed` : "Target Achieved!"}</div>
-            <div>Weakest Verified Subject: <strong>${weakest[0]} (${weakest[1]}/100)</strong>. Target splits: P ${savedTarget.p}, C ${savedTarget.c}, M ${savedTarget.m}.</div>`;
-        } else {
-          diag.innerHTML = `<div class="font-extrabold">Desired Target Balance &bull; Lowest Target Subject: ${weakest[0]} (${weakest[1]}/100)</div>
-            <div>${latestMock
-              ? `Your latest verified Full Mock (<strong>${latestMock.sessionId}</strong>) achieved <strong>${latestMock.totalScore}/300</strong> (${rawTotal - latestMock.totalScore >= 0 ? "+" + (rawTotal - latestMock.totalScore) + " marks below your desired target" : "ahead of target"}). Click <strong>Sync Mock</strong> above to inspect your actual strength.`
-              : `No Full Mock submitted in Tab 4 yet. Complete a 75-Q Full Mock in Tab 4, then click <strong>Sync Mock</strong> to compare actual strength against this desired target.`}</div>`;
-        }
+        const gap = targetTotal - rawTotal;
+        diag.innerHTML = !isTargetMode
+          ? `<div class="font-extrabold">Actual Strength vs. Locked Target (${targetTotal}/300): ${gap > 0 ? `Deficiency of ${gap} Marks Remaining` : "Target Achieved!"}</div>
+             <div>Weakest Verified Subject: <strong>${weakest[0]} (${weakest[1]}/100)</strong>. Locked Targets: P ${savedTarget.p}, C ${savedTarget.c}, M ${savedTarget.m}.</div>`
+          : `<div class="font-extrabold">Previewing Target Balance &bull; Lowest Subject: ${weakest[0]} (${weakest[1]}/100)</div>
+             <div>Click <strong>Set Target</strong> to lock these subject marks as your official benchmark, or click <strong>Sync Mock</strong> to inspect your actual strength.</div>`;
       }
 
       out.innerHTML = `
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div class="p-4 rounded-2xl ${isTargetMode ? "bg-indigo-50 border-indigo-200" : "bg-emerald-50 border-emerald-200"} border">
-            <div class="text-[10px] font-extrabold uppercase ${isTargetMode ? "text-indigo-700" : "text-emerald-700"}">${isTargetMode ? "Desired Target Total" : "Actual Verified Score"}</div>
+            <div class="text-[10px] font-extrabold uppercase ${isTargetMode ? "text-indigo-700" : "text-emerald-700"}">${isTargetMode ? "Target Preview Total" : "Actual Verified Score"}</div>
             <div class="text-2xl font-black text-slate-900 mt-0.5">${rawTotal} <span class="text-xs font-bold text-slate-500">/ 300</span></div>
             <div class="text-[11px] font-bold ${isTargetMode ? "text-indigo-700" : "text-emerald-700"} mt-0.5">Shift-Eq: ${eff}/300</div>
           </div>
@@ -1625,7 +1721,8 @@
             <div class="text-xs font-extrabold text-slate-900 mt-1 leading-snug">${tier}</div>
           </div>
         </div>
-        <div class="space-y-2 pt-2">
+        ${matrixHtml}
+        <div class="space-y-2 pt-1">
           <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700">${isTargetMode ? "Tentative Institute & Branch Outcome at Selected Target" : "Actual Institute & Branch Readiness from Synced Mock"} (${st.cat}${catBonus > 0 ? " +" + catBonus + " Quota Eq." : ""})</div>
           ${colleges.map(c => `
             <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2 text-xs">
@@ -1667,24 +1764,20 @@
       const weakest = [["Physics", st.p], ["Chemistry", st.c], ["Botany", st.b], ["Zoology", st.z]].sort((a, b) => a[1] - b[1])[0];
       const diag = document.getElementById("t6-bottleneck");
       if (diag) {
-        if (!isTargetMode) {
-          const gap = targetTotal - rawTotal;
-          diag.innerHTML = `<div class="font-extrabold">Actual Strength vs. Desired Target (${targetTotal}/720): ${gap > 0 ? `Gap of +${gap} Marks Needed` : "Target Achieved!"}</div>
-            <div>Weakest Verified Subject: <strong>${weakest[0]} (${weakest[1]}/180)</strong>. Target splits: P ${savedTarget.p}, C ${savedTarget.c}, B ${savedTarget.b}, Z ${savedTarget.z}.</div>`;
-        } else {
-          diag.innerHTML = `<div class="font-extrabold">Desired Biology Anchor: ${bioTotal}/360 &bull; Lowest Target Subject: ${weakest[0]} (${weakest[1]}/180)</div>
-            <div>${latestMock
-              ? `Your latest verified Full Mock (<strong>${latestMock.sessionId}</strong>) achieved <strong>${latestMock.totalScore}/720</strong> (${rawTotal - latestMock.totalScore >= 0 ? "+" + (rawTotal - latestMock.totalScore) + " marks below your desired target" : "ahead of target"}). Click <strong>Sync Mock</strong> above to inspect your actual strength.`
-              : `No Full Mock submitted in Tab 4 yet. Complete a 180-Q Full Mock in Tab 4, then click <strong>Sync Mock</strong> to compare actual strength against this desired target.`}</div>`;
-        }
+        const gap = targetTotal - rawTotal;
+        diag.innerHTML = !isTargetMode
+          ? `<div class="font-extrabold">Actual Strength vs. Locked Target (${targetTotal}/720): ${gap > 0 ? `Deficiency of ${gap} Marks Remaining` : "Target Achieved!"}</div>
+             <div>Weakest Verified Subject: <strong>${weakest[0]} (${weakest[1]}/180)</strong>. Locked Targets: P ${savedTarget.p}, C ${savedTarget.c}, B ${savedTarget.b}, Z ${savedTarget.z}.</div>`
+          : `<div class="font-extrabold">Previewing Biology Anchor: ${bioTotal}/360 &bull; Lowest Subject: ${weakest[0]} (${weakest[1]}/180)</div>
+             <div>Click <strong>Set Target</strong> to lock these subject marks as your official benchmark, or click <strong>Sync Mock</strong> to inspect your actual strength.</div>`;
       }
 
       out.innerHTML = `
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div class="p-4 rounded-2xl ${isTargetMode ? "bg-indigo-50 border-indigo-200" : "bg-emerald-50 border-emerald-200"} border">
-            <div class="text-[10px] font-extrabold uppercase ${isTargetMode ? "text-indigo-700" : "text-emerald-700"}">${isTargetMode ? "Desired Target Score" : "Actual Verified Score"}</div>
+            <div class="text-[10px] font-extrabold uppercase ${isTargetMode ? "text-indigo-700" : "text-emerald-700"}">${isTargetMode ? "Target Preview Score" : "Actual Verified Score"}</div>
             <div class="text-2xl font-black text-slate-900 mt-0.5">${rawTotal} <span class="text-xs font-bold text-slate-500">/ 720</span></div>
-            <div class="text-[11px] font-bold ${isTargetMode ? "text-indigo-700" : "text-emerald-700"} mt-0.5">Biology: ${bioTotal}/360</div>
+            <div class="text-[11px] font-bold ${isTargetMode ? "text-indigo-700" : "text-emerald-700"} mt-0.5">Diff-Eq: ${eff}/720 &bull; Bio: ${bioTotal}/360</div>
           </div>
           <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
             <div class="text-[10px] font-extrabold uppercase text-emerald-700">${isTargetMode ? "Tentative Expected AIR" : "Actual Projected AIR"}</div>
@@ -1696,7 +1789,8 @@
             <div class="text-xs font-extrabold text-slate-900 mt-1 leading-snug">${tier}</div>
           </div>
         </div>
-        <div class="space-y-2 pt-2">
+        ${matrixHtml}
+        <div class="space-y-2 pt-1">
           <div class="text-xs font-extrabold uppercase tracking-wider text-slate-700">${isTargetMode ? "Tentative AIIMS & GMC Outcome at Selected Target" : "Actual AIIMS & GMC Readiness from Synced Mock"} (${st.cat}${catBonus > 0 ? " +" + catBonus + " Quota Eq." : ""})</div>
           ${colleges.map(c => `
             <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2 text-xs">
@@ -1712,21 +1806,15 @@
   window.syncT6Val = function (key, rawVal) {
     const maxV = IS_JEE ? 100 : 180;
     const v = Math.min(maxV, Math.max(0, Math.round(Number(rawVal) || 0)));
-    if (IS_JEE) {
-      window._T6_JEE[key] = v;
-      if (window._T6_MODE !== "VERIFIED") saveSelfTarget(window._T6_JEE);
-    } else {
-      window._T6_NEET[key] = v;
-      if (window._T6_MODE !== "VERIFIED") saveSelfTarget(window._T6_NEET);
-    }
+    if (IS_JEE) window._T6_JEE[key] = v;
+    else window._T6_NEET[key] = v;
+
     if (window._T6_MODE === "VERIFIED") {
       window._T6_MODE = "TARGET";
-      if (IS_JEE) saveSelfTarget(window._T6_JEE);
-      else saveSelfTarget(window._T6_NEET);
       const pill = document.getElementById("t6-mode-badge");
       if (pill) {
-        pill.textContent = "MODE: DESIRED SELF-TARGET (TENTATIVE OUTCOME)";
-        pill.className = "px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800 text-[10px] font-extrabold uppercase";
+        pill.textContent = "MODE: DESIRED SELF-TARGET (CLICK SET TARGET TO LOCK)";
+        pill.className = "inline-block px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800 text-[10px] font-extrabold uppercase";
       }
     }
     const rEl = document.getElementById("t6-rng-" + key);
@@ -1744,10 +1832,10 @@
     const maxSub = IS_JEE ? 100 : 180;
     const isTargetMode = (window._T6_MODE !== "VERIFIED");
 
-    if (isTargetMode) {
+    if (isTargetMode && !window._T6_DIRTY_PREVIEW) {
       const saved = loadSavedSelfTarget();
-      if (IS_JEE) window._T6_JEE = { ...window._T6_JEE, ...saved };
-      else window._T6_NEET = { ...window._T6_NEET, ...saved };
+      if (IS_JEE) window._T6_JEE = { ...saved };
+      else window._T6_NEET = { ...saved };
     }
 
     const rows = IS_JEE
@@ -1775,17 +1863,17 @@
     const syncBannerHtml = isTargetMode
       ? `<div id="t6-sync-pill" class="p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 text-xs text-indigo-950 space-y-1">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <span><strong>&#127919; Self-Target Goal Active:</strong> Sliders show your desired target marks; right panel previews your tentative expected outcome.</span>
+            <span><strong>&#127919; Self-Target Goal Mode:</strong> Adjust sliders &amp; click <strong>Set Target</strong> to lock your goal, or click <strong>Sync Mock</strong> to inspect actual achievement.</span>
             ${vLogs.length ? `<button type="button" onclick="if(window.applySyncedMockToTab6()){ window.renderScienceTab7(); }" class="underline font-extrabold text-emerald-700 cursor-pointer">Load Actual Mock Strength &rarr;</button>` : ""}
           </div>
           <div class="text-[11px] opacity-90">${vLogs.length
             ? `Verified Full Mocks Logged: <strong>${vLogs.length}</strong> &bull; Latest: <strong>${vLogs[0].sessionId} (${vLogs[0].totalScore}/${MAX_MARKS})</strong> &bull; Best: <strong>${bestScore}/${MAX_MARKS}</strong>`
-            : `No Full ${REQUIRED_QS}-Q Mock submitted in Tab 4 yet. Submit a Full Mock in Tab 4, then click <strong>Sync Mock</strong> to check actual strength.`}</div>
+            : `No Full ${REQUIRED_QS}-Q Mock submitted in Tab 4 yet. Submit a Full Mock in Tab 4 to populate Achievement vs. Deficiency.`}</div>
         </div>`
       : `<div id="t6-sync-pill" class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs text-emerald-950 space-y-1">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <span><strong>&#10003; Actual Strength Achieved:</strong> Sliders reflect verified marks from Full Mock <strong>${window._T6_SYNCED_ID}</strong></span>
-            <button type="button" onclick="window.switchToDesiredTargetMode();" class="underline font-extrabold text-indigo-700 cursor-pointer">Back to My Desired Target</button>
+            <span><strong>&#10003; Actual Strength Achieved:</strong> Sliders show verified marks from Full Mock <strong>${window._T6_SYNCED_ID}</strong></span>
+            <button type="button" onclick="window.switchToDesiredTargetMode();" class="underline font-extrabold text-indigo-700 cursor-pointer">Back to My Locked Target</button>
           </div>
           <div class="text-[11px] opacity-90">Full Mocks Completed: <strong>${vLogs.length}</strong> &bull; Rolling Average: <strong>${avgScore}/${MAX_MARKS}</strong> &bull; Best Full Mock: <strong>${bestScore}/${MAX_MARKS}</strong></div>
         </div>`;
@@ -1797,14 +1885,18 @@
             <div class="flex items-start justify-between gap-2">
               <div class="space-y-1">
                 <span id="t6-mode-badge" class="inline-block px-2.5 py-1 rounded-full ${isTargetMode ? "bg-indigo-100 text-indigo-800" : "bg-emerald-100 text-emerald-800"} text-[10px] font-extrabold uppercase">
-                  ${isTargetMode ? "MODE: DESIRED SELF-TARGET (TENTATIVE OUTCOME)" : "MODE: SYNCED ACTUAL STRENGTH ACHIEVED"}
+                  ${isTargetMode ? (window._T6_TARGET_LOCKED_MSG ? "✓ " + window._T6_TARGET_LOCKED_MSG : "MODE: DESIRED SELF-TARGET") : "MODE: SYNCED ACTUAL STRENGTH"}
                 </span>
                 <h2 class="text-xl font-extrabold text-slate-900 pt-0.5">${isTargetMode ? "Set Desired Subject Target Marks" : "Actual Subject Strength Achieved"}</h2>
                 <div class="text-[11px] font-semibold text-slate-600">${isTargetMode
-                  ? "Adjust sliders to set your personal target & preview expected rank, or click Sync Mock to load your actual Tab 4 score."
-                  : "Showing your actual verified Full-Mock marks. Drag any slider to edit your Desired Target again."}</div>
+                  ? "Adjust sliders & dropdowns, then click Set Target to lock your goal and compare against your actual Tab 4 achievement."
+                  : "Showing your actual verified Full-Mock marks alongside your Locked Target & Deficiency Matrix."}</div>
               </div>
               <div class="flex flex-col gap-1.5 shrink-0">
+                <button type="button" onclick="window.commitCurrentAsTarget();"
+                  class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold shadow-sm cursor-pointer">
+                  &#127919; Set Target
+                </button>
                 <button type="button" onclick="if(window.applySyncedMockToTab6()){ window.renderScienceTab7(); } else { alert('No submitted Tab 4 Full Mock found in ledger yet. Submit a complete Tab 4 Full Mock first.'); }"
                   class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-sm cursor-pointer">
                   &#8635; Sync Mock
@@ -1843,7 +1935,7 @@
             <div class="grid grid-cols-2 gap-3 pt-1 text-xs">
               <div>
                 <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "NTA Shift Normalization" : "Paper Difficulty Level"}</label>
-                <select onchange="if(${IS_JEE}){ window._T6_JEE.shift=this.value; if(window._T6_MODE!=='VERIFIED') saveSelfTarget(window._T6_JEE); } else { window._T6_NEET.diff=this.value; if(window._T6_MODE!=='VERIFIED') saveSelfTarget(window._T6_NEET); } window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
+                <select onchange="if(${IS_JEE}){ window._T6_JEE.shift=this.value; } else { window._T6_NEET.diff=this.value; } window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
                   <option value="TOUGH" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "TOUGH" ? "selected" : ""}>Tough Paper (+${IS_JEE ? 14 : 15} Eq.)</option>
                   <option value="MODERATE" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "MODERATE" ? "selected" : ""}>Standard NTA Paper (0 Eq.)</option>
                   <option value="EASY" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "EASY" ? "selected" : ""}>High-Cutoff Paper (-${IS_JEE ? 12 : 10} Eq.)</option>
@@ -1851,11 +1943,11 @@
               </div>
               <div>
                 <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "Admission Category" : "Counselling Quota"}</label>
-                <select onchange="if(${IS_JEE}){ window._T6_JEE.cat=this.value; if(window._T6_MODE!=='VERIFIED') saveSelfTarget(window._T6_JEE); } else { window._T6_NEET.cat=this.value; if(window._T6_MODE!=='VERIFIED') saveSelfTarget(window._T6_NEET); } window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
-                  <option value="GEN" selected>General (OPEN)</option>
-                  <option value="EWS">GEN-EWS</option>
-                  <option value="OBC">OBC-NCL</option>
-                  <option value="SCST">SC / ST</option>
+                <select onchange="if(${IS_JEE}){ window._T6_JEE.cat=this.value; } else { window._T6_NEET.cat=this.value; } window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
+                  <option value="GEN" ${(IS_JEE ? window._T6_JEE.cat : window._T6_NEET.cat) === "GEN" ? "selected" : ""}>General (OPEN)</option>
+                  <option value="EWS" ${(IS_JEE ? window._T6_JEE.cat : window._T6_NEET.cat) === "EWS" ? "selected" : ""}>GEN-EWS</option>
+                  <option value="OBC" ${(IS_JEE ? window._T6_JEE.cat : window._T6_NEET.cat) === "OBC" ? "selected" : ""}>OBC-NCL</option>
+                  <option value="SCST" ${(IS_JEE ? window._T6_JEE.cat : window._T6_NEET.cat) === "SCST" ? "selected" : ""}>SC / ST</option>
                 </select>
               </div>
             </div>
