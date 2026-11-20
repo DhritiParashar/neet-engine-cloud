@@ -1897,17 +1897,19 @@
                   ? "Adjust sliders & dropdowns, then click Set Target to lock your goal and compare against your actual Tab 4 achievement."
                   : "Showing your actual verified Full-Mock marks alongside your Locked Target & Deficiency Matrix."}</div>
               </div>
-              <div class="flex flex-col gap-1.5 shrink-0">
+              <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:flex-end;">
+                <button id="t6-set-target-top" type="button" onclick="window.commitCurrentAsTarget();"
+                  style="background:#4f46e5;color:#ffffff;border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer;">
+                  &#127919; Set Target
+                </button>
+                <button type="button" onclick="window.resetDesiredTargetToDefault();"
+                  style="background:#f1f5f9;color:#1e293b;border:1px solid #cbd5e1;border-radius:10px;padding:8px 11px;font-size:12px;font-weight:800;cursor:pointer;">
+                  Reset Target
+                </button>
                 <button type="button" onclick="if(window.applySyncedMockToTab6()){ window.renderScienceTab7(); } else { alert('No submitted Tab 4 Full Mock found in ledger yet. Submit a complete Tab 4 Full Mock first.'); }"
-                  class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-sm cursor-pointer">
+                  style="background:#059669;color:#ffffff;border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer;">
                   &#8635; Sync Mock
                 </button>
-                ${!isTargetMode ? `
-                  <button type="button" onclick="window.switchToDesiredTargetMode();"
-                    class="px-3.5 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-[11px] font-extrabold cursor-pointer">
-                    My Target
-                  </button>
-                ` : ""}
               </div>
             </div>
 
@@ -1938,8 +1940,7 @@
                 Reset Target
               </button>
             </div>
-
-                        <div id="t6-target-action-bar" style="display:flex;gap:8px;align-items:center;padding-top:8px;">
+<div id="t6-target-action-bar" style="display:flex;gap:8px;align-items:center;padding-top:6px;">
               <button id="t6-set-target-btn" type="button" onclick="window.commitCurrentAsTarget();"
                 style="flex:1;background:#4f46e5;color:#ffffff;border:none;border-radius:12px;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer;">
                 &#127919; Set Target (Lock ${IS_JEE ? (window._T6_JEE.p + window._T6_JEE.c + window._T6_JEE.m) + "/300" : (window._T6_NEET.p + window._T6_NEET.c + window._T6_NEET.b + window._T6_NEET.z) + "/720"})
@@ -1949,7 +1950,6 @@
                 Reset Target
               </button>
             </div>
-
             <div class="grid grid-cols-2 gap-3 pt-1 text-xs">
               <div>
                 <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "NTA Shift Normalization" : "Paper Difficulty Level"}</label>
@@ -2632,7 +2632,8 @@
     renderTab5: window.renderScienceTab5,
     renderTrapClinic5: window.renderScienceTab5,
     renderTab6: window.renderScienceTab6,
-    renderTab7: window.renderScienceTab7
+    renderTab7: window.renderScienceTab7,
+    renderScienceTab7: window.renderScienceTab7
   };
   Object.entries(tabMap).forEach(([k, fn]) => {
     Object.defineProperty(window, k, { get: () => fn, set: () => {}, configurable: true });
