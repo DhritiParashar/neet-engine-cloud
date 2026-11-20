@@ -958,7 +958,7 @@
               : logs.map(lg => {
                 const effVal = lg.effScore !== undefined ? lg.effScore : lg.totalScore;
                 const dBadge = lg.diffLabel || "Standard NTA Paper";
-                return `<tr class="border-b border-slate-100"><td class="py-3 pr-3 font-mono font-extrabold text-slate-900">${lg.sessionId}</td><td class="py-3 pr-3 text-slate-600">${lg.timestamp}</td><td class="py-3 pr-3"><span class="px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 font-extrabold text-[10px]">${dBadge}</span></td><td class="py-3 pr-3 font-black">${lg.totalScore} / ${lg.maxScore} <span class="text-[11px] font-bold text-emerald-700">(Eq: ${effVal})</span></td><td class="py-3 pr-3 font-bold">${lg.accuracy}% (${lg.counts})</td><td class="py-3 flex gap-1.5"><button type="button" onclick="window.downloadMockPdfReport('${lg.sessionId}');" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold cursor-pointer">PDF Marksheet</button><button type="button" onclick="window.applySyncedMockToTab6('${lg.sessionId}'); window.selectUnifiedTab(7);" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold cursor-pointer">&#8635; Sync Tab 7</button></td></tr>`;
+                return `<tr class="border-b border-slate-100"><td class="py-3 pr-3 font-mono font-extrabold text-slate-900">${lg.sessionId}</td><td class="py-3 pr-3 text-slate-600">${lg.timestamp}</td><td class="py-3 pr-3"><span class="px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 font-extrabold text-[10px]">${dBadge}</span></td><td class="py-3 pr-3 font-black">${lg.totalScore} / ${lg.maxScore} <span class="text-[11px] font-bold text-emerald-700">(Eq: ${effVal})</span></td><td class="py-3 pr-3 font-bold">${lg.accuracy}% (${lg.counts})</td><td class="py-3 flex gap-1.5"><button type="button" onclick="window.downloadMockPdfReport('${lg.sessionId}');" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold cursor-pointer">PDF Marksheet</button><button type="button" onclick="window.applySyncedMockToTab6('${lg.sessionId}'); window.selectUnifiedTab(7, true);" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold cursor-pointer">&#8635; Sync Tab 7</button></td></tr>`;
               }).join("")}
             </tbody>
           </table>
@@ -1042,7 +1042,7 @@
               <button type="button" onclick="window.submitMockAndSync();" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold cursor-pointer">Submit Full Mock &amp; Sync Tab 7</button>
             ` : `
               <button type="button" onclick="window.downloadMockPdfReport('${window._MOCK_SERIAL_ID}');" class="px-4 py-2 rounded-xl bg-amber-500 text-slate-950 text-xs font-extrabold cursor-pointer">Download PDF Marksheet</button>
-              <button type="button" onclick="window.applySyncedMockToTab6('${window._MOCK_SERIAL_ID}'); window.selectUnifiedTab(7);" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-extrabold cursor-pointer">View Calibrated Standing in Tab 7 &rarr;</button>
+              <button type="button" onclick="window.applySyncedMockToTab6('${window._MOCK_SERIAL_ID}'); window.selectUnifiedTab(7, true);" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-extrabold cursor-pointer">View Calibrated Standing in Tab 7 &rarr;</button>
               <button type="button" onclick="window.startFreshMockReset();" class="px-3.5 py-2 rounded-xl border text-xs font-extrabold cursor-pointer">New Full Mock</button>
             `}
           </div>
@@ -1486,28 +1486,41 @@
   // ============================================================================
   const TARGET_KEY = IS_JEE ? "goalisb_jee_self_target_v1" : "goalisb_neet_self_target_v1";
 
-  function loadSavedSelfTarget() {
-    try {
-      const raw = JSON.parse(localStorage.getItem(TARGET_KEY) || "null");
-      if (raw && typeof raw === "object") return raw;
-    } catch (_) {}
+  function getDefaultSelfTarget() {
     return IS_JEE
       ? { p: 82, c: 80, m: 78, shift: "MODERATE", cat: "GEN" }
       : { p: 165, c: 170, b: 175, z: 175, diff: "MODERATE", cat: "GEN" };
+  }
+
+  function loadSavedSelfTarget() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(TARGET_KEY) || "null");
+      if (raw && typeof raw === "object") return { ...getDefaultSelfTarget(), ...raw };
+    } catch (_) {}
+    return getDefaultSelfTarget();
   }
 
   function saveSelfTarget(obj) {
     try { localStorage.setItem(TARGET_KEY, JSON.stringify(obj)); } catch (_) {}
   }
 
-  window._T6_MODE = window._T6_MODE || "TARGET";
+  window._T6_MODE = "TARGET";
   window._T6_JEE = loadSavedSelfTarget();
   window._T6_NEET = loadSavedSelfTarget();
 
   window.switchToDesiredTargetMode = function () {
     const saved = loadSavedSelfTarget();
-    if (IS_JEE) window._T6_JEE = { ...window._T6_JEE, ...saved };
-    else window._T6_NEET = { ...window._T6_NEET, ...saved };
+    if (IS_JEE) window._T6_JEE = { ...saved };
+    else window._T6_NEET = { ...saved };
+    window._T6_MODE = "TARGET";
+    window.renderScienceTab7();
+  };
+
+  window.resetDesiredTargetToDefault = function () {
+    const def = getDefaultSelfTarget();
+    saveSelfTarget(def);
+    if (IS_JEE) window._T6_JEE = { ...def };
+    else window._T6_NEET = { ...def };
     window._T6_MODE = "TARGET";
     window.renderScienceTab7();
   };
@@ -1801,7 +1814,12 @@
                     class="px-3.5 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-[11px] font-extrabold cursor-pointer">
                     My Target
                   </button>
-                ` : ""}
+                ` : `
+                  <button type="button" onclick="window.resetDesiredTargetToDefault();"
+                    class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-[11px] font-extrabold cursor-pointer">
+                    Reset Target
+                  </button>
+                `}
               </div>
             </div>
 
@@ -1825,7 +1843,7 @@
             <div class="grid grid-cols-2 gap-3 pt-1 text-xs">
               <div>
                 <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "NTA Shift Normalization" : "Paper Difficulty Level"}</label>
-                <select onchange="if(${IS_JEE}) window._T6_JEE.shift=this.value; else window._T6_NEET.diff=this.value; window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
+                <select onchange="if(${IS_JEE}){ window._T6_JEE.shift=this.value; if(window._T6_MODE!=='VERIFIED') saveSelfTarget(window._T6_JEE); } else { window._T6_NEET.diff=this.value; if(window._T6_MODE!=='VERIFIED') saveSelfTarget(window._T6_NEET); } window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
                   <option value="TOUGH" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "TOUGH" ? "selected" : ""}>Tough Paper (+${IS_JEE ? 14 : 15} Eq.)</option>
                   <option value="MODERATE" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "MODERATE" ? "selected" : ""}>Standard NTA Paper (0 Eq.)</option>
                   <option value="EASY" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "EASY" ? "selected" : ""}>High-Cutoff Paper (-${IS_JEE ? 12 : 10} Eq.)</option>
@@ -1833,7 +1851,7 @@
               </div>
               <div>
                 <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "Admission Category" : "Counselling Quota"}</label>
-                <select onchange="if(${IS_JEE}) window._T6_JEE.cat=this.value; else window._T6_NEET.cat=this.value; window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
+                <select onchange="if(${IS_JEE}){ window._T6_JEE.cat=this.value; if(window._T6_MODE!=='VERIFIED') saveSelfTarget(window._T6_JEE); } else { window._T6_NEET.cat=this.value; if(window._T6_MODE!=='VERIFIED') saveSelfTarget(window._T6_NEET); } window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
                   <option value="GEN" selected>General (OPEN)</option>
                   <option value="EWS">GEN-EWS</option>
                   <option value="OBC">OBC-NCL</option>
@@ -2436,7 +2454,7 @@
             <div class="grid grid-cols-2 gap-3 pt-1 text-xs">
               <div>
                 <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "NTA Shift Normalization" : "Paper Difficulty Level"}</label>
-                <select onchange="if(${IS_JEE}) window._T6_JEE.shift=this.value; else window._T6_NEET.diff=this.value; window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
+                <select onchange="if(${IS_JEE}){ window._T6_JEE.shift=this.value; if(window._T6_MODE!=='VERIFIED') saveSelfTarget(window._T6_JEE); } else { window._T6_NEET.diff=this.value; if(window._T6_MODE!=='VERIFIED') saveSelfTarget(window._T6_NEET); } window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
                   <option value="TOUGH" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "TOUGH" ? "selected" : ""}>Tough Paper (+${IS_JEE ? 14 : 15} Eq.)</option>
                   <option value="MODERATE" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "MODERATE" ? "selected" : ""}>Standard NTA Paper (0 Eq.)</option>
                   <option value="EASY" ${(IS_JEE ? window._T6_JEE.shift : window._T6_NEET.diff) === "EASY" ? "selected" : ""}>High-Cutoff Paper (-${IS_JEE ? 12 : 10} Eq.)</option>
@@ -2444,7 +2462,7 @@
               </div>
               <div>
                 <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "Admission Category" : "Counselling Quota"}</label>
-                <select onchange="if(${IS_JEE}) window._T6_JEE.cat=this.value; else window._T6_NEET.cat=this.value; window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
+                <select onchange="if(${IS_JEE}){ window._T6_JEE.cat=this.value; if(window._T6_MODE!=='VERIFIED') saveSelfTarget(window._T6_JEE); } else { window._T6_NEET.cat=this.value; if(window._T6_MODE!=='VERIFIED') saveSelfTarget(window._T6_NEET); } window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">
                   <option value="GEN" selected>General (OPEN)</option>
                   <option value="EWS">GEN-EWS</option>
                   <option value="OBC">OBC-NCL</option>
@@ -2562,8 +2580,9 @@
     });
   }
 
-  window.selectUnifiedTab = function (tabNum) {
+  window.selectUnifiedTab = function (tabNum, keepSyncMode) {
     const n = Math.min(7, Math.max(1, Number(tabNum) || 1));
+    if (n === 7 && !keepSyncMode) { window._T6_MODE = "TARGET"; }
     window._ACTIVE_SCI_TAB = n;
     syncTabPillVisuals(n);
     const target = getTarget();
