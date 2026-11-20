@@ -298,32 +298,46 @@
 })();
 
 // ==============================================================================
-// EMBEDDED SOCRATIC AI DOUBT SOLVER FOR TAB 6 (JEE & NEET v11)
+// CAT-STYLE SPLIT 2-COLUMN TRAP DOCTOR & AI DOUBT SOLVER (JEE & NEET v12)
+// Left (8 Cols): Compact Subject/Chapter Trap Cards + 1-Click "Ask AI Doubt Doctor"
+// Right (4 Cols Sticky): Clean 2-Field "AI Doubt & Trap Breakdown" Panel
 // ==============================================================================
 (function () {
   const HOST = (window.location.hostname || "").toLowerCase();
   const TITLE = (document.title || "").toUpperCase();
   const PORTAL = HOST.includes("neet") || TITLE.includes("NEET") ? "NEET" : "JEE";
 
+  window.askAiAboutTrapCard = function (topic, trapTitle, ruleText) {
+    const topicEl = document.getElementById("jn-ai-doubt-topic");
+    const qEl = document.getElementById("jn-ai-doubt-q");
+    if (topicEl) {
+      const opt = Array.from(topicEl.options).find(o => o.value.toLowerCase().includes(topic.toLowerCase()));
+      if (opt) topicEl.value = opt.value;
+    }
+    if (qEl) {
+      qEl.value = `${trapTitle}\nContext: ${ruleText}\n\nBreak down why students fall into this -1 trap, show a worked exam example, and give a 30-second verification shortcut.`;
+      qEl.focus();
+    }
+    window.submitJeeNeetAiDoubt();
+  };
+
   window.submitJeeNeetAiDoubt = async function () {
     const topicEl = document.getElementById("jn-ai-doubt-topic");
     const qEl = document.getElementById("jn-ai-doubt-q");
-    const attEl = document.getElementById("jn-ai-doubt-att");
     const outEl = document.getElementById("jn-ai-doubt-out");
     const btnEl = document.getElementById("jn-ai-doubt-btn");
     if (!qEl || !outEl) return;
 
     const question = qEl.value.trim();
     if (!question) {
-      alert("Please enter or paste your question / concept doubt first.");
+      alert("Paste any question or click 'Ask AI Doubt Doctor About This Trap' on a card first.");
       return;
     }
-    const topic = topicEl ? topicEl.value : `${PORTAL} Core Concept`;
-    const attempt = attEl ? attEl.value.trim() : "";
+    const topic = topicEl ? topicEl.value : `${PORTAL} Trap & Concept Check`;
 
-    if (btnEl) { btnEl.disabled = true; btnEl.textContent = "Analyzing Concept & NTA Trap..."; }
+    if (btnEl) { btnEl.disabled = true; btnEl.textContent = "Analyzing Trap & Shortcut..."; }
     outEl.style.display = "block";
-    outEl.innerHTML = `<div class="text-xs font-bold text-indigo-600">Generating step-by-step Socratic derivation, NTA -1 trap check &amp; 30-second shortcut...</div>`;
+    outEl.innerHTML = `<div class="text-xs font-bold text-indigo-600">Generating Socratic breakdown &amp; 30s shortcut...</div>`;
 
     try {
       const res = await fetch("/api/doubt", {
@@ -333,7 +347,7 @@
           track: PORTAL === "NEET" ? "NEET_UG_720" : "JEE_MAIN_ADV_300",
           topic: topic,
           question: question,
-          student_attempt: attempt
+          student_attempt: ""
         })
       });
       const data = await res.json();
@@ -343,87 +357,113 @@
         .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
         .replace(/\n/g, "<br>");
       outEl.innerHTML = `
-        <div class="text-[11px] font-extrabold uppercase text-emerald-700 mb-2">✓ Socratic AI Resolution &amp; NTA Negative-Marking Guard</div>
-        <div class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed">${formatted}</div>
+        <div class="text-[10px] font-extrabold uppercase text-emerald-700 mb-1.5">✓ Socratic Breakdown &amp; 30s Antidote</div>
+        <div class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed max-h-80 overflow-y-auto pr-1">${formatted}</div>
       `;
     } catch (err) {
-      outEl.innerHTML = `<div class="text-xs font-bold text-rose-600">Error contacting AI Doubt Engine: ${err.message}</div>`;
+      outEl.innerHTML = `<div class="text-xs font-bold text-rose-600">Error: ${err.message}</div>`;
     } finally {
-      if (btnEl) { btnEl.disabled = false; btnEl.textContent = "🧠 Ask AI Socratic Tutor"; }
+      if (btnEl) { btnEl.disabled = false; btnEl.textContent = "✨ Analyze Trap & Generate 30s Shortcut"; }
     }
   };
 
   window.mountTab6AiDoubtBox = function () {
     const trapH = Array.from(document.querySelectorAll("h1,h2,h3,div"))
       .find(el => el.children.length === 0 && /Chapter-Wise -1 Trap Vault/i.test(el.textContent || ""));
-    if (!trapH || document.getElementById("jn-ai-doubts-card")) return;
+    if (!trapH) return;
+
+    // Remove legacy bulky full-width card if present
+    const oldCard = document.getElementById("jn-ai-doubts-card");
+    if (oldCard && !oldCard.dataset.splitLayout) oldCard.remove();
+    const oldPill = document.getElementById("jn-ai-pill-btn");
+    if (oldPill) oldPill.remove();
 
     const bannerCard = trapH.closest("div.rounded-2xl, section, div.bg-white") || trapH.parentElement;
-    if (!bannerCard) return;
+    if (!bannerCard || !bannerCard.parentElement) return;
+    const rootWrap = bannerCard.parentElement;
 
-    const errBtn = Array.from(bannerCard.querySelectorAll("button"))
-      .find(b => /My Logged Mock -1 Errors/i.test(b.textContent || ""));
-    if (errBtn && errBtn.parentElement && !document.getElementById("jn-ai-pill-btn")) {
-      const pill = document.createElement("button");
-      pill.id = "jn-ai-pill-btn";
-      pill.type = "button";
-      pill.className = "px-4 py-2 rounded-full text-xs font-extrabold bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm cursor-pointer transition";
-      pill.textContent = "🧠 Ask AI Socratic Doubt";
-      pill.onclick = () => {
-        const c = document.getElementById("jn-ai-doubts-card");
-        if (c) { c.scrollIntoView({ behavior: "smooth", block: "center" }); document.getElementById("jn-ai-doubt-q")?.focus(); }
-      };
-      errBtn.parentElement.appendChild(pill);
-    }
+    // Convert the content below bannerCard into a CAT-style 12-column split (8 left + 4 sticky right)
+    let splitGrid = document.getElementById("jn-tab6-split-grid");
+    if (!splitGrid) {
+      const siblingsAfter = [];
+      let cur = bannerCard.nextElementSibling;
+      while (cur) {
+        siblingsAfter.push(cur);
+        cur = cur.nextElementSibling;
+      }
+      if (!siblingsAfter.length) return;
 
-    const topics = PORTAL === "NEET"
-      ? ["Botany — Molecular Basis & Genetics", "Zoology — Human Physiology & Reproduction", "Physics — Electrostatics, Optics & Modern Physics", "Chemistry — Organic Mechanisms & Equilibrium"]
-      : ["Physics — Rotational Motion, Electrodynamics & Modern Physics", "Chemistry — Organic Named Reactions, Thermodynamics & Coordination", "Mathematics — Calculus, Vectors/3D, Conics & Probability"];
+      splitGrid = document.createElement("div");
+      splitGrid.id = "jn-tab6-split-grid";
+      splitGrid.className = "grid grid-cols-1 lg:grid-cols-12 gap-5 items-start mt-4";
 
-    const card = document.createElement("div");
-    card.id = "jn-ai-doubts-card";
-    card.className = "bg-white dark:bg-slate-900 border-2 border-indigo-500/30 rounded-2xl p-6 shadow-sm space-y-4 my-5";
-    card.innerHTML = `
-      <div class="flex flex-wrap items-center justify-between gap-2">
+      const leftCol = document.createElement("div");
+      leftCol.id = "jn-tab6-left-traps";
+      leftCol.className = "lg:col-span-8 space-y-4";
+      siblingsAfter.forEach(node => leftCol.appendChild(node));
+
+      const topics = PORTAL === "NEET"
+        ? ["Botany • NCERT Line & Genetics Trap", "Zoology • Physiology & Assertion-Reason", "Physics • Sign Convention & Formula Trap", "Chemistry • Organic Reagent & Equilibrium"]
+        : ["Physics • Boundary & Constraint Check", "Chemistry • Reagent & Thermo Sign Check", "Mathematics • Domain, Calculus & Vector Trap"];
+
+      const rightCol = document.createElement("div");
+      rightCol.id = "jn-ai-doubts-card";
+      rightCol.dataset.splitLayout = "1";
+      rightCol.className = "lg:col-span-4 lg:sticky lg:top-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3.5";
+      rightCol.innerHTML = `
         <div>
-          <span class="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-extrabold uppercase">SOCRATIC AI DOUBT SOLVER &bull; STEP-BY-STEP + 30-SEC SHORTCUT</span>
-          <h3 class="text-lg font-extrabold text-slate-900 dark:text-white mt-1">Ask Any ${PORTAL} Concept, Numerical, or Mock Question Doubt</h3>
-          <p class="text-xs text-slate-500">Paste any tricky problem or mock question below for the NCERT/JEE core rule, -1 trap warning, and fastest solving shortcut.</p>
+          <div class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600">SOCRATIC AI TUTOR</div>
+          <h3 class="text-lg font-extrabold text-slate-900 dark:text-white mt-0.5">AI Doubt &amp; Trap Breakdown</h3>
+          <p class="text-xs text-slate-500 mt-1">Click any trap card&#39;s <strong>Ask AI Doubt Doctor</strong> link or paste your own ${PORTAL} question below.</p>
         </div>
-      </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
-          <label class="block text-[11px] font-extrabold text-slate-600 mb-1">Subject &amp; Chapter Track</label>
+          <label class="block text-[11px] font-extrabold text-slate-700 dark:text-slate-300 mb-1">Topic / Trap Focus</label>
           <select id="jn-ai-doubt-topic" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-2 text-xs font-bold">
             ${topics.map(t => `<option value="${t}">${t}</option>`).join("")}
           </select>
         </div>
-        <div class="md:col-span-2">
-          <label class="block text-[11px] font-extrabold text-slate-600 mb-1">Your Attempt / Where You Got Stuck (Optional)</label>
-          <input id="jn-ai-doubt-att" type="text" placeholder="e.g., Confused between isothermal vs adiabatic work sign convention..."
-            class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-2 text-xs" />
+
+        <div>
+          <label class="block text-[11px] font-extrabold text-slate-700 dark:text-slate-300 mb-1">Question or Trap to Analyze</label>
+          <textarea id="jn-ai-doubt-q" rows="4" placeholder="Paste any ${PORTAL} question or click 'Ask AI Doubt Doctor' on a trap card..."
+            class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 p-3 text-xs"></textarea>
         </div>
-      </div>
 
-      <div>
-        <label class="block text-[11px] font-extrabold text-slate-600 mb-1">Question Stem / Concept Doubt</label>
-        <textarea id="jn-ai-doubt-q" rows="3" placeholder="Paste the full question or describe the concept you want broken down step-by-step..."
-          class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 p-3 text-xs"></textarea>
-      </div>
-
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <span class="text-[11px] text-slate-400">Powered by GOALisB Socratic Tutor (/api/doubt)</span>
         <button id="jn-ai-doubt-btn" type="button" onclick="window.submitJeeNeetAiDoubt()"
-          class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold shadow cursor-pointer">
-          🧠 Ask AI Socratic Tutor
+          class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold shadow cursor-pointer transition">
+          &#10024; Analyze Trap &amp; Generate 30s Shortcut
         </button>
-      </div>
 
-      <div id="jn-ai-doubt-out" style="display:none;" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800"></div>
-    `;
-    bannerCard.insertAdjacentElement("afterend", card);
+        <div id="jn-ai-doubt-out" style="display:none;" class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800"></div>
+      `;
+
+      splitGrid.appendChild(leftCol);
+      splitGrid.appendChild(rightCol);
+      rootWrap.appendChild(splitGrid);
+    }
+
+    // Attach 1-click "⚡ Ask AI Doubt Doctor About This Trap →" link onto each trap card on the left
+    const leftArea = document.getElementById("jn-tab6-left-traps");
+    if (leftArea) {
+      Array.from(leftArea.querySelectorAll("div.rounded-2xl, div.rounded-xl")).forEach(card => {
+        if (card.dataset.aiLinkBound) return;
+        const titleEl = Array.from(card.querySelectorAll("h3, h4, div.font-extrabold, div.font-bold"))
+          .find(el => /^Trap #\d+:/i.test((el.textContent || "").trim()));
+        if (!titleEl) return;
+        card.dataset.aiLinkBound = "1";
+        const trapTitle = titleEl.textContent.trim();
+        const bodySnippet = (card.textContent || "").replace(/\s+/g, " ").slice(0, 220);
+
+        const linkBtn = document.createElement("button");
+        linkBtn.type = "button";
+        linkBtn.className = "mt-2.5 inline-flex items-center gap-1 text-xs font-extrabold text-indigo-600 hover:text-indigo-500 cursor-pointer";
+        linkBtn.innerHTML = "&#9889; Ask AI Doubt Doctor About This Trap &rarr;";
+        linkBtn.onclick = () => window.askAiAboutTrapCard(PORTAL, trapTitle, bodySnippet);
+        card.appendChild(linkBtn);
+      });
+    }
   };
 
-  setInterval(window.mountTab6AiDoubtBox, 600);
+  setInterval(window.mountTab6AiDoubtBox, 500);
 })();
