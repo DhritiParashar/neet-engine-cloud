@@ -1116,7 +1116,7 @@
   };
 
   // ============================================================================
-  // TAB 5: DEDICATED SUBJECT-WISE & SECTIONAL TIMED PRACTICE MOCK ARENA (v36)
+  // TAB 5: DEDICATED SUBJECT-WISE & SECTIONAL TIMED PRACTICE MOCK ARENA (v47)
   // ============================================================================
   const PRAC_LOG_KEY = IS_JEE ? "goalisb_jee_practice_mock_ledger_v1" : "goalisb_neet_practice_mock_ledger_v1";
   window._PM_SCOPE = window._PM_SCOPE || (IS_JEE ? "PHYSICS" : "BIOLOGY");
@@ -1172,6 +1172,16 @@
     }, 1000);
   }
 
+  function pickPracticePool(pool, count) {
+    if (!pool.length) return [];
+    const out = [];
+    while (out.length < count) {
+      const batch = shuffleArray(pool);
+      for (let i = 0; i < batch.length && out.length < count; i++) out.push(batch[i]);
+    }
+    return out;
+  }
+
   function buildPracticePaper() {
     const meta = getPracticeMeta();
     const key = window._PM_SERIAL + "_" + meta.scope;
@@ -1182,13 +1192,13 @@
     if (IS_JEE) {
       const mcqs = window._SCI_QUESTIONS.filter(q => q.subject === meta.scope && q.question_type !== "NUMERICAL_INT");
       const nums = window._SCI_QUESTIONS.filter(q => q.subject === meta.scope && q.question_type === "NUMERICAL_INT");
-      pickRandomDistinct(mcqs, 20).forEach(b => paper.push({ ...b, mock_sec: "Section A (MCQ)", mock_subj: meta.scope }));
-      pickRandomDistinct(nums, 5).forEach(b => paper.push({ ...b, mock_sec: "Section B (Numerical)", mock_subj: meta.scope }));
+      pickPracticePool(mcqs, 20).forEach(b => paper.push({ ...b, mock_sec: "Section A (MCQ)", mock_subj: meta.scope }));
+      pickPracticePool(nums, 5).forEach(b => paper.push({ ...b, mock_sec: "Section B (Numerical)", mock_subj: meta.scope }));
     } else {
       const subjs = meta.scope === "BIOLOGY" ? ["BOTANY", "ZOOLOGY"] : [meta.scope];
       subjs.forEach(s => {
         const pool = window._SCI_QUESTIONS.filter(q => q.subject === s && Array.isArray(q.options_json) && q.options_json.length >= 4);
-        pickRandomDistinct(pool, 45).forEach(b => paper.push({ ...b, mock_sec: "Compulsory MCQ", mock_subj: s }));
+        pickPracticePool(pool, 45).forEach(b => paper.push({ ...b, mock_sec: "Compulsory MCQ", mock_subj: s }));
       });
     }
     if (paper.length === meta.qs) {
@@ -1354,7 +1364,7 @@
           <table class="w-full text-left border-collapse text-xs">
             <thead><tr class="border-b border-slate-200 text-[11px] font-extrabold uppercase text-slate-500"><th class="py-2 pr-3">PRACTICE ID</th><th class="py-2 pr-3">DATE &amp; TIME</th><th class="py-2 pr-3">SUBJECT BLUEPRINT</th><th class="py-2 pr-3">SCORE</th><th class="py-2 pr-3">ACCURACY</th><th class="py-2 pr-3">TIME</th><th class="py-2">MARKSHEET</th></tr></thead>
             <tbody>
-              ${!pLogs.length ? `<tr><td colspan="6" class="py-4 text-slate-500">No subject practice mocks completed yet. Select a subject above and launch a timed practice mock.</td></tr>`
+              ${!pLogs.length ? `<tr><td colspan="7" class="py-4 text-slate-500">No subject practice mocks completed yet. Select a subject above and launch a timed practice mock.</td></tr>`
               : pLogs.map(x => `<tr class="border-b border-slate-100"><td class="py-2.5 pr-3 font-mono font-extrabold">${x.sessionId}</td><td class="py-2.5 pr-3 text-slate-600">${x.timestamp}</td><td class="py-2.5 pr-3 font-bold">${x.blueprint}</td><td class="py-2.5 pr-3 font-black text-${accent}-700">${x.totalScore} / ${x.maxScore}</td><td class="py-2.5 pr-3 font-semibold">${x.accuracy}% (${x.counts})</td><td class="py-2.5 pr-3">${x.timeTaken}</td><td class="py-2.5"><button type="button" onclick="window.downloadPracticePdfReport('${x.sessionId}');" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold cursor-pointer">Download PDF Marksheet</button></td></tr>`).join("")}
             </tbody>
           </table>
@@ -1375,6 +1385,13 @@
           </div>
           ${pracLedger}
         </div>`;
+      return;
+    }
+
+    if (!paper.length) {
+      target.innerHTML = `<div class="p-8 text-center text-sm font-bold text-slate-500">Connecting to Neon PostgreSQL Practice Bank...</div>`;
+      await hydrateFromNeon();
+      if (buildPracticePaper().length) return window.renderScienceTab5(target);
       return;
     }
 
@@ -1404,6 +1421,18 @@
             `}
           </div>
         </div>
+
+        ${window._PM_SUBMITTED ? (() => {
+          const latest = getPracticeLogs().find(x => x.sessionId === window._PM_SERIAL) || getPracticeLogs()[0];
+          return latest ? `
+            <div class="bg-white border-2 border-emerald-500 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+              <div>
+                <div class="text-xs font-extrabold uppercase text-emerald-700">PRACTICE MOCK SCORECARD &bull; ${latest.sessionId}</div>
+                <div class="text-xl font-black text-slate-900 mt-0.5">Score: ${latest.totalScore} / ${latest.maxScore} &bull; Accuracy: ${latest.accuracy}% (${latest.counts})</div>
+              </div>
+              <button type="button" onclick="window.downloadPracticePdfReport('${latest.sessionId}');" class="px-4 py-2.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-extrabold shadow-sm cursor-pointer">Download PDF Marksheet</button>
+            </div>` : "";
+        })() : ""}
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-8 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
