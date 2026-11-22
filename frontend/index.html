@@ -275,22 +275,13 @@ window.IPM_MANIFEST = {
     const user = getUser();
     const name = user ? user.name : "Guest Aspirant";
     let hist = [];
-    try { hist = JSON.parse(localStorage.getItem("ipm_mock_history_v1") || "[]"); } catch (e) {}
+    try { hist = JSON.parse(localStorage.getItem("goalisb_neet_full_mock_ledger_v1") || "[]"); } catch (e) {}
     const latest = hist[0];
 
     let telemetry = CFG.defaultTel;
-    if (latest && latest.maxScore) {
-      const host = window.location.host.toLowerCase();
-      if (host.includes("gmat")) {
-        const est = Math.min(805, Math.max(205, Math.round((205 + (latest.score / latest.maxScore) * 600) / 10) * 10 + 5));
-        telemetry = `Mocks: ${hist.length} &bull; Latest Scaled: ${est}/805`;
-      } else if (host.includes("gre")) {
-        const est = Math.min(340, Math.max(260, Math.round(260 + (latest.score / latest.maxScore) * 80)));
-        telemetry = `Mocks: ${hist.length} &bull; Latest Scaled: ${est}/340`;
-      } else {
-        const scaled198 = Math.round((latest.score / latest.maxScore) * 198);
-        telemetry = `Mocks: ${hist.length} &bull; Latest Scaled: ${scaled198}/198`;
-      }
+    if (latest && Number(latest.maxScore) === 720) {
+      const sc = Number(latest.effScore !== undefined ? latest.effScore : latest.totalScore || 0);
+      telemetry = `Mocks: ${hist.length} &bull; Latest: ${sc}/720`;
     } else if (user && user.targetScore) {
       telemetry = `Target: ${user.targetScore} &bull; Mocks: 0`;
     }
@@ -324,7 +315,7 @@ window.IPM_MANIFEST = {
                 <span class="font-extrabold text-base text-slate-900 dark:text-white tracking-tight whitespace-nowrap">${CFG.title}</span>
                 <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">${CFG.tag}</span>
               </div>
-              <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-md xl:max-w-xl">${CFG.sub}</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[260px] xl:max-w-md">${CFG.sub}</div>
             </div>
           </div>
 
@@ -384,18 +375,18 @@ window.IPM_MANIFEST = {
   // Event-driven header rendering (zero polling CPU)
 })();
 </script>
-  <script src="/js/modules/science_traps_bank.js?v=20261120v15"></script>
-  <script src="/js/modules/neet_master_modules.js?v=20261120v15"></script>
-  <script src="/js/portal_switcher.js?v=20261120v15"></script>
-  <script src="/js/modules/systematic_serial_id.js?v=20261120v15"></script>
-  <script src="/js/modules/tab6_independent_scroll.js?v=20261120v15"></script>
+  <script src="/js/modules/science_traps_bank.js?v=20261122v_neet_parity"></script>
+  <script src="/js/modules/neet_master_modules.js?v=20261122v_neet_parity"></script>
+  <script src="/js/portal_switcher.js?v=20261122v_neet_parity"></script>
+  <script src="/js/modules/systematic_serial_id.js?v=20261122v_neet_parity"></script>
+  <script src="/js/modules/tab6_independent_scroll.js?v=20261122v_neet_parity"></script>
 
 <!-- UNIVERSAL FLOATING GO-TO-TOP BUTTON (ALL 7 PORTALS) -->
 <style>
   #goalisbGoToTopBtn {
     position: fixed;
-    right: 22px;
-    bottom: 76px;
+    right: 18px;
+    bottom: 18px;
     z-index: 9990;
     display: inline-flex;
     align-items: center;

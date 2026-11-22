@@ -522,8 +522,11 @@
   };
 
   function newSerialId() {
-    const num = Math.floor(1000 + Math.random() * 9000);
-    return (IS_JEE ? "JEE-2026-" : "NEET-2026-") + num;
+    const d = new Date();
+    const ymd = d.getFullYear().toString() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0");
+    const prefix = IS_JEE ? "JEE-MAIN-FULL75" : "NEET-FULL180";
+    const logs = getVerifiedFullMockLogs();
+    return `${prefix}-${ymd}-#${String(logs.length + 1).padStart(2, "0")}`;
   }
 
   function getCandidateName() {
@@ -554,6 +557,7 @@
     logs.unshift(entry);
     localStorage.setItem(LOG_KEY, JSON.stringify(logs.slice(0, 30)));
     localStorage.setItem(SYNC_KEY, JSON.stringify(entry));
+    if (typeof window.renderCleanHeader === 'function') window.renderCleanHeader();
   }
 
   window._MOCK_SERIAL_ID = window._MOCK_SERIAL_ID || newSerialId();
@@ -776,6 +780,7 @@
       localStorage.removeItem(SYNC_KEY);
       window._T6_SYNCED_ID = null;
       window._T6_MODE = "TARGET";
+      if (typeof window.renderCleanHeader === "function") window.renderCleanHeader();
       window.renderScienceTab4();
       return;
     }
@@ -946,7 +951,7 @@
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <button type="button" onclick="window.selectUnifiedTab(7);" class="px-4 py-2 rounded-xl bg-${accent}-50 border border-${accent}-200 text-${accent}-700 text-xs font-extrabold cursor-pointer">View Forecaster in Tab 7 &rarr;</button>
-            <button type="button" onclick="window.openResetDeclarationModal('CLEAR_LEDGER');" class="px-4 py-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-extrabold cursor-pointer">Clear Log</button>
+            <button type="button" onclick="window.openResetDeclarationModal('CLEAR_LEDGER');" class="px-4 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-extrabold cursor-pointer">&#8634; Reset / Clear Logs</button>
           </div>
         </div>
         <div class="overflow-x-auto">
@@ -961,7 +966,7 @@
               : logs.map(lg => {
                 const effVal = lg.effScore !== undefined ? lg.effScore : lg.totalScore;
                 const dBadge = lg.diffLabel || "Standard NTA Paper";
-                return `<tr class="border-b border-slate-100"><td class="py-3 pr-3 font-mono font-extrabold text-slate-900">${lg.sessionId}</td><td class="py-3 pr-3 text-slate-600">${lg.timestamp}</td><td class="py-3 pr-3"><span class="px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 font-extrabold text-[10px]">${dBadge}</span></td><td class="py-3 pr-3 font-black">${lg.totalScore} / ${lg.maxScore} <span class="text-[11px] font-bold text-emerald-700">(Eq: ${effVal})</span></td><td class="py-3 pr-3 font-bold">${lg.accuracy}% (${lg.counts})</td><td class="py-3 flex gap-1.5"><button type="button" onclick="window.downloadMockPdfReport('${lg.sessionId}');" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold cursor-pointer">PDF Marksheet</button><button type="button" onclick="window.applySyncedMockToTab6('${lg.sessionId}'); window.selectUnifiedTab(7, true);" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold cursor-pointer">&#8635; Sync Tab 7</button></td></tr>`;
+                return `<tr class="border-b border-slate-100"><td class="py-3 pr-3 font-mono font-extrabold text-slate-900">${lg.sessionId}</td><td class="py-3 pr-3 text-slate-600">${lg.timestamp}</td><td class="py-3 pr-3"><span class="px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 font-extrabold text-[10px]">${dBadge}</span></td><td class="py-3 pr-3 font-black">${lg.totalScore} / ${lg.maxScore} <span class="text-[11px] font-bold text-emerald-700">(Eq: ${effVal})</span></td><td class="py-3 pr-3 font-bold">${lg.accuracy}% (${lg.counts})</td><td class="py-3 flex gap-1.5"><button type="button" onclick="window.downloadMockPdfReport('${lg.sessionId}');" class="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold cursor-pointer">&#11015; Marksheet &amp; Script</button><button type="button" onclick="window.applySyncedMockToTab6('${lg.sessionId}'); window.selectUnifiedTab(7, true);" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold cursor-pointer">&#8635; Sync Tab 7</button></td></tr>`;
               }).join("")}
             </tbody>
           </table>
@@ -1065,7 +1070,7 @@
             </div>
           </div>` : ""}
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        ${!window._CBT_SUBMITTED ? `<div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-8 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
               <div><span class="text-xs font-extrabold uppercase text-${accent}-600">Question ${qIdx + 1} of ${totalQs} &bull; ${q.mock_subj} &bull; ${q.mock_sec}</span><div class="text-[11px] text-slate-500">Code: ${q.question_code} &bull; Tier: ${q.difficulty_tier || "STANDARD"} &bull; ${q.chapter_name}</div></div>
@@ -1113,7 +1118,7 @@
               }).join("")}
             </div>
           </div>
-        </div>
+        </div>` : ""}
         ${ledgerHtml}
       </div>`;
   };
@@ -1437,7 +1442,7 @@
             </div>` : "";
         })() : ""}
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        ${!window._CBT_SUBMITTED ? `<div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-8 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
               <div><span class="text-xs font-extrabold uppercase text-${accent}-600">Question ${qIdx + 1} of ${totalQs} &bull; ${q.mock_subj} &bull; ${q.mock_sec}</span><div class="text-[11px] text-slate-500">Code: ${q.question_code} &bull; ${q.chapter_name}</div></div>
@@ -1560,10 +1565,10 @@
         return true;
       }
       if (!IS_JEE && rec.subjects.PHYSICS && rec.subjects.CHEMISTRY && rec.subjects.BOTANY && rec.subjects.ZOOLOGY) {
-        window._T6_NEET.p = Math.max(0, Number(rec.subjects.PHYSICS.s) || 0);
-        window._T6_NEET.c = Math.max(0, Number(rec.subjects.CHEMISTRY.s) || 0);
-        window._T6_NEET.b = Math.max(0, Number(rec.subjects.BOTANY.s) || 0);
-        window._T6_NEET.z = Math.max(0, Number(rec.subjects.ZOOLOGY.s) || 0);
+        window._T6_NEET.p = Number(rec.subjects.PHYSICS.s) || 0;
+        window._T6_NEET.c = Number(rec.subjects.CHEMISTRY.s) || 0;
+        window._T6_NEET.b = Number(rec.subjects.BOTANY.s) || 0;
+        window._T6_NEET.z = Number(rec.subjects.ZOOLOGY.s) || 0;
         if (rec.difficulty) window._T6_NEET.diff = rec.difficulty;
         window._T6_SYNCED_ID = rec.sessionId;
         window._T6_MODE = "VERIFIED";
@@ -1741,7 +1746,7 @@
       const bioTotal = st.b + st.z;
       const diffAdj = st.diff === "TOUGH" ? 15 : (st.diff === "EASY" ? -10 : 0);
       const catBonus = st.cat === "SCST" ? 85 : (st.cat === "OBC" ? 12 : (st.cat === "EWS" ? 10 : 0));
-      const eff = Math.min(720, Math.max(0, rawTotal + diffAdj));
+      const eff = Math.min(720, Math.max(-180, rawTotal + diffAdj));
       const quotaEff = Math.min(720, eff + catBonus);
 
       let air = "AIR > 22,00,000", tier = "Below Qualifying Cutoff (NCERT Bio 340+ Rebuild Needed)";
@@ -1807,7 +1812,8 @@
 
   window.syncT6Val = function (key, rawVal) {
     const maxV = IS_JEE ? 100 : 180;
-    const v = Math.min(maxV, Math.max(0, Math.round(Number(rawVal) || 0)));
+    const minV = IS_JEE ? -25 : -45;
+    const v = Math.min(maxV, Math.max(minV, Math.round(Number(rawVal) || 0)));
     if (IS_JEE) window._T6_JEE[key] = v;
     else window._T6_NEET[key] = v;
 
@@ -1920,13 +1926,13 @@
                 <div class="flex items-center justify-between text-xs font-extrabold">
                   <span>${lbl} ${isTargetMode ? "Target" : "Achieved"} (0 – ${maxSub})</span>
                   <div class="flex items-center gap-1">
-                    <input id="t6-num-${key}" type="number" min="0" max="${maxSub}" value="${val}"
+                    <input id="t6-num-${key}" type="number" min="${IS_JEE ? -25 : -45}" max="${maxSub}" value="${val}"
                       oninput="window.syncT6Val('${key}', this.value);"
                       class="w-16 rounded-lg border border-slate-300 px-2 py-1 text-right font-mono font-extrabold text-${accent}-700" />
                     <span class="text-slate-500">/ ${maxSub}</span>
                   </div>
                 </div>
-                <input id="t6-rng-${key}" type="range" min="0" max="${maxSub}" step="1" value="${val}"
+                <input id="t6-rng-${key}" type="range" min="${IS_JEE ? -25 : -45}" max="${maxSub}" step="1" value="${val}"
                   oninput="window.syncT6Val('${key}', this.value);"
                   class="w-full accent-${accent}-600 cursor-pointer" />
               </div>
@@ -2693,193 +2699,4 @@
       syncTabPillVisuals(window._ACTIVE_SCI_TAB || 1);
     }, 300);
   });
-})();
-
-// ==============================================================================
-// EXACT CAT-STYLE TRAP DOCTOR & AI DOUBT SOLVER FOR JEE & NEET (v15)
-// - Fixes Tab 6 active pill snapping back to Tab 1 on click
-// - Guarantees Socratic AI Breakdown persists & scrolls into view cleanly
-// ==============================================================================
-(function () {
-  const HOST = (window.location.hostname || "").toLowerCase();
-  const TITLE = (document.title || "").toUpperCase();
-  const PORTAL = HOST.includes("neet") || TITLE.includes("NEET") ? "NEET" : "JEE";
-
-  window.askAiAboutTrapCard = function (trapTitle, trapBodyText, ev) {
-    if (ev && ev.stopPropagation) ev.stopPropagation();
-    window._JN_ACTIVE_TAB = 6;
-    const topicEl = document.getElementById("jn-ai-doubt-topic");
-    const qEl = document.getElementById("jn-ai-doubt-q");
-    if (topicEl) topicEl.value = trapTitle;
-    if (qEl) {
-      qEl.value = `Explain this ${PORTAL} trap with a worked example and show how to avoid it under exam pressure:\n${trapTitle}\n${trapBodyText}`;
-    }
-    window.submitJeeNeetAiDoubt();
-  };
-
-  window.submitJeeNeetAiDoubt = async function (ev) {
-    if (ev && ev.stopPropagation) ev.stopPropagation();
-    window._JN_ACTIVE_TAB = 6;
-    const topicEl = document.getElementById("jn-ai-doubt-topic");
-    const qEl = document.getElementById("jn-ai-doubt-q");
-    const outEl = document.getElementById("jn-ai-doubt-out");
-    const btnEl = document.getElementById("jn-ai-doubt-btn");
-    if (!qEl || !outEl) return;
-
-    const question = qEl.value.trim();
-    if (!question) {
-      alert(`Paste any ${PORTAL} question or click 'Ask AI Doubt Doctor About This Trap' on a card first.`);
-      return;
-    }
-    const topic = (topicEl && topicEl.value.trim()) || `${PORTAL} • Boundary & Distractor Check`;
-
-    if (btnEl) { btnEl.disabled = true; btnEl.textContent = "⏳ Generating Socratic Breakdown..."; }
-    outEl.style.display = "block";
-    outEl.dataset.lockedOutput = "1";
-    outEl.innerHTML = `<div class="text-xs font-bold text-indigo-600">Analyzing trap mechanics, worked example &amp; 30s shortcut...</div>`;
-
-    try {
-      const res = await fetch("/api/doubt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          track: PORTAL === "NEET" ? "NEET_UG_720" : "JEE_MAIN_ADV_300",
-          topic: topic,
-          question: question,
-          student_attempt: ""
-        })
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      const rawText = (data && (data.solution || data.feedback || data.detail)) || "";
-      if (!rawText.trim()) throw new Error("Empty response from /api/doubt");
-
-      const formatted = String(rawText)
-        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-        .replace(/\n/g, "<br>");
-      outEl.style.display = "block";
-      outEl.innerHTML = `
-        <div class="text-[10px] font-extrabold uppercase text-emerald-700 mb-1.5">✓ Socratic Breakdown &amp; 30s Antidote</div>
-        <div class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed space-y-1.5">${formatted}</div>
-      `;
-      outEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    } catch (err) {
-      // Deterministic Socratic fallback if API key is rate-limited or offline
-      const lines = question.split("\n").filter(Boolean);
-      const titleLine = lines[1] || topic;
-      const detailLine = lines.slice(2).join(" ") || question;
-      outEl.style.display = "block";
-      outEl.innerHTML = `
-        <div class="text-[10px] font-extrabold uppercase text-emerald-700 mb-1.5">✓ Socratic Trap Breakdown &amp; 30s Antidote</div>
-        <div class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed space-y-2">
-          <p><strong>1. Why Students Lose -1 Mark (${titleLine}):</strong><br>${detailLine}</p>
-          <p><strong>2. Exam-Hall Verification Protocol:</strong><br>Before bubbling or locking your final option, verify domain/boundary conditions, strand/sign polarity, and units against the exact NCERT/NTA rule highlighted in green on the card.</p>
-          <p><strong>3. 30-Second Antidote:</strong><br>Eliminate the two extreme/unqualified distractors first, then test one concrete boundary value to confirm the exact option in under 30 seconds.</p>
-        </div>
-      `;
-      outEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    } finally {
-      if (btnEl) { btnEl.disabled = false; btnEl.textContent = "✨ Analyze Trap & Generate 30s Shortcut"; }
-    }
-  };
-
-  window.mountTab6AiDoubtBox = function () {
-    const trapH = Array.from(document.querySelectorAll("h1,h2,h3,div"))
-      .find(el => el.children.length === 0 && /Chapter-Wise -1 Trap Vault/i.test(el.textContent || ""));
-    if (!trapH) return;
-
-    // Keep Tab 6 highlighted in the top bar whenever Trap Vault is active on screen
-    window._JN_ACTIVE_TAB = 6;
-
-    const bannerCard = trapH.closest("div.rounded-2xl, div.rounded-3xl, section, div.bg-white") || trapH.parentElement;
-    if (!bannerCard || !bannerCard.parentElement) return;
-    const rootWrap = bannerCard.parentElement;
-
-    let splitGrid = document.getElementById("jn-tab6-split-grid");
-    if (!splitGrid) {
-      const siblingsAfter = [];
-      let cur = bannerCard.nextElementSibling;
-      while (cur) {
-        siblingsAfter.push(cur);
-        cur = cur.nextElementSibling;
-      }
-      if (!siblingsAfter.length) return;
-
-      splitGrid = document.createElement("div");
-      splitGrid.id = "jn-tab6-split-grid";
-      splitGrid.className = "grid grid-cols-1 lg:grid-cols-12 gap-5 items-start mt-4";
-
-      const leftCol = document.createElement("div");
-      leftCol.id = "jn-tab6-left-traps";
-      leftCol.className = "lg:col-span-8 space-y-4";
-      siblingsAfter.forEach(node => leftCol.appendChild(node));
-
-      const defaultTopic = PORTAL === "NEET"
-        ? "Biology • NCERT Line & Assertion-Reason Check"
-        : "Physics & Math • Boundary & Distractor Check";
-
-      const rightCol = document.createElement("div");
-      rightCol.id = "jn-ai-doubts-card";
-      rightCol.dataset.splitLayout = "1";
-      rightCol.className = "lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3.5";
-      rightCol.innerHTML = `
-        <div>
-          <div class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600">SOCRATIC AI TUTOR</div>
-          <h3 class="text-lg font-extrabold text-slate-900 dark:text-white mt-0.5">AI Doubt &amp; Trap Breakdown</h3>
-          <p class="text-xs text-slate-500 mt-1">Click any trap card&#39;s <strong>Ask AI Doubt Doctor</strong> link or paste your own ${PORTAL} question below.</p>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-extrabold text-slate-700 dark:text-slate-300 mb-1">Topic / Trap Focus</label>
-          <input id="jn-ai-doubt-topic" type="text" value="${defaultTopic}"
-            class="w-full rounded-full border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3.5 py-2 text-xs font-extrabold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500" />
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-extrabold text-slate-700 dark:text-slate-300 mb-1">Question or Trap to Analyze</label>
-          <textarea id="jn-ai-doubt-q" rows="4" placeholder="Paste any ${PORTAL} question or click 'Ask AI Doubt Doctor' on a trap card..."
-            class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 p-3 text-xs leading-relaxed focus:outline-none focus:border-indigo-500"></textarea>
-        </div>
-
-        <button id="jn-ai-doubt-btn" type="button" onclick="window.submitJeeNeetAiDoubt(event)"
-          class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold shadow cursor-pointer transition">
-          &#10024; Analyze Trap &amp; Generate 30s Shortcut
-        </button>
-
-        <div id="jn-ai-doubt-out" style="display:none;" class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800"></div>
-      `;
-
-      splitGrid.appendChild(leftCol);
-      splitGrid.appendChild(rightCol);
-      rootWrap.appendChild(splitGrid);
-    }
-
-    const leftArea = document.getElementById("jn-tab6-left-traps");
-    if (leftArea) {
-      const trapTitleEls = Array.from(leftArea.querySelectorAll("h2, h3, h4, div, p, span"))
-        .filter(el => el.children.length === 0 && /^Trap #\d+\s*:/i.test((el.textContent || "").trim()));
-
-      trapTitleEls.forEach(titleEl => {
-        const card = titleEl.closest("div[class*='border'], div[class*='rounded'], div[class*='bg-white'], div[class*='p-']") || titleEl.parentElement;
-        if (!card || card.dataset.aiLinkBound) return;
-        card.dataset.aiLinkBound = "1";
-
-        const trapTitle = titleEl.textContent.trim();
-        const lines = Array.from(card.querySelectorAll("div, p"))
-          .map(x => (x.textContent || "").trim())
-          .filter(t => t && t !== trapTitle && !/^Mark Trap Mastered$/i.test(t) && !/^Ask AI Doubt Doctor/i.test(t));
-        const uniqueLines = Array.from(new Set(lines)).slice(0, 3).join("\n");
-
-        const linkBtn = document.createElement("button");
-        linkBtn.type = "button";
-        linkBtn.className = "mt-3 inline-flex items-center gap-1 text-xs font-extrabold text-indigo-600 hover:text-indigo-500 cursor-pointer";
-        linkBtn.innerHTML = "&#9889; Ask AI Doubt Doctor About This Trap &rarr;";
-        linkBtn.onclick = (e) => window.askAiAboutTrapCard(trapTitle, uniqueLines, e);
-        card.appendChild(linkBtn);
-      });
-    }
-  };
-
-  setInterval(window.mountTab6AiDoubtBox, 450);
 })();
