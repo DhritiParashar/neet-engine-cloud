@@ -227,9 +227,8 @@
     const container = navBtns[0].parentElement;
     if (!container) return;
 
-    const activeBtn = navBtns.find(b => b.className && (b.className.includes("bg-indigo-600") || b.className.includes("bg-emerald-600")));
-    const detectedNum = activeBtn ? Number((activeBtn.textContent.trim().match(/^([1-7])\./) || [0, 1])[1]) : Number(window._JN_ACTIVE_TAB || 1);
-    const isTrapView = !!document.getElementById('jn-ai-doubts-card'); const curNum = isTrapView ? 6 : Number(window._JN_ACTIVE_TAB || detectedNum || 1);
+    const isTrapView = !!document.getElementById("jn-ai-doubts-card");
+    const curNum = isTrapView ? 6 : Number(window._ACTIVE_SCI_TAB || window._JN_ACTIVE_TAB || 1);
 
     const isNeet = PORTAL === "NEET";
     const activeCls = isNeet ? "bg-emerald-600 text-white shadow-sm" : "bg-indigo-600 text-white shadow-sm";
@@ -246,6 +245,7 @@
 
   window.selectJeeNeetTab = function (tabNum) {
     const n = Number(tabNum);
+    window._ACTIVE_SCI_TAB = n;
     window._JN_ACTIVE_TAB = n;
     window.ACTIVE_TAB = n;
     window.scrollTo(0, 0);

@@ -1750,7 +1750,7 @@ ${!window._CBT_SUBMITTED ? `        <div class="grid grid-cols-1 lg:grid-cols-12
       const quotaEff = Math.min(720, eff + catBonus);
 
       let air = "AIR > 22,00,000", tier = "Below Qualifying Cutoff (NCERT Bio 340+ Rebuild Needed)";
-      if (eff <= 0) { air = "AIR > 23,50,000"; tier = "0 Marks — Attempt Mock in Tab 4 or Raise Target Sliders"; }
+      if (eff <= 0) { air = "AIR > 23,50,000"; tier = isTargetMode ? "0 Marks — Raise Target Sliders" : "Below NTA Qualifying Cutoff — Negative-Marking Rebuild"; }
       else if (eff >= 705) { air = "AIR 1 – 150"; tier = "AIIMS New Delhi / MAMC / VMMC Delhi"; }
       else if (eff >= 685) { air = "AIR 400 – 1,800"; tier = "Top AIIMS (Bhopal, Jodhpur, Rishikesh) & JIPMER"; }
       else if (eff >= 660) { air = "AIR 2,800 – 6,500"; tier = "Premier State Govt Medical Colleges (AIQ)"; }
@@ -1938,17 +1938,7 @@ ${!window._CBT_SUBMITTED ? `        <div class="grid grid-cols-1 lg:grid-cols-12
               </div>
             `).join("")}
 
-<div id="t6-target-action-bar" style="display:flex;gap:8px;align-items:center;padding-top:6px;">
-              <button id="t6-set-target-btn" type="button" onclick="window.commitCurrentAsTarget();"
-                style="flex:1;background:#4f46e5;color:#ffffff;border:none;border-radius:12px;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer;">
-                &#127919; Set Target (Lock ${IS_JEE ? (window._T6_JEE.p + window._T6_JEE.c + window._T6_JEE.m) + "/300" : (window._T6_NEET.p + window._T6_NEET.c + window._T6_NEET.b + window._T6_NEET.z) + "/720"})
-              </button>
-              <button type="button" onclick="window.resetDesiredTargetToDefault();"
-                style="background:#f1f5f9;color:#1e293b;border:1px solid #cbd5e1;border-radius:12px;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer;">
-                Reset Target
-              </button>
-            </div>
-            <div class="grid grid-cols-2 gap-3 pt-1 text-xs">
+<div class="grid grid-cols-2 gap-3 pt-1 text-xs">
               <div>
                 <label class="block font-extrabold text-slate-600 mb-1">${IS_JEE ? "NTA Shift Normalization" : "Paper Difficulty Level"}</label>
                 <select onchange="if(${IS_JEE}){ window._T6_JEE.shift=this.value; } else { window._T6_NEET.diff=this.value; } window.updateScienceTab6();" class="w-full rounded-xl border border-slate-300 px-3 py-2 font-bold">

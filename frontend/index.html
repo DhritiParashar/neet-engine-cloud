@@ -280,7 +280,7 @@ window.IPM_MANIFEST = {
 
     let telemetry = CFG.defaultTel;
     if (latest && Number(latest.maxScore) === 720) {
-      const sc = Number(latest.effScore !== undefined ? latest.effScore : latest.totalScore || 0);
+      const sc = Number(latest.totalScore !== undefined ? latest.totalScore : (latest.effScore || 0));
       telemetry = `Mocks: ${hist.length} &bull; Latest: ${sc}/720`;
     } else if (user && user.targetScore) {
       telemetry = `Target: ${user.targetScore} &bull; Mocks: 0`;
