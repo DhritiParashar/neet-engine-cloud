@@ -37,14 +37,14 @@
 
     const prefixBase = `${p}-${track}-`;
     let priorCount = 0;
-    const histKeys = ["ipm_mock_history_v1", "jee_mock_history_v1", "neet_mock_history_v1"];
+    const histKeys = ["goalisb_neet_full_mock_ledger_v1", "goalisb_jee_full_mock_ledger_v1", "ipm_mock_history_v1"];
     for (const k of histKeys) {
       try {
         const arr = JSON.parse(localStorage.getItem(k) || "[]");
         if (Array.isArray(arr)) {
           priorCount += arr.filter(h => {
             if (!h) return false;
-            const sid = String(h.serialId || "");
+            const sid = String(h.serialId || h.sessionId || "");
             if (sid.startsWith(prefixBase)) return true;
             if (!isPractice && Number(h.score || 0) > 0 && !sid.includes("PRAC-")) {
               if (p === "JEE" && track.startsWith("ADV")) return /adv/i.test(String(h.blueprint || sid));

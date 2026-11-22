@@ -1118,7 +1118,7 @@ ${!window._CBT_SUBMITTED ? `        <div class="grid grid-cols-1 lg:grid-cols-12
               }).join("")}
             </div>
           </div>
-        </div>` : ""}` : ""}
+        </div>` : ""}
         ${ledgerHtml}
       </div>`;
   };
