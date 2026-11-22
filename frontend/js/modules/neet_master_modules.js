@@ -1070,7 +1070,7 @@
             </div>
           </div>` : ""}
 
-        ${!window._CBT_SUBMITTED ? `<div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+${!window._CBT_SUBMITTED ? `        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-8 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
               <div><span class="text-xs font-extrabold uppercase text-${accent}-600">Question ${qIdx + 1} of ${totalQs} &bull; ${q.mock_subj} &bull; ${q.mock_sec}</span><div class="text-[11px] text-slate-500">Code: ${q.question_code} &bull; Tier: ${q.difficulty_tier || "STANDARD"} &bull; ${q.chapter_name}</div></div>
@@ -1118,7 +1118,7 @@
               }).join("")}
             </div>
           </div>
-        </div>` : ""}
+        </div>` : ""}` : ""}
         ${ledgerHtml}
       </div>`;
   };
@@ -1442,7 +1442,7 @@
             </div>` : "";
         })() : ""}
 
-        ${!window._CBT_SUBMITTED ? `<div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-8 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
               <div><span class="text-xs font-extrabold uppercase text-${accent}-600">Question ${qIdx + 1} of ${totalQs} &bull; ${q.mock_subj} &bull; ${q.mock_sec}</span><div class="text-[11px] text-slate-500">Code: ${q.question_code} &bull; ${q.chapter_name}</div></div>
