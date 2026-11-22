@@ -1991,6 +1991,13 @@ ${!window._CBT_SUBMITTED ? `        <div class="grid grid-cols-1 lg:grid-cols-12
         </div>
       </div>
     `;
+    // Force browser range-input thumbs to match exact synced/target numeric values
+    rows.forEach(([, key, val]) => {
+      const rEl = document.getElementById("t6-rng-" + key);
+      const nEl = document.getElementById("t6-num-" + key);
+      if (rEl) rEl.value = String(val);
+      if (nEl) nEl.value = String(val);
+    });
     window.updateScienceTab6();
   };
 
